@@ -15,6 +15,8 @@
 
 
 # stringify
+#### eventually need to find other solution because deparse
+#### is for internal use only and not in the R API
 stringify <- deparse
 # whatchu know 'bout that point-free style?
 

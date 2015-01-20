@@ -19,7 +19,4 @@ Suggests:
     knitr,
     testthat,
     magrittr
-Enhances: 
-    dplyr,
-    magrittr
 VignetteBuilder: knitr
