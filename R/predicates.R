@@ -41,6 +41,8 @@
 #' not_na(NA)
 #' not_na(2.8)
 #' not_na("tree")
+#'
+#' @export
 not_na <- function(x, allow.NaN=FALSE){
   if(length(x)>1)            stop("not_na must be called with single element")
   if(is.null(x))             stop("not_na must be called with single element")
