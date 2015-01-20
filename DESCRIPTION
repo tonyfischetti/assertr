@@ -1,14 +1,26 @@
 Package: assertr
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1
-Date: 2015-01-20
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Title: Assertive Programming For R Analysis Pipelines
+Version: 0.0.0.9000
+Authors@R: person("Tony", "Fischetti", email="tony.fischetti@gmail.com",
+  role = c("aut", "cre"))
+Maintainer: Tony Fischetti <tony.fischetti@gmail.com>
+Description: Provides functionality to assert conditions
+    that have to be met so that errors in data used in
+    analysis pipelines can fail quickly. Similar to
+    'stopifnot()' but more powerful, friendly, and easier
+    for use in pipelines.
+URL: https://github.com/tonyfischetti/assertr
+BugReports: https://github.com/tonyfischetti/assertr/issues
+License: MIT + file LICENSE
 LazyData: TRUE
 Imports: 
     Rcpp (>= 0.11.3)
+Suggests: 
+    dplyr,
+    magrittr
+Enhances: 
+    dplyr,
+    magrittr
 LinkingTo: 
     Rcpp
