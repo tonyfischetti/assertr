@@ -25,10 +25,30 @@
 
 
 # PREDICATES (for vectors)
-not_na <- function(x){
-  if(is.na(x))
-    return(FALSE)
+
+#' Returns TRUE if element is not NA
+#'
+#' This is the inverse of \code{\link[base]{is.na}} if it is
+#' used on a atomic element. This is a convenience function meant
+#' to be used as a predicate in an \code{\link{assertr}} assertion.
+#'
+#' @param x A single atomic value
+#' @param allow.NaN A logical indicating whether NaNs should be allowed
+#'        (default FALSE)
+#' @return TRUE if x is not NA, FALSE otherwise
+#' @seealso \code{\link{is.na}}
+#' @examples
+#' not_na(NA)
+#' not_na(2.8)
+#' not_na("tree")
+not_na <- function(x, allow.NaN=FALSE){
+  if(length(x)>1)            stop("not_na must be called with single element")
+  if(is.null(x))             stop("not_na must be called with single element")
+  if(allow.NaN && is.nan(x)) return(TRUE)
+  if(is.na(x))               return(FALSE)
+  return(TRUE)
 }
+
 
 # dummy
 divby5 <- function(x){

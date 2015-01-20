@@ -18,9 +18,12 @@ Imports:
     Rcpp (>= 0.11.3)
 Suggests: 
     dplyr,
+    knitr,
+    testthat,
     magrittr
 Enhances: 
     dplyr,
     magrittr
 LinkingTo: 
     Rcpp
+VignetteBuilder: knitr
