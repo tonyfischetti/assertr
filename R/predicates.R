@@ -44,13 +44,7 @@ not_na <- function(x, allow.NaN=FALSE){
 
 
 
-# Inf
-# within_bound("fds", 2)
-# within_nound(3,3)(2.4)
-# within_nound(3,2)(2.4)
-# within_nound(2,3)(2.4)
-# within_nound(2,3)(5)
-# within_nound(2,3)("43")
+
 
 
 #' Creates bounds checking predicate
@@ -113,6 +107,10 @@ within_bounds <- function(lower.bound, upper.bound,
     if(length(x)>1)      stop("bounds must be checked on a single element")
     if(is.null(x))       stop("bounds must be checked on a single element")
     if(!is.numeric(x))   stop("bounds must only be checked on numerics")
+    if(is.na(x)){
+      if(allow.NA)    return(TRUE)
+      if(!allow.NA)   return(FALSE)
+    }
     lower.operator <- `>=`
     if(!include.lower) lower.operator <- `>`
     upper.operator <- `<=`
