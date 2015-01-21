@@ -55,7 +55,7 @@ assert_vector <- function(the.frame, column, predicate){
   full.predicate <- make.predicate.proper(predicate)
   log.vect <- vapply(the.vector, full.predicate, logical(1))
   violations <- which(!(log.vect))
-  if(sum(violations)){
+  if(length(violations)){
     first.violation <- violations[1]
     offending.element <- the.vector[first.violation]
     error.message <- make.error.message(name.of.predicate, first.violation,
@@ -64,10 +64,10 @@ assert_vector <- function(the.frame, column, predicate){
   }
   return(the.frame)
 }
+# REWRITE THIS SO IT STOPS AT THE FIRST VIOLATION
 
 
-
-
+#' @export
 assert <- assert_vector
 
 
