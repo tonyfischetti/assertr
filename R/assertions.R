@@ -16,15 +16,9 @@
 
 
 
-# assert
-## checks arity
-## calls delagate functions
+# assert just returns what it's given
 
 
-# assert_frame
-#    example (has_rows)
-
-# check if column exists
 
 #############################################################################
 ### assert_vector(data.frame, column_from_data.frame, predicate_function) ###
@@ -32,6 +26,24 @@
 # uses predicate provided on every element of a vector
 # and either errors out (with helpful message)
 # or returns the data.frame it was called with
+
+#' Returns TRUE if element is not NA
+#'
+#' This is the inverse of \code{\link[base]{is.na}} if it is
+#' used on a atomic element. This is a convenience function meant
+#' to be used as a predicate in an \code{\link{assertr}} assertion.
+#'
+#' @param x A single atomic value
+#' @param allow.NaN A logical indicating whether NaNs should be allowed
+#'        (default FALSE)
+#' @return TRUE if x is not NA, FALSE otherwise
+#' @seealso \code{\link{is.na}}
+#' @examples
+#' not_na(NA)
+#' not_na(2.8)
+#' not_na("tree")
+#'
+#' @export
 assert_vector <- function(the.frame, column, predicate){
   name.of.column <- stringify(substitute(column))
   if(!(name.of.column %in% names(the.frame))){
@@ -52,6 +64,8 @@ assert_vector <- function(the.frame, column, predicate){
   }
   return(the.frame)
 }
+
+
 
 
 assert <- assert_vector

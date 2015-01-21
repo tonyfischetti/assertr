@@ -13,16 +13,6 @@
 
 
 
-# assert
-## checks arity
-## calls delagate functions
-
-
-# assert_frame
-#    example (has_rows)
-
-# assert_vector
-
 
 # PREDICATES (for vectors)
 
@@ -52,6 +42,91 @@ not_na <- function(x, allow.NaN=FALSE){
 }
 
 
+
+
+# Inf
+# within_bound("fds", 2)
+# within_nound(3,3)(2.4)
+# within_nound(3,2)(2.4)
+# within_nound(2,3)(2.4)
+# within_nound(2,3)(5)
+# within_nound(2,3)("43")
+
+
+#' Creates bounds checking predicate
+#'
+#' This function returns a predicate function that will take a single
+#' numeric value and return TRUE if the value is within the bounds set.
+#' This does not actually check the bounds of anything--it only returns
+#' a function that actually does the checking when called with a number.
+#' This is a convenience function meant to return a predicate function to
+#' be used in an \code{\link{assertr}} assertion.
+#'
+#' @param lower.bound The lowest permitted value
+#' @param upper.bound The upper permitted value
+#' @param include.lower A logical indicating whether lower bound
+#'        should be inclusive (default TRUE)
+#' @param include.upper A logical indicating whether upprt bound
+#'        should be inclusive (default TRUE)
+#' @param allow.NA A logical indicating whether NAs (including NaNs)
+#'        should be permitted (default TRUE)
+#'
+#' @return A function that takes one numeric and returns TRUE
+#'         if the value is within the bounds defined by the
+#'         arguments supplied by \code{within_bounds} and FALSE
+#'         otherwise
+#'
+#' @examples
+#' predicate <- within_bounds(3,4)
+#' predicate(pi)
+#'
+#' ## is equivalent to
+#'
+#' within_bounds(3,4)(pi)
+#'
+#' # a correlation coefficient must always be between 0 and 1
+#' coeff <- cor.test(c(1,2,3), c(.5, 2.4, 4))[["estimate"]]
+#' within_bounds(0,1)(coeff)
+#'
+#' ## check for positive number
+#' positivep <- within_bounds(0, Inf, include.lower=FALSE)
+#'
+#' ## this is meant to be used as a predicate in an assert statement
+#' assert(mtcars, cyl, within_bounds(4,8))
+#'
+#' ## or in a pipeline, like this was meant for
+#'
+#' library(magrittr)
+#'
+#' mtcars %>%
+#'   assert(cyl, within_bounds(4,8))
+#'
+#' @export
+within_bounds <- function(lower.bound, upper.bound,
+                          include.lower=TRUE, include.upper=TRUE,
+                          allow.NA=TRUE){
+  if(!(is.numeric(lower.bound) && is.numeric(upper.bound)))
+    stop("bounds must be numeric")
+  if(lower.bound >= upper.bound)
+    stop("lower bound must be strictly lower than upper bound")
+  function(x){
+    if(length(x)>1)      stop("bounds must be checked on a single element")
+    if(is.null(x))       stop("bounds must be checked on a single element")
+    if(!is.numeric(x))   stop("bounds must only be checked on numerics")
+    lower.operator <- `>=`
+    if(!include.lower) lower.operator <- `>`
+    upper.operator <- `<=`
+    if(!include.upper) upper.operator <- `<`
+    if(lower.operator(x, lower.bound) && upper.operator(x, upper.bound))
+      return(TRUE)
+    return(FALSE)
+  }
+
+}
+# so, this function returns a function to be used as argument to another
+# function
+
+
 # dummy
 divby5 <- function(x){
   if(x %% 5 != 0)
@@ -60,70 +135,3 @@ divby5 <- function(x){
 
 
 
-
-
-# # assert predicate
-# # this function takes a dataframe, a column,
-# # and a predicate
-# # if the predicate holds true for every element
-# # of the vector, this function passes and just returns the
-# # data frame that was passed to it (for later use in pipeline)
-# # if it fails, it'll tell you the first element for which it failed
-# # and stop execution
-# #
-# # the predicate can be any function that returns FALSE
-# # when an undesirable/unallowable event/condition is met
-# # there is no need to explicitly return TRUE
-# assertP <- function(aframe, column, predicate){
-#   davector <- aframe[[column]]
-#   # to help out the user, we only require
-#   # that the predicate returns FALSE when something
-#   # bad happens. because of this, we need to wrap that
-#   # function in another one that explicitly returns TRUE
-#   # if there is no return value (for acceptable elements)
-#   anotherpred <- function(x){
-#     if(length(predicate(x))==0){
-#       return(TRUE)
-#     }
-#     if(predicate(x)==FALSE){
-#       return(FALSE)
-#     }
-#     return(TRUE)
-#   }
-#   # retlog <- sapply(davector, predicate)
-#   retlog <- sapply(davector, anotherpred)
-#   viol <- which(!(retlog))
-#   if(sum(viol)){
-#     firstviol <- viol[1]
-#     stop(paste0("Assertion violated at index ",
-#                firstviol, " (", davector[firstviol], ")"), call.=FALSE)
-#   }
-#   return(aframe)
-# }
-#
-#
-#
-# read.csv("./test.csv", stringsAsFactors=FALSE,
-#                  colClasses=c("character",
-#                               "numeric",
-#                               "numeric")) %>%
-#   assertP("height", function(x){!is.na(x)}) %>%
-#   assertP("height", notna) %>%
-#   assertP("height", function(x){if(x%%5!=0){return(FALSE)}}) %>%
-#   assertP("height", divby5) %>%
-#   filter(condition=="B")
-#
-#
-#
-#
-#
-#
-# # assertv(this, "height", function(x){!is.na(x)})
-#
-# # make function for
-# # notna()
-# # between(numeric, numeric)
-# #    that returns a function (predicate)
-# #    stock predicated
-# # lambda functions that only return FALSE if not true
-#
