@@ -19,20 +19,27 @@ test_that("not_na handles NaNs right", {
 })
 
 test_that("not_na errors out when appropriate", {
-  expect_error(not_na(c(1,2)),       "not_na must be called with single element")
-  expect_error(not_na(diag(c(1,2))), "not_na must be called with single element")
-  expect_error(not_na(c()),          "not_na must be called with single element")
-  expect_error(not_na(),             "argument \"x\" is missing, with no default")
+  expect_error(not_na(c(1,2)),
+               "not_na must be called with single element")
+  expect_error(not_na(diag(c(1,2))),
+               "not_na must be called with single element")
+  expect_error(not_na(c()),
+               "not_na must be called with single element")
+  expect_error(not_na(),
+               "argument \"x\" is missing, with no default")
 })
 ######################################
 
 
 ########### within_bounds ###########
 test_that("within_bounds fails appropriately", {
-  expect_error(within_bounds(), "argument \"lower.bound\" is missing, with no default")
+  expect_error(within_bounds(),
+               "argument \"lower.bound\" is missing, with no default")
   expect_error(within_bounds(1, "tree"), "bounds must be numeric")
-  expect_error(within_bounds(2, 1), "lower bound must be strictly lower than upper bound")
-  expect_error(within_bounds(2, 2), "lower bound must be strictly lower than upper bound")
+  expect_error(within_bounds(2, 1),
+               "lower bound must be strictly lower than upper bound")
+  expect_error(within_bounds(2, 2),
+               "lower bound must be strictly lower than upper bound")
 })
 
 test_that("returned predicate works appropriately", {
@@ -52,9 +59,13 @@ test_that("returned predicate works appropriately", {
 })
 
 test_that("returned predicate fails appropriately", {
-  expect_error(within_bounds(0,1)(), "argument \"x\" is missing, with no default")
-  expect_error(within_bounds(0,1)("tree"), "bounds must only be checked on numerics")
-  expect_error(within_bounds(0,1)(c(1,2)), "bounds must be checked on a single element")
-  expect_error(within_bounds(0,1)(c()), "bounds must be checked on a single element")
+  expect_error(within_bounds(0,1)(),
+               "argument \"x\" is missing, with no default")
+  expect_error(within_bounds(0,1)("tree"),
+               "bounds must only be checked on numerics")
+  expect_error(within_bounds(0,1)(c(1,2)),
+               "bounds must be checked on a single element")
+  expect_error(within_bounds(0,1)(c()),
+               "bounds must be checked on a single element")
 })
 #####################################

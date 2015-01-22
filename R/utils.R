@@ -14,13 +14,6 @@
 
 
 
-# stringify
-#### eventually need to find other solution because deparse
-#### is for internal use only and not in the R API
-stringify <- deparse
-# whatchu know 'bout that point-free style?
-
-
 # for error messages, it's useful if the function
 # name can be used (so the useR can tell what)
 # predicate function failed. The problem is,

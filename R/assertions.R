@@ -82,9 +82,6 @@ assert <- function(the.frame, column, predicate){
 #'
 #' @param data A data frame, list, or environment
 #' @param expr A logical expression
-#' @param character.only a logical indicating whether attributes
-#'        from \code{data} in \code{expr} can be assumed to be
-#'        character strings (default FALSE)
 #'
 #' @return data if verification passes. errors if not
 #' @note See \code{vignette("assertr")} for how to use this in context
@@ -92,32 +89,34 @@ assert <- function(the.frame, column, predicate){
 #' @examples
 #'
 #' verify(mtcars, drat > 2)     # returns mtcars
-#' verify(mtcars, drat > 3)     # produces error
+#' \dontrun{
+#' verify(mtcars, drat > 3)     # produces error}
+#'
 #'
 #' library(magrittr)            # for piping operator
 #'
+#' \dontrun{
 #' mtcars %>%
 #'   verify(drat > 3) %>%
-#'   # anything here will not run
+#'   # anything here will not run}
 #'
 #' mtcars %>%
-#'  verify(nrow(mtcars)>2)
-#'  # nothing here will run
+#'  verify(nrow(mtcars) > 2)
+#'  # anything here will run
 #'
 #' alist <- list(a=c(1,2,3), b=c(4,5,6))
 #' verify(alist, length(a) > 2)
 #' verify(alist, length(a) > 2 && length(b) > 2)
 #' verify(alist, a > 0 & b > 2)
 #'
+#' \dontrun{
 #' alist %>%
 #'   verify(alist, length(a) > 5)
-#'   # nothing here will run
 #'
 #'
 #' @export
-verify <- function(data, expr, character.only=FALSE){
-  if(!character.only)
-    expr <- substitute(expr)
+verify <- function(data, expr){
+  expr <- substitute(expr)
   # conform to terminology from subset
   envir <- data
   enclos <- parent.frame()

@@ -4,16 +4,12 @@
 \alias{verify}
 \title{Raises error if expression is FALSE anywhere}
 \usage{
-verify(data, expr, character.only = FALSE)
+verify(data, expr)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}
 
 \item{expr}{A logical expression}
-
-\item{character.only}{a logical indicating whether attributes
-       from \code{data} in \code{expr} can be assumed to be
-       character strings (default FALSE)}
 }
 \value{
 data if verification passes. errors if not
@@ -30,26 +26,30 @@ See \code{vignette("assertr")} for how to use this in context
 }
 \examples{
 verify(mtcars, drat > 2)     # returns mtcars
-verify(mtcars, drat > 3)     # produces error
+\dontrun{
+verify(mtcars, drat > 3)     # produces error}
+
 
 library(magrittr)            # for piping operator
 
+\dontrun{
 mtcars \%>\%
   verify(drat > 3) \%>\%
-  # anything here will not run
+  # anything here will not run}
 
 mtcars \%>\%
- verify(nrow(mtcars)>2)
- # nothing here will run
+ verify(nrow(mtcars) > 2)
+ # anything here will run
 
 alist <- list(a=c(1,2,3), b=c(4,5,6))
 verify(alist, length(a) > 2)
 verify(alist, length(a) > 2 && length(b) > 2)
 verify(alist, a > 0 & b > 2)
 
+\dontrun{
 alist \%>\%
   verify(alist, length(a) > 5)
-  # nothing here will run
+  # nothing here will run}
 }
 \seealso{
 \code{\link{assert}}
