@@ -2,6 +2,7 @@ packrat/lib*/
 .Rhistory
 .DS_Store
 .Rproj.user
+.Rproj
 inst/doc
 
 # Object files
