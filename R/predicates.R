@@ -42,11 +42,6 @@ not_na <- function(x, allow.NaN=FALSE){
 }
 
 
-
-
-
-
-
 #' Creates bounds checking predicate
 #'
 #' This function returns a predicate function that will take a single
