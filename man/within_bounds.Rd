@@ -5,7 +5,7 @@
 \title{Creates bounds checking predicate}
 \usage{
 within_bounds(lower.bound, upper.bound, include.lower = TRUE,
-  include.upper = TRUE, allow.NA = TRUE)
+  include.upper = TRUE, allow.na = TRUE)
 }
 \arguments{
 \item{lower.bound}{The lowest permitted value}
@@ -18,7 +18,7 @@ should be inclusive (default TRUE)}
 \item{include.upper}{A logical indicating whether upprt bound
 should be inclusive (default TRUE)}
 
-\item{allow.NA}{A logical indicating whether NAs (including NaNs)
+\item{allow.na}{A logical indicating whether NAs (including NaNs)
        should be permitted (default TRUE)}
 }
 \value{
@@ -51,13 +51,13 @@ within_bounds(0,1)(coeff)
 positivep <- within_bounds(0, Inf, include.lower=FALSE)
 
 ## this is meant to be used as a predicate in an assert statement
-assert(mtcars, cyl, within_bounds(4,8))
+assert(mtcars, within_bounds(4,8), cyl)
 
 ## or in a pipeline, like this was meant for
 
 library(magrittr)
 
 mtcars \%>\%
-  assert(cyl, within_bounds(4,8))
+  assert(within_bounds(4,8), cyl)
 }
 

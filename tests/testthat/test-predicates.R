@@ -50,7 +50,7 @@ test_that("returned predicate works appropriately", {
   expect_equal(within_bounds(3, 4, include.upper=FALSE)(4), FALSE)
   expect_equal(within_bounds(3, 4)(10), FALSE)
   expect_equal(within_bounds(3, 4)(as.numeric(NA)), TRUE)
-  expect_equal(within_bounds(3, 4, allow.NA=FALSE)(as.numeric(NA)), FALSE)
+  expect_equal(within_bounds(3, 4, allow.na=FALSE)(as.numeric(NA)), FALSE)
   expect_equal(within_bounds(0, Inf)(0), TRUE)
   expect_equal(within_bounds(0, Inf, include.lower=FALSE)(0), FALSE)
   expect_equal(within_bounds(0, Inf)(10), TRUE)
@@ -69,3 +69,34 @@ test_that("returned predicate fails appropriately", {
                "bounds must be checked on a single element")
 })
 #####################################
+
+
+############### in_set ###############
+test_that("in_set fails appropriately", {
+  expect_error(in_set(),
+               "can not test for membership in empty set")
+  expect_error(in_set(,allow.na=FALSE),
+               "argument is missing, with no default")
+})
+
+test_that("returned predicate works appropriately", {
+  expect_equal(in_set(3, 4)(pi), FALSE)
+  expect_equal(in_set(3, 4)(4), TRUE)
+  expect_equal(in_set(1:10)(2), TRUE)
+  expect_equal(in_set(1:10)(11), FALSE)
+  expect_equal(in_set(1:10)(NA), TRUE)
+  expect_equal(in_set(1:10, allow.na = TRUE)(NA), TRUE)
+  expect_equal(in_set(1:10, allow.na = FALSE)(NA), FALSE)
+  expect_equal(in_set(1, "tree")("tree"), TRUE)
+  expect_equal(in_set(1, "tree")("leaf"), FALSE)
+})
+
+test_that("returned predicate fails appropriately", {
+  expect_error(in_set(0,1)(),
+               "argument \"x\" is missing, with no default")
+  expect_error(in_set(0,1)(c(1,2)),
+               "bounds must be checked on a single element")
+  expect_error(in_set(0,1)(c()),
+               "bounds must be checked on a single element")
+})
+######################################

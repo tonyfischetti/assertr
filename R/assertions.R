@@ -1,75 +1,65 @@
 
-###########################################################
-##                                                       ##
-##   assertions.R                                        ##
-##                                                       ##
-##      provides different assertion functions for       ##
-##      different use cases and one master assert()      ##
-##      function that delegates which specific one       ##
-##      to use                                           ##
-##                                                       ##
-##                                                       ##
-##                Author: Tony Fischetti                 ##
-##                        tony.fischetti@gmail.com       ##
-##                                                       ##
-###########################################################
+##
+##  provides different assertion functions
+##
 
 
-
-# assert just returns what it's given
-
-
-
-#############################################################################
-### assert(data.frame, column_from_data.frame, predicate_function) ###
-#############################################################################
-# uses predicate provided on every element of a vector
-# and either errors out (with helpful message)
-# or returns the data.frame it was called with
-
-#' Returns TRUE if element is not NA
+#' Raises error if predicate is FALSE in any columns selected
 #'
-#' This is the inverse of \code{\link[base]{is.na}} if it is
-#' used on a atomic element. This is a convenience function meant
-#' to be used as a predicate in an \code{\link{assertr}} assertion.
+#' Meant for use in a data analysis pipeline, this function will
+#' just return the data it's supplied if there are no FALSEs
+#' when the predicate is applied to every element of the columns
+#' indicated. If any element in any of the columns, when applied
+#' to the predicate, is FALSE, then this function will raise an
+#' error, effectively terminating the pipeline early.
 #'
-#' @param x A single atomic value
-#' @param allow.NaN A logical indicating whether NaNs should be allowed
-#'        (default FALSE)
-#' @return TRUE if x is not NA, FALSE otherwise
-#' @seealso \code{\link{is.na}}
+#' @param data A data frame
+#' @param predicate A function that returns FALSE when violated
+#' @param ... Comma separated list of unquoted expressions.
+#'            You can treat variable names like they are positions.
+#'            Use positive values to select variables; use negative
+#'            values to drop variables.
+#'
+#' @return data if predicate assertion is TRUE passes. error if not.
+#' @note See \code{vignette("assertr")} for how to use this in context
+#' @seealso \code{\link{verify}}
 #' @examples
-#' not_na(NA)
-#' not_na(2.8)
-#' not_na("tree")
+#'
+#' assert(mtcars, not_na, vs)           # returns mtcars
+#'
+#' assert(mtcars, not_na, mpg:carb)     # return mtcars
+#'
+#' library(magrittr)                    # for piping operator
+#'
+#' mtcars %>%
+#'   assert(in_set(c(0,1)), vs)
+#'   # anything here will run
+#'
+#' \dontrun{
+#' mtcars %>%
+#'   assert(in_set(c(1, 2, 3, 4, 6)), carb)
+#'   # the assertion is untrue so
+#'   # nothing here will run}
 #'
 #' @export
-assert <- function(the.frame, column, predicate){
-  #assert <- function(data, attrbs, predicate,
-  name.of.column <- deparse(substitute(column))
-  if(!(name.of.column %in% names(the.frame))){
-    stop(paste0("column '", name.of.column, "' not in data.frame '",
-                stringify(substitute(the.frame)), "'"))
-  }
-  name.of.predicate <- get.name.of.function(deparse(substitute(predicate)))
-  the.vector <- the.frame[[name.of.column]]
+assert <- function(data, predicate, ...){
+  sub.frame <- dplyr::select(data, ...)
+  name.of.predicate <- as.character(substitute(predicate))
+  if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
   full.predicate <- make.predicate.proper(predicate)
-  log.vect <- vapply(the.vector, full.predicate, logical(1))
-  violations <- which(!(log.vect))
-  if(length(violations)){
-    first.violation <- violations[1]
-    offending.element <- the.vector[first.violation]
-    error.message <- make.error.message(name.of.predicate, first.violation,
-                                        name.of.column, offending.element)
-    stop(error.message, call.=FALSE)
-  }
-  return(the.frame)
+  # ew! we have to use loops because we should stop
+  # at the first violation and we need the index
+  vapply(names(sub.frame),
+         function(column){
+           this.vector <- sub.frame[[column]]
+           for(i in 1:length(this.vector)){
+             if(!(predicate(this.vector[i]))){
+               error.message <- make.error.message(name.of.predicate, i,
+                                                   column, this.vector[i])
+               stop(error.message, call.=FALSE)}}
+           return(TRUE)}, logical(1))
+  return(data)
 }
-# REWRITE THIS SO IT STOPS AT THE FIRST VIOLATION
-
-
-
-
 
 
 #' Raises error if expression is FALSE anywhere
@@ -83,7 +73,7 @@ assert <- function(the.frame, column, predicate){
 #' @param data A data frame, list, or environment
 #' @param expr A logical expression
 #'
-#' @return data if verification passes. errors if not
+#' @return data if verification passes. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{assert}}
 #' @examples
@@ -101,8 +91,8 @@ assert <- function(the.frame, column, predicate){
 #'   # anything here will not run}
 #'
 #' mtcars %>%
-#'  verify(nrow(mtcars) > 2)
-#'  # anything here will run
+#'   verify(nrow(mtcars) > 2)
+#'   # anything here will run
 #'
 #' alist <- list(a=c(1,2,3), b=c(4,5,6))
 #' verify(alist, length(a) > 2)
@@ -112,6 +102,7 @@ assert <- function(the.frame, column, predicate){
 #' \dontrun{
 #' alist %>%
 #'   verify(alist, length(a) > 5)
+#'   # nothing here will run}
 #'
 #'
 #' @export

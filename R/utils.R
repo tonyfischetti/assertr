@@ -1,17 +1,7 @@
 
-###########################################################
-##                                                       ##
-##   utils.R                                             ##
-##                                                       ##
-##      FILL OUT LATER                                   ##
-##                                                       ##
-##                                                       ##
-##                Author: Tony Fischetti                 ##
-##                        tony.fischetti@gmail.com       ##
-##                                                       ##
-###########################################################
-
-
+##
+## utility function that are not exported
+##
 
 
 # for error messages, it's useful if the function
@@ -40,11 +30,11 @@ make.predicate.proper <- function(improper.predicate){
     return(TRUE)
   }
 }
+# this is a closure
 # marvel at this function's dedication to the FP paradigm!
 
 
-
-# may need one for every strain of assertion functions
+# abstract out creation of error messages
 # so we can make it prettier in future versions
 make.error.message <- function(name.of.predicate,
                                index.of.first.violation,

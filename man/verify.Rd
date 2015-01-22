@@ -12,7 +12,7 @@ verify(data, expr)
 \item{expr}{A logical expression}
 }
 \value{
-data if verification passes. errors if not
+data if verification passes. error if not.
 }
 \description{
 Meant for use in a data analysis pipeline, this function will
@@ -38,8 +38,8 @@ mtcars \%>\%
   # anything here will not run}
 
 mtcars \%>\%
- verify(nrow(mtcars) > 2)
- # anything here will run
+  verify(nrow(mtcars) > 2)
+  # anything here will run
 
 alist <- list(a=c(1,2,3), b=c(4,5,6))
 verify(alist, length(a) > 2)

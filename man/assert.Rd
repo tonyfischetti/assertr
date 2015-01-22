@@ -2,30 +2,52 @@
 % Please edit documentation in R/assertions.R
 \name{assert}
 \alias{assert}
-\title{Returns TRUE if element is not NA}
+\title{Raises error if predicate is FALSE in any columns selected}
 \usage{
-assert(the.frame, column, predicate)
+assert(data, predicate, ...)
 }
 \arguments{
-\item{x}{A single atomic value}
+\item{data}{A data frame}
 
-\item{allow.NaN}{A logical indicating whether NaNs should be allowed
-(default FALSE)}
+\item{predicate}{A function that returns FALSE when violated}
+
+\item{...}{Comma separated list of unquoted expressions.
+           You can treat variable names like they are positions.
+           Use positive values to select variables; use negative
+           values to drop variables.}
 }
 \value{
-TRUE if x is not NA, FALSE otherwise
+data if predicate assertion is TRUE passes. error if not.
 }
 \description{
-This is the inverse of \code{\link[base]{is.na}} if it is
-used on a atomic element. This is a convenience function meant
-to be used as a predicate in an \code{\link{assertr}} assertion.
+Meant for use in a data analysis pipeline, this function will
+just return the data it's supplied if there are no FALSEs
+when the predicate is applied to every element of the columns
+indicated. If any element in any of the columns, when applied
+to the predicate, is FALSE, then this function will raise an
+error, effectively terminating the pipeline early.
+}
+\note{
+See \code{vignette("assertr")} for how to use this in context
 }
 \examples{
-not_na(NA)
-not_na(2.8)
-not_na("tree")
+assert(mtcars, not_na, vs)           # returns mtcars
+
+assert(mtcars, not_na, mpg:carb)     # return mtcars
+
+library(magrittr)                    # for piping operator
+
+mtcars \%>\%
+  assert(in_set(c(0,1)), vs)
+  # anything here will run
+
+\dontrun{
+mtcars \%>\%
+  assert(in_set(c(1, 2, 3, 4, 6)), carb)
+  # the assertion is untrue so
+  # nothing here will run}
 }
 \seealso{
-\code{\link{is.na}}
+\code{\link{verify}}
 }
 

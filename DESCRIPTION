@@ -14,8 +14,9 @@ URL: https://github.com/tonyfischetti/assertr
 BugReports: https://github.com/tonyfischetti/assertr/issues
 License: MIT + file LICENSE
 LazyData: TRUE
-Suggests: 
+Imports:
     dplyr,
+Suggests: 
     knitr,
     testthat,
     magrittr

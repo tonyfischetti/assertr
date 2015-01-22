@@ -2,7 +2,7 @@
 % Please edit documentation in R/predicates.R
 \name{not_na}
 \alias{not_na}
-\title{Returns TRUE if element is not NA}
+\title{Returns TRUE if value is not NA}
 \usage{
 not_na(x, allow.NaN = FALSE)
 }

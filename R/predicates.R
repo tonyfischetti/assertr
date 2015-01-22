@@ -1,22 +1,10 @@
 
-###########################################################
-##                                                       ##
-##   predicates.R                                        ##
-##                                                       ##
-##      defines some useful predicates for use with      ##
-##      assert functions in assertr                      ##
-##                                                       ##
-##                Author: Tony Fischetti                 ##
-##                        tony.fischetti@gmail.com       ##
-##                                                       ##
-###########################################################
+##
+##  defines some useful predicates for use with assert functions in assertr                      ##
+##
 
 
-
-
-# PREDICATES (for vectors)
-
-#' Returns TRUE if element is not NA
+#' Returns TRUE if value is not NA
 #'
 #' This is the inverse of \code{\link[base]{is.na}} if it is
 #' used on a atomic element. This is a convenience function meant
@@ -57,7 +45,7 @@ not_na <- function(x, allow.NaN=FALSE){
 #'        should be inclusive (default TRUE)
 #' @param include.upper A logical indicating whether upprt bound
 #'        should be inclusive (default TRUE)
-#' @param allow.NA A logical indicating whether NAs (including NaNs)
+#' @param allow.na A logical indicating whether NAs (including NaNs)
 #'        should be permitted (default TRUE)
 #'
 #' @return A function that takes one numeric and returns TRUE
@@ -81,19 +69,19 @@ not_na <- function(x, allow.NaN=FALSE){
 #' positivep <- within_bounds(0, Inf, include.lower=FALSE)
 #'
 #' ## this is meant to be used as a predicate in an assert statement
-#' assert(mtcars, cyl, within_bounds(4,8))
+#' assert(mtcars, within_bounds(4,8), cyl)
 #'
 #' ## or in a pipeline, like this was meant for
 #'
 #' library(magrittr)
 #'
 #' mtcars %>%
-#'   assert(cyl, within_bounds(4,8))
+#'   assert(within_bounds(4,8), cyl)
 #'
 #' @export
 within_bounds <- function(lower.bound, upper.bound,
                           include.lower=TRUE, include.upper=TRUE,
-                          allow.NA=TRUE){
+                          allow.na=TRUE){
   if(!(is.numeric(lower.bound) && is.numeric(upper.bound)))
     stop("bounds must be numeric")
   if(lower.bound >= upper.bound)
@@ -103,8 +91,8 @@ within_bounds <- function(lower.bound, upper.bound,
     if(is.null(x))       stop("bounds must be checked on a single element")
     if(!is.numeric(x))   stop("bounds must only be checked on numerics")
     if(is.na(x)){
-      if(allow.NA)    return(TRUE)
-      if(!allow.NA)   return(FALSE)
+      if(allow.na)    return(TRUE)
+      if(!allow.na)   return(FALSE)
     }
     lower.operator <- `>=`
     if(!include.lower) lower.operator <- `>`
@@ -114,17 +102,60 @@ within_bounds <- function(lower.bound, upper.bound,
       return(TRUE)
     return(FALSE)
   }
-
 }
 # so, this function returns a function to be used as argument to another
 # function
 
 
-# dummy
-divby5 <- function(x){
-  if(x %% 5 != 0)
+#' Returns TRUE if value in set
+#'
+#' This function returns a predicate function that will take a single
+#' value and return TRUE if the value is a member of the set of objects
+#' supplied. This doesn't actually check the membership of anything--it
+#' only returns a function that actually does the checking when called
+#' with a value. This is a convenience function meant to return a
+#' predicate function to be used in an \code{\link{assertr}} assertion.
+#'
+#' @param ... objects that make up the set
+#' @param allow.na A logical indicating whether NAs (including NaNs)
+#'        should be permitted (default TRUE)
+#' @return TRUE if x is in set, FALSE otherwise
+#' @seealso \code{\link{\%in\%}}
+#' @examples
+#' predicate <- in_set(3,4)
+#' predicate(4)
+#'
+#' ## is equivalent to
+#'
+#' in_set(3,4)(3)
+#'
+#' # the remainder of division by 2 is always 0 or 1
+#' rem <- 10 %% 2
+#' in_set(0,1)(rem)
+#'
+#' ## this is meant to be used as a predicate in an assert statement
+#' assert(mtcars, in_set(3,4,5), gear)
+#'
+#' ## or in a pipeline, like this was meant for
+#'
+#' library(magrittr)
+#'
+#' mtcars %>%
+#'   assert(in_set(3,4,5), gear) %>%
+#'   assert(in_set(0,1), vs, am)
+#'
+#' @export
+in_set <- function(..., allow.na=TRUE){
+  set <- c(...)
+  if(!length(set)) stop("can not test for membership in empty set")
+  function(x){
+    if(length(x)>1)      stop("bounds must be checked on a single element")
+    if(is.null(x))       stop("bounds must be checked on a single element")
+    if(x %in% set)
+      return(TRUE)
+    if(is.na(x))
+      if(allow.na)
+        return(TRUE)
     return(FALSE)
+  }
 }
-
-
-
