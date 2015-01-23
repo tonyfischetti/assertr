@@ -5,12 +5,12 @@ assertr
 
 [![Build Status](https://travis-ci.org/tonyfischetti/assertr.svg?branch=master)](https://travis-ci.org/tonyfischetti/assertr)
 
-#### What is it?
+### What is it?
 The assertr package supplies a suite of functions designed to verify
 assumptions about data early in an dplyr/magrittr analysis pipeline so that
 data errors are spotted early and can be addressed quickly.
 
-#### Installation
+### Installation
 
     install.packages("devtools")
     devtools::install_github("tonyfischetti/assertr")
@@ -18,7 +18,7 @@ data errors are spotted early and can be addressed quickly.
 I also plan to make this package available on CRAN, too, in the
 near future.
 
-#### What does it look like?
+### What does it look like?
 This package offers two assertion functions, `assert` and `verify`, that
 are designed to be used shortly after data-loading in a dplyr/magrittr
 pipeline...
@@ -47,7 +47,7 @@ This could be written using `assertr` like this:
 If any of these assertions were violated, an error would have been raised
 and the pipeline would have been terminated early.
 
-#### What does `assertr` give me?
+### What does `assertr` give me?
 
 - `verify` - takes a data frame (its first argument is provided by
 the `%>%` operator above), and a logical (boolean) expression. Then, `verify`
@@ -70,7 +70,7 @@ value falls within the bounds supplied, and
 - `in_set` - that returns a predicate function that checks if an element is
 a member of the set supplied.
 
-#### More info
+### More info
 
 For more info, check out the `assertr` vignette
 
