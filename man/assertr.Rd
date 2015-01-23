@@ -6,17 +6,21 @@
 \alias{assertr-package}
 \title{assertr: Assertive programming for R analysis pipeline.}
 \description{
-The assertr package does this and that. It does
-\itemize{
-  \item this
-  \item that
-}
+The assertr package supplies a suite of functions designed to verify
+assumptions about data early in an analysis pipeline.
 }
 \details{
 See the assertr vignette or the documentation for more information \cr
 > \code{vignette("assertr")}
 }
 \examples{
-example
+\dontrun{
+library(magrittr)     # for the piping operator
+
+mtcars \%>\%
+  verify(mpg > 0) \%>\%
+  assert(in_set(0,1), am, vs) \%>\%
+  assert(is.numeric, mpg:carb) \%>\%
+  # do something actually interesting here}
 }
 

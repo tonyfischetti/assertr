@@ -80,7 +80,7 @@ test_that("assert returns data if verification passes", {
 
 
 test_that("assert breaks appropriately", {
-  expect_error(assert(in_set(0,1 ), mtcars$vs),
+  expect_error(assert(in_set(0,1), mtcars$vs),
                "no applicable method for 'select_' applied to an object of class \"function\"")
   expect_error(assert("tree"),
                "no applicable method for 'select_' applied to an object of class \"character\"")

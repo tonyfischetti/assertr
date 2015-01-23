@@ -1,7 +1,7 @@
 ---
 title: "Assertive R Programming with assertr"
 author: "Tony Fischetti"
-date: "Jan 20, 2015"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Assertive R Programming with assertr}
@@ -9,55 +9,222 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+In data analysis workflows that depend on un-sanitized data sets from external
+sources, it’s very common that errors in data bring an analysis to a
+screeching halt. Oftentimes, these errors occur late in the analysis and
+provide no clear indication of which datum caused the error.
 
-## Vignette Info
+On occasion, the error resulting from bad data won’t even appear to be a
+data error at all. Still worse, errors in data will pass through analysis
+without error, remain undetected, and produce inaccurate results.
 
-Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+The solution to problem is to provide as much information as you can about
+how you expect data to look up front so that any deviation from this
+expectation can be dealt with immediately. This is what the assertr package
+tries to make dead simple.
 
-## Styles
+Essentially, assertr provides a suite of functions designed to verify
+assumptions about data early in an analysis pipeline. assertr is meant to be
+used with the piping constructs of the `magrittr` package and fits right in with
+the structure and data manipulation verbs of the `dplyr` package.
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+### concrete data errors
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+Let’s say, for example, that the R’s builtin car dataset, mtcars, was not 
+builtin but rather procured from a external source than was known for making
+errors in data entry or coding.
 
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+In particular, the mtcars dataset looks like this:
+```{r}
+head(mtcars)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+But let's pretend that the data we got accidentally negated the 5th mpg value:
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r}
+our.data <- mtcars
+our.data$mpg[5] <- our.data$mpg[5] * -1
+our.data[4:6,]
 ```
 
-Also a quote using `>`:
+Whoops!
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+If we wanted to find the average miles per gallon for each number of engine
+cylinders, we might do so like this:
 
-## Development
+```{r message=FALSE}
+library(dplyr)
 
-A development version of this package is available at: 
-[http://github.com/tonyfischetti/assertr](http://github.com/tonyfischetti/assertr)
+our.data %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+
+```
+
+This indicates that average miles per gallon for a 8 cylinder car is a lowly
+12.43. However, in the correct dataset it's really just over 15. Data errors
+like that are extremely easy to miss because it doesn't cause an error, and the
+results look reasonable.
+
+### enter assertr
+
+To combat this, we might want to use assertr's `verify` function to make sure
+that `mpg` is a positive number:
+
+```{r error=TRUE}
+library(assertr)
+
+our.data %>%
+  verify(mpg >= 0) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+If we had done this, we would have caught this data error.
+
+The `verify` function takes a data frame (its first argument is provided by
+the `%>%` operator), and a logical (boolean) expression. Then, `verify`
+evaluates that expression using the scope of the provided data frame. If any
+of the logical values of the expression's result are `FALSE`, `verify` will
+raise an error that terminates any further processing of the pipeline.
+
+We could have also written this assertion using `assertr`'s `assert` function...
+
+```{r error=TRUE}
+our.data %>%
+  assert(within_bounds(0,Inf), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+The `assert` function takes a data frame, a predicate function, and a arbitrary
+number of columns to apply to predicate function to. The predicate function
+(a function that returns a logical/boolean value) is then applied to every
+element of the columns selected, and will raise an error when it finds the
+first violation.
+
+Internally, the `assert` function uses `dplyr`'s `select` function to extract
+the columns to test the predicate function on. This allows for complex
+assertions; let's say we wanted to make sure that all values in the dataset
+are *greater* than zero (except `mpg`):
+
+```{r error=TRUE}
+library(assertr)
+
+our.data %>%
+  assert(within_bounds(0,Inf, include.lower=FALSE), -mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+### verify vs. assert
+
+The first noticable difference between `verify` and `assert` is that `verify`
+takes a expression, and `assert` takes a predicate and columns to apply it to.
+This might make the `verify` function look more elegant--but there's an
+important drawback. 
+
+`verify` has to evaluate the entire expression first, and *then* check if there
+were any violations. Because of this, `verify` can't tell you the offending
+datum. That brings us to the second difference.
+
+Because `assert` applies the predicate function to each datum, one at a time,
+it can stop immediately after finding the first violation, and specify the
+location and the value of the offending element.
+
+This also means that it `assert` will fail sooner than `verify`, potentially
+making it a faster less-time consuming affair for data that are assumed to
+have errors. 
+
+One important drawback to `assert`, and a consequence of its application of
+the predicate to *columns*, it that `assert` can't confirm assertions about
+the data structure *itself*. For example, let's say we were reading a dataset
+from disk that we know has more than 100 observations; we could write a check
+of that assumtion like this:
+
+```{r eval=FALSE}
+dat <- read.csv("a-data-file.csv") %>%
+  verify(nrow(dat) > 100) %>%
+  ....
+```
+
+This is a powerful advantage over `assert`... but `assert` has one more
+advantage of its own that we heretofore ignored.
+
+### assertr's predicates
+
+`assertr`'s predicates, both builtin and custom, make `assert` very powerful.
+The three predicates that are built in to `assertr` (more coming soon!) are
+
+- `not_na` - that checks if an element in not NA
+- `within_bounds` - that retruns a predicate function that checks if a numeric
+value falls withing the bounds of supplied, and
+- `in_set` - that returns a predicate function that checks if an element is
+a member of the set supplied.
+
+We've already seen `within_bounds` in action... let's use the `in_set` function
+to make sure that there are only 0s and 1s (automatic and manual, respectively)
+values in the `am` column...
+
+
+```{r, eval=FALSE}
+our.data %>%
+  assert(in_set(0,1), am) %>%
+  ...
+```
+
+If we were reading a dataset that contained a column representing boroughs of
+New York City (named `BORO`), we can verify that there are no mis-spelled
+or otherwise unexpected boroughs like so...
+
+```{r, eval=FALSE}
+boroughs <- c("Bronx", "Manhattan", "Queens", "Brooklyn", "Staten Island")
+
+read.csv("a-dataset.csv") %>%
+  assert(in_set(boroughs), BORO) %>%
+  ...
+```
+
+Rad!
+
+### custom predicates
+
+A convenient feature of `assertr` is that it makes the construction of custom
+predicate functions easy.
+
+In order to make a custom predicate, you only have to specify cases where the
+predicate should return FALSE. Let's say that a dataset has an ID column
+(named `ID`) that we want to check is not an empty string. We can create a
+predicate like this:
+
+```{r}
+not.empty.p <- function(x) if(x=="") return(FALSE)
+```
+
+and apply it like this:
+
+```{r, eval=FALSE}
+read.csv("another-dataset.csv") %>%
+  assert(not.empty.p, ID) %>%
+  ...
+```
+
+Let's say that the ID column is always a 7-digit number. We can confirm that
+the all the IDs are 7-digits by defining the following predicate:
+
+```{r}
+seven.digit.p <- function(x) nchar(x)==7
+```
+
+A powerful consequence of this easy creation of predicates is that the
+`assert` function lends itself to use with lambda predicates (unnamed
+predicates that are only used once). The check above might be better written as
+
+```{r, eval=FALSE}
+read.csv("another-dataset.csv") %>%
+  assert(function(x) nchar(x)==7, ID) %>%
+  ...
+```
+
+Neat-o!
