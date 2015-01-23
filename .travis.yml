@@ -9,7 +9,7 @@ before_install:
 
 install:
   - ./travis-tool.sh install_github hadley/dplyr
-  - ./travis-tool.sh install_github hadley/magrittr
+  - ./travis-tool.sh install_github smbache/magrittr
   - ./travis-tool.sh install_deps
 
 script: ./travis-tool.sh run_tests
