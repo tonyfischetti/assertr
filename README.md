@@ -1,12 +1,14 @@
 assertr
 ===
 
+![assertr logo](http://statethatiamin.onlythisrose.com/assertrlogo.png)
+
 [![Build Status](https://travis-ci.org/tonyfischetti/assertr.svg?branch=master)](https://travis-ci.org/tonyfischetti/assertr)
 
 #### What is it?
 The assertr package supplies a suite of functions designed to verify
 assumptions about data early in an dplyr/magrittr analysis pipeline so that
-data errors are spotted early and address quickly.
+data errors are spotted early and can be addressed quickly.
 
 #### Installation
 
@@ -29,7 +31,7 @@ confirm
 - that the dataset contains more than 10 observations
 - that the column for 'miles per gallon' (mpg) is a positive number
 - that the am and vs columns (automatic/manual and v/straight engine,
-respectively) contains 0s and 1s only
+respectively) contain 0s and 1s only
 
 This could be written using `assertr` like this:
 
@@ -48,7 +50,7 @@ and the pipeline would have been terminated early.
 #### What does `assertr` give me?
 
 - `verify` - takes a data frame (its first argument is provided by
-the `%>%` operator), and a logical (boolean) expression. Then, `verify`
+the `%>%` operator above), and a logical (boolean) expression. Then, `verify`
 evaluates that expression using the scope of the provided data frame. If any
 of the logical values of the expression's result are `FALSE`, `verify` will
 raise an error that terminates any further processing of the pipeline.
