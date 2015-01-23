@@ -27,9 +27,11 @@ errors in data entry or coding. Pretend we wanted to find the average
 miles per gallon for each number of engine cylinders. We might want to first,
 confirm
 - that the dataset contains more than 10 observations
-- that the column for 'miles per gallon' (`mpg`) is a positive number
-- that the `am` and `vs` columns (automatic/manual and v/straight engine,
+- that the column for 'miles per gallon' (mpg) is a positive number
+- that the am and vs columns (automatic/manual and v/straight engine,
 respectively) contains 0s and 1s only
+
+This could be written using `assertr` like this:
 
     mtcars %>%
       verify(nrow(mtcars) > 2) %>%
