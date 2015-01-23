@@ -33,6 +33,12 @@ respectively) contains 0s and 1s only
 
 This could be written using `assertr` like this:
 
+    the_data <-
+      read.csv('/path/to/data/file.csv') %>%
+      subset(variable_a > x) %>%
+      transform(variable_c = variable_a/variable_b) %>%
+      head(100)
+
     mtcars %>%
       verify(nrow(mtcars) > 2) %>%
       verify(mpg > 0) %>%
