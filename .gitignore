@@ -3,7 +3,6 @@ packrat/lib*/
 .DS_Store
 .Rproj.user
 .Rproj
-inst/doc
 
 # Object files
 *.o
