@@ -33,11 +33,6 @@ respectively) contains 0s and 1s only
 
 This could be written using `assertr` like this:
 
-    the_data <-
-      read.csv('/path/to/data/file.csv') %>%
-      subset(variable_a > x) %>%
-      transform(variable_c = variable_a/variable_b) %>%
-      head(100)
 
     mtcars %>%
       verify(nrow(mtcars) > 2) %>%
@@ -46,12 +41,32 @@ This could be written using `assertr` like this:
       group_by(cyl) %>%
       summarise(avg.mpg=mean(mpg))
 
+
 If any of these assertions were violated, an error would have been raised
 and the pipeline would have been terminated early.
 
 #### What does `assertr` give me?
 
+- `verify` - takes a data frame (its first argument is provided by
+the `%>%` operator), and a logical (boolean) expression. Then, `verify`
+evaluates that expression using the scope of the provided data frame. If any
+of the logical values of the expression's result are `FALSE`, `verify` will
+raise an error that terminates any further processing of the pipeline.
+- `assert` - takes a data frame, a predicate function, and an arbitrary
+number of columns to apply the predicate function to. The predicate function
+(a function that returns a logical/boolean value) is then applied to every
+element of the columns selected, and will raise an error when it finds the
+first violation.  Internally, the `assert` function uses `dplyr`'s
+`select` function to extract the columns to test the predicate function on. 
+
 `assertr` also offers three (so far) predicate functions designed to be used
+with the `assert` function:
+
+- `not_na` - that checks if an element is not NA
+- `within_bounds` - that returns a predicate function that checks if a numeric
+value falls within the bounds supplied, and
+- `in_set` - that returns a predicate function that checks if an element is
+a member of the set supplied.
 
 #### More info
 
