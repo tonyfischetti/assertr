@@ -26,18 +26,18 @@ test_that("verify returns data if verification passes", {
 })
 
 test_that("verify raises error if verification fails", {
-  expect_error(verify(mtcars, drat > 3), "verification failed!")
-  expect_error(verify(mtcars, nrow(mtcars) > 34), "verification failed!")
-  expect_error(verify(mtcars, am %in% c(1,2)), "verification failed!")
+  expect_error(verify(mtcars, drat > 3), "verification failed! \\(4 failures)")
+  expect_error(verify(mtcars, nrow(mtcars) > 34), "verification failed! \\(1 failure)")
+  expect_error(verify(mtcars, am %in% c(1,2)), "verification failed! \\(19 failures)")
   # looks to parent frame scope?
-  expect_error(verify(mtcars, a < 0), "verification failed!")
+  expect_error(verify(mtcars, a < 0), "verification failed! \\(1 failure)")
   # respects scoping rules?
-  expect_error(verify(alist, length(a) == 1), "verification failed!")
-  expect_error(verify(alist, length(a) > 4), "verification failed!")
+  expect_error(verify(alist, length(a) == 1), "verification failed! \\(1 failure)")
+  expect_error(verify(alist, length(a) > 4), "verification failed! \\(1 failure)")
   expect_error(verify(alist, length(a) > 2 && length(b) > 3),
-               "verification failed!")
-  expect_error(verify(alist, a >= 2 | b > 4), "verification failed!")
-  expect_error(verify(alist, 2 > 4), "verification failed!")
+               "verification failed! \\(1 failure)")
+  expect_error(verify(alist, a >= 2 | b > 4), "verification failed! \\(1 failure)")
+  expect_error(verify(alist, 2 > 4), "verification failed! \\(1 failure)")
 })
 
 test_that("verify breaks appropriately", {
@@ -49,8 +49,7 @@ test_that("verify breaks appropriately", {
                  "coercing argument of type 'double' to logical")
   expect_error(suppressWarnings(verify(mtcars, "1")),
                "missing value where TRUE/FALSE needed")
-  # why does it not think the errors are the same?
-  # expect_error(verify(mtcars, 2 > 1, "tree"), "unused argument (\"tree\")")
+  expect_error(verify(mtcars, 2 > 1, "tree"), "unused argument \\(\"tree\")")
   expect_error(verify(mtcars, d > 1), "object 'd' not found")
 })
 ######################################
@@ -70,13 +69,13 @@ test_that("assert returns data if verification passes", {
                iris)
 })
 
-# test_that("assert raises error if verification fails", {
-#   # why does it not think the errors are the same?
-#   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear),
-#                "Error: Assertion 'within_bounds' violated at index 4 of vector 'gear' (value: 3)")
-#   expect_equal(assert(mtcars, within_bounds(3,5), gear, carb),
-#                "Assertion 'within_bounds' violated at index 3 of vector 'carb' (value: 1)")
-# })
+test_that("assert raises error if verification fails", {
+  # why does it not think the errors are the same?
+  expect_error(assert(mtcars, within_bounds(3.5,4.5), gear),
+               "Error : Assertion 'within_bounds' violated at index 4 of vector 'gear' \\(value: 3)")
+  expect_error(assert(mtcars, within_bounds(3,5), gear, carb),
+               "Error : Assertion 'within_bounds' violated at index 3 of vector 'carb' \\(value: 1)")
+})
 
 
 test_that("assert breaks appropriately", {

@@ -36,16 +36,17 @@ make.predicate.proper <- function(improper.predicate){
 
 # abstract out creation of error messages
 # so we can make it prettier in future versions
-make.error.message <- function(name.of.predicate,
-                               index.of.first.violation,
-                               name.of.column,
-                               offending.element){
+make.assert.error.message <- function(name.of.predicate,
+                                      index.of.first.violation,
+                                      name.of.column,
+                                      offending.element){
   paste0("Assertion '", name.of.predicate, "' violated at index ",
          index.of.first.violation, " of vector '", name.of.column,
          "' (value: ", offending.element, ")")
 }
 
 
-
-
-
+make.verify.error.message <- function(num.violations){
+  sing.plur <- ifelse(num.violations==1, " failure)", " failures)")
+  paste0(c("verification failed! (", num.violations, sing.plur))
+}

@@ -54,8 +54,8 @@ assert <- function(data, predicate, ...){
            this.vector <- sub.frame[[column]]
            for(i in 1:length(this.vector)){
              if(!(predicate(this.vector[i]))){
-               error.message <- make.error.message(name.of.predicate, i,
-                                                   column, this.vector[i])
+               error.message <- make.assert.error.message(name.of.predicate, i,
+                                                          column, this.vector[i])
                stop(error.message, call.=FALSE)}}
            return(TRUE)}, logical(1))
   return(data)
@@ -114,7 +114,9 @@ verify <- function(data, expr){
   logical.results <- eval(expr, envir, enclos)
   if(all(logical.results))
     return(data)
-  stop("verification failed!")
+  num.violations <- sum(!logical.results)
+  error.message <- make.verify.error.message(num.violations)
+  stop(error.message)
 }
 
 
