@@ -13,7 +13,10 @@ in_set(..., allow.na = TRUE)
 should be permitted (default TRUE)}
 }
 \value{
-TRUE if x is in set, FALSE otherwise
+A function that takes one value and returns TRUE
+        if the value is in the set defined by the
+        arguments supplied by \code{in_set} and FALSE
+        otherwise
 }
 \description{
 This function returns a predicate function that will take a single

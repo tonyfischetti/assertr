@@ -30,6 +30,8 @@ miles per gallon for each number of engine cylinders. We might want to first,
 confirm
 - that the dataset contains more than 10 observations
 - that the column for 'miles per gallon' (mpg) is a positive number
+- that the column for ‘miles per gallon’ (mpg) does not contain a datum
+that is outside 4 standard deviations from its mean, and
 - that the am and vs columns (automatic/manual and v/straight engine,
 respectively) contain 0s and 1s only
 
@@ -37,8 +39,9 @@ This could be written using `assertr` like this:
 
 
     mtcars %>%
-      verify(nrow(mtcars) > 2) %>%
+      verify(nrow(mtcars) > 10) %>%
       verify(mpg > 0) %>%
+      insist(within_n_sds(4), mpg) %>%
       assert(in_set(0,1), am, vs) %>%
       group_by(cyl) %>%
       summarise(avg.mpg=mean(mpg))
@@ -61,6 +64,9 @@ element of the columns selected, and will raise an error when it finds the
 first violation.  Internally, the `assert` function uses `dplyr`'s
 `select` function to extract the columns to test the predicate function on. 
 
+- `insist` - takes a data frame, a predicate-generating function, and an
+arbitrary number of columns.
+
 `assertr` also offers three (so far) predicate functions designed to be used
 with the `assert` function:
 
@@ -70,10 +76,14 @@ value falls within the bounds supplied, and
 - `in_set` - that returns a predicate function that checks if an element is
 a member of the set supplied.
 
+and a predicate generator designed to be used with the `insist` function:
+
+- `within_n_sds` - used to dynamically create bounds to check vector elements with
+
 ### More info
 
 For more info, check out the `assertr` vignette
 
     > vignette("assertr")
 
-Or [read it here](http://www.onthelambda.com/wp-content/uploads/2015/01/assertr.html)
+Or [read it here](http://www.onthelambda.com/wp-content/uploads/2015/03/assertr.html)

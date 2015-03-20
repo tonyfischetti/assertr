@@ -10,7 +10,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2015-01-23" />
+<meta name="date" content="2015-03-20" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2015-01-23</em></h4>
+<h4 class="date"><em>2015-03-20</em></h4>
 </div>
 
 
@@ -106,7 +106,7 @@ our.data %&gt;%
 <span class="st">  </span><span class="kw">verify</span>(mpg &gt;=<span class="st"> </span><span class="dv">0</span>) %&gt;%
 <span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
-<pre><code>## Error in verify(., mpg &gt;= 0): verification failed!</code></pre>
+<pre><code>## Error in verify(., mpg &gt;= 0): verification failed! (1 failure)</code></pre>
 <p>If we had done this, we would have caught this data error.</p>
 <p>The <code>verify</code> function takes a data frame (its first argument is provided by the <code>%&gt;%</code> operator), and a logical (boolean) expression. Then, <code>verify</code> evaluates that expression using the scope of the provided data frame. If any of the logical values of the expression’s result are <code>FALSE</code>, <code>verify</code> will raise an error that terminates any further processing of the pipeline.</p>
 <p>We could have also written this assertion using <code>assertr</code>’s <code>assert</code> function…</p>
@@ -131,7 +131,7 @@ our.data %&gt;%
 <p><code>verify</code> has to evaluate the entire expression first, and <em>then</em> check if there were any violations. Because of this, <code>verify</code> can’t tell you the offending datum. That brings us to the second difference.</p>
 <p>Because <code>assert</code> applies the predicate function to each datum, one at a time, it can stop immediately after finding the first violation, and specify the location and the value of the offending element.</p>
 <p>This also means that <code>assert</code> will fail sooner than <code>verify</code>, potentially making it a faster, less time-consuming affair for data that are assumed to have errors.</p>
-<p>One important drawback to <code>assert</code>, and a consequence of its application of the predicate to <em>columns</em>, is that <code>assert</code> can’t confirm assertions about the data structure <em>itself</em>. For example, let’s say we were reading a dataset from disk that we know has more than 100 observations; we could write a check of that assumtion like this:</p>
+<p>One important drawback to <code>assert</code>, and a consequence of its application of the predicate to <em>columns</em>, is that <code>assert</code> can’t confirm assertions about the data structure <em>itself</em>. For example, let’s say we were reading a dataset from disk that we know has more than 100 observations; we could write a check of that assumption like this:</p>
 <pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;a-data-file.csv&quot;</span>) %&gt;%
 <span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(dat) &gt;<span class="st"> </span><span class="dv">100</span>) %&gt;%
 <span class="st">  </span>....</code></pre>
@@ -139,7 +139,7 @@ our.data %&gt;%
 </div>
 <div id="assertrs-predicates" class="section level3">
 <h3>assertr’s predicates</h3>
-<p><code>assertr</code>’s predicates, both built-in and custom, make <code>assert</code> very powerful. The three predicates that are built in to <code>assertr</code> (more coming soon!) are</p>
+<p><code>assertr</code>’s predicates, both built-in and custom, make <code>assert</code> very powerful. The three predicates that are built in to <code>assertr</code> are</p>
 <ul>
 <li><code>not_na</code> - that checks if an element is not NA</li>
 <li><code>within_bounds</code> - that returns a predicate function that checks if a numeric value falls within the bounds supplied, and</li>
@@ -173,6 +173,134 @@ our.data %&gt;%
 <span class="st">  </span><span class="kw">assert</span>(function(x) <span class="kw">nchar</span>(x)==<span class="dv">7</span>, ID) %&gt;%
 <span class="st">  </span>...</code></pre>
 <p>Neat-o!</p>
+</div>
+<div id="enter-insist-and-predicate-generators" class="section level3">
+<h3>enter <code>insist</code> and predicate ‘generators’</h3>
+<p>Very often, there is a need to dynamically determine the predicate function to be used based on the vector being checked.</p>
+<p>For example, to check to see if every element of a vector is within <em>n</em> standard deviations of the mean, you need to create a <code>within_bounds</code> predicate <em>after</em> dynamically determining the bounds by reading and computing on the vector itself.</p>
+<p>To this end, the <code>assert</code> function is no good; it just applies a raw predicate to a vector. We need a function like <code>assert</code> that will apply predicate <em>generators</em> to vectors, return predicates, and <em>then</em> perform <code>assert</code>-like functionality by checking each element of the vectors with its respective custom predicate. This is precisely what <code>insist</code> does.</p>
+<p>This is all much simpler than it may sound. Hopefully, the examples will clear up any confusion.</p>
+<p>The primary use case for <code>insist</code> is in conjunction with the <code>within_n_sds</code> predicate generator.</p>
+<p>Suppose we wanted to check that every <code>mpg</code> value in the <code>mtcars</code> data set was within 3 standard deviations of the mean before finding the average miles per gallon for each number of engine cylinders. We could write something like this:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">3</span>), mpg) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Source: local data frame [3 x 2]
+## 
+##   cyl  avg.mpg
+## 1   4 26.66364
+## 2   6 19.74286
+## 3   8 15.10000</code></pre>
+<p>Notice what happens when we drop that z-score to 2 stardard deviations from the mean</p>
+<pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">2</span>), mpg) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Error: Assertion 'within_n_sds' violated at index 18 of vector 'mpg' (value: 32.4)</code></pre>
+<p>Execution of the pipeline was halted. But now we know exactly which data point (and column) violated the predicate that <code>within_n_sds(3)(mtcars$mpg)</code> returned.</p>
+<p>Now that’s an efficient car!</p>
+<p>After the predicate generator, <code>insist</code> takes an arbitrary number of columns just like <code>assert</code> using the syntax of <code>dplyr</code>’s <code>select</code> function. If you wanted to check that everything in mtcars is within 10 standard deviations of the mean (of each column vector), you can do so like this:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">10</span>), mpg:carb) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Source: local data frame [3 x 2]
+## 
+##   cyl  avg.mpg
+## 1   4 26.66364
+## 2   6 19.74286
+## 3   8 15.10000</code></pre>
+<p>Aces!</p>
+</div>
+<div id="combining-chains-of-assertions" class="section level3">
+<h3>combining chains of assertions</h3>
+<p>Let’s say that as part of an automated pipeline that grabs mtcars from an untrusted source and finds the average miles per gallon for each number of engine cylinders, we want to perform the following checks…</p>
+<ul>
+<li>that the dataset contains more than 10 observations</li>
+<li>that the column for ‘miles per gallon’ (mpg) is a positive number</li>
+<li>that the column for ‘miles per gallon’ (mpg) does not contain a datum that is outside 4 standard deviations from its mean, and</li>
+<li>that the am and vs columns (automatic/manual and v/straight engine, respectively) contain 0s and 1s only</li>
+</ul>
+<p>This could be written thusly:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(mtcars) &gt;<span class="st"> </span><span class="dv">10</span>) %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>) %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg) %&gt;%
+<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Source: local data frame [3 x 2]
+## 
+##   cyl  avg.mpg
+## 1   4 26.66364
+## 2   6 19.74286
+## 3   8 15.10000</code></pre>
+<p>Ew, there are four lines of assertions before the real fun starts. We can make look much better by abstracting out all the assertions:</p>
+<pre class="sourceCode r"><code class="sourceCode r">check_me &lt;-<span class="st"> </span>. %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(mtcars) &gt;<span class="st"> </span><span class="dv">10</span>) %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>) %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg) %&gt;%
+<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs)
+
+mtcars %&gt;%
+<span class="st">  </span>check_me %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Source: local data frame [3 x 2]
+## 
+##   cyl  avg.mpg
+## 1   4 26.66364
+## 2   6 19.74286
+## 3   8 15.10000</code></pre>
+<p>Awesome! Now we can add an arbitrary number of assertions, as the need arises, without touching the real logic.</p>
+</div>
+<div id="advanced-creating-your-own-predicate-generators-for-insist" class="section level3">
+<h3>advanced: creating your own predicate generators for <code>insist</code></h3>
+<p><code>assertr</code> is build with robustness, correctness, and extensibility in mind. Just like <code>assertr</code> makes it easy to create your own custom predicates, so too does this package make it easy to create your own custom predicate generators.</p>
+<p>Okay… so its, perhaps, not <em>easy</em> because predicate generators by nature are functions that return functions. But it’s possible!</p>
+<p>Let’s say you wanted to create a predicate generator that checks if all elements of a vector are within 3 times the vector’s interquartile range from the median. We need to create a function that looks like this</p>
+<pre class="sourceCode r"><code class="sourceCode r">within_3_iqrs &lt;-<span class="st"> </span>function(a_vector){
+  the_median &lt;-<span class="st"> </span><span class="kw">median</span>(a_vector)
+  the_iqr &lt;-<span class="st"> </span><span class="kw">IQR</span>(a_vector)
+  <span class="kw">within_bounds</span>((the_median-the_iqr*<span class="dv">3</span>), (the_median+the_iqr*<span class="dv">3</span>))
+}</code></pre>
+<p>Now, we can use it on <code>mpg</code> from <code>mtcars</code> like so:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(within_3_iqrs, mpg) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Source: local data frame [3 x 2]
+## 
+##   cyl  avg.mpg
+## 1   4 26.66364
+## 2   6 19.74286
+## 3   8 15.10000</code></pre>
+<p>There are two problems with this, though…</p>
+<ol style="list-style-type: decimal">
+<li>We may want to abstract this so that we can supply an arbitrary number of IQRs to create the bounds with</li>
+<li>We lose the ability to choose what optional arguments (if any) that we give to the returned <code>within_bounds</code> predicate.</li>
+</ol>
+<p>Now we have to write a function that returns a function that returns a function…</p>
+<pre class="sourceCode r"><code class="sourceCode r">within_n_iqrs &lt;-<span class="st"> </span>function(n, ...){
+  function(a_vector){
+    the_median &lt;-<span class="st"> </span><span class="kw">median</span>(a_vector)
+    the_iqr &lt;-<span class="st"> </span><span class="kw">IQR</span>(a_vector)
+    <span class="kw">within_bounds</span>((the_median-the_iqr*n), (the_median+the_iqr*n), ...)
+  }
+}</code></pre>
+<p>Much better! Now, if we want to check that every <code>mpg</code> from <code>mtcars</code> is within 5 IQRs of the median and <em>not allow NA values</em> we can do so like this:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_iqrs</span>(<span class="dv">5</span>), mpg) %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
+<pre><code>## Source: local data frame [3 x 2]
+## 
+##   cyl  avg.mpg
+## 1   4 26.66364
+## 2   6 19.74286
+## 3   8 15.10000</code></pre>
+<p>Super!</p>
 </div>
 
 

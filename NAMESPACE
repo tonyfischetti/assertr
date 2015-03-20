@@ -2,6 +2,8 @@
 
 export(assert)
 export(in_set)
+export(insist)
 export(not_na)
 export(verify)
 export(within_bounds)
+export(within_n_sds)

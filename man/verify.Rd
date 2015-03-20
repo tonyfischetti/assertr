@@ -52,6 +52,6 @@ alist \%>\%
   # nothing here will run}
 }
 \seealso{
-\code{\link{assert}}
+\code{\link{assert}} \code{\link{insist}}
 }
 

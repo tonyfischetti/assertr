@@ -17,7 +17,7 @@ assert(data, predicate, ...)
            values to drop variables.}
 }
 \value{
-data if predicate assertion is TRUE passes. error if not.
+data if predicate assertion is TRUE. error if not.
 }
 \description{
 Meant for use in a data analysis pipeline, this function will
@@ -48,6 +48,6 @@ mtcars \%>\%
   # nothing here will run}
 }
 \seealso{
-\code{\link{verify}}
+\code{\link{verify}} \code{\link{insist}}
 }
 

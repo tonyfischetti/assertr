@@ -141,7 +141,7 @@ One important drawback to `assert`, and a consequence of its application of
 the predicate to *columns*, is that `assert` can't confirm assertions about
 the data structure *itself*. For example, let's say we were reading a dataset
 from disk that we know has more than 100 observations; we could write a check
-of that assumtion like this:
+of that assumption like this:
 
 ```{r eval=FALSE, purl = FALSE}
 dat <- read.csv("a-data-file.csv") %>%
@@ -155,7 +155,7 @@ advantage of its own that we heretofore ignored.
 ### assertr's predicates
 
 `assertr`'s predicates, both built-in and custom, make `assert` very powerful.
-The three predicates that are built in to `assertr` (more coming soon!) are
+The three predicates that are built in to `assertr` are
 
 - `not_na` - that checks if an element is not NA
 - `within_bounds` - that returns a predicate function that checks if a numeric
@@ -228,3 +228,179 @@ read.csv("another-dataset.csv") %>%
 ```
 
 Neat-o!
+
+
+### enter `insist` and predicate 'generators'
+
+Very often, there is a need to dynamically determine the predicate function
+to be used based on the vector being checked.
+
+For example, to check to see if every element of a vector is within _n_
+standard deviations of the mean, you need to create a `within_bounds`
+predicate _after_ dynamically determining the bounds by reading and computing
+on the vector itself.
+
+To this end, the `assert` function is no good; it just applies a raw predicate
+to a vector. We need a function like `assert` that will apply predicate
+_generators_ to vectors, return predicates, and _then_ perform `assert`-like
+functionality by checking each element of the vectors with its respective custom
+predicate. This is precisely what `insist` does.
+
+This is all much simpler than it may sound. Hopefully, the examples will clear
+up any confusion.
+
+The primary use case for `insist` is in conjunction with the `within_n_sds`
+predicate generator.
+
+Suppose we wanted to check that every `mpg` value in the `mtcars` data set was
+within 3 standard deviations of the mean before finding the average miles
+per gallon for each number of engine cylinders. We could write something
+like this:
+
+```{r purl = FALSE}
+
+mtcars %>%
+  insist(within_n_sds(3), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Notice what happens when we drop that z-score to 2 stardard deviations
+from the mean
+
+```{r error=TRUE,  purl = FALSE}
+mtcars %>%
+  insist(within_n_sds(2), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Execution of the pipeline was halted. But now we know exactly which data point
+(and column) violated the predicate that `within_n_sds(3)(mtcars$mpg)`
+returned.
+
+Now that's an efficient car!
+
+After the predicate generator, `insist` takes an arbitrary number of columns
+just like `assert` using the syntax of `dplyr`'s `select` function. If you
+wanted to check that everything in mtcars is within 10 standard deviations
+of the mean (of each column vector), you can do so like this:
+
+```{r purl = FALSE}
+mtcars %>%
+  insist(within_n_sds(10), mpg:carb) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Aces!
+
+
+### combining chains of assertions
+
+Let's say that as part of an automated pipeline that grabs mtcars from an
+untrusted source and finds the average miles per gallon for each number of
+engine cylinders, we want to perform the following checks...
+
+- that the dataset contains more than 10 observations
+- that the column for 'miles per gallon' (mpg) is a positive number
+- that the column for 'miles per gallon' (mpg) does not contain a
+datum that is outside 4 standard deviations from its mean, and
+- that the am and vs columns (automatic/manual and v/straight engine, 
+respectively) contain 0s and 1s only
+
+This could be written thusly:
+
+```{r purl = FALSE}
+mtcars %>%
+  verify(nrow(mtcars) > 10) %>%
+  verify(mpg > 0) %>%
+  insist(within_n_sds(4), mpg) %>%
+  assert(in_set(0,1), am, vs) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Ew, there are four lines of assertions before the real fun starts. We can
+make look much better by abstracting out all the assertions:
+
+```{r purl = FALSE}
+
+check_me <- . %>%
+  verify(nrow(mtcars) > 10) %>%
+  verify(mpg > 0) %>%
+  insist(within_n_sds(4), mpg) %>%
+  assert(in_set(0,1), am, vs)
+
+mtcars %>%
+  check_me %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Awesome! Now we can add an arbitrary number of assertions, as the need arises,
+without touching the real logic.
+
+
+### advanced: creating your own predicate generators for `insist`
+
+`assertr` is build with robustness, correctness, and extensibility in mind.
+Just like `assertr` makes it easy to create your own custom predicates, so
+too does this package make it easy to create your own custom predicate
+generators.
+
+Okay... so its, perhaps, not _easy_ because predicate generators by nature
+are functions that return functions. But it's possible!
+
+Let's say you wanted to create a predicate generator that checks if all
+elements of a vector are within 3 times the vector's interquartile range from
+the median. We need to create a function that looks like this
+
+```{r purl = FALSE}
+within_3_iqrs <- function(a_vector){
+  the_median <- median(a_vector)
+  the_iqr <- IQR(a_vector)
+  within_bounds((the_median-the_iqr*3), (the_median+the_iqr*3))
+}
+```
+
+Now, we can use it on `mpg` from `mtcars` like so:
+
+```{r purl = FALSE}
+mtcars %>%
+  insist(within_3_iqrs, mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+There are two problems with this, though...
+
+1. We may want to abstract this so that we can supply an arbitrary number
+of IQRs to create the bounds with
+2. We lose the ability to choose what optional arguments (if any) that we
+give to the returned `within_bounds` predicate.
+
+Now we have to write a function that returns a function that returns
+a function...
+
+```{r purl = FALSE}
+within_n_iqrs <- function(n, ...){
+  function(a_vector){
+    the_median <- median(a_vector)
+    the_iqr <- IQR(a_vector)
+    within_bounds((the_median-the_iqr*n), (the_median+the_iqr*n), ...)
+  }
+}
+```
+
+Much better! Now, if we want to check that every `mpg` from `mtcars` is
+within 5 IQRs of the median and *not allow NA values* we can do so like this:
+
+```{r purl = FALSE}
+mtcars %>%
+  insist(within_n_iqrs(5), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Super!

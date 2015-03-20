@@ -4,6 +4,12 @@ context("assertions about assertions in assertion.R")
 a <- 1
 alist <- list(a=c(1,2,3), b=c(4,5,6))
 
+our.iris <- iris
+our.iris.2 <- our.iris
+our.iris.2[106,1] <- 7
+our.iris.3 <- our.iris.2
+our.iris.3[c(118, 119, 123, 132, 131, 136), 1] <- 7
+
 
 ############### verify ###############
 test_that("verify returns data if verification passes", {
@@ -70,13 +76,11 @@ test_that("assert returns data if verification passes", {
 })
 
 test_that("assert raises error if verification fails", {
-  # why does it not think the errors are the same?
   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear),
                "Error : Assertion 'within_bounds' violated at index 4 of vector 'gear' \\(value: 3)")
   expect_error(assert(mtcars, within_bounds(3,5), gear, carb),
                "Error : Assertion 'within_bounds' violated at index 3 of vector 'carb' \\(value: 1)")
 })
-
 
 test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
@@ -85,3 +89,37 @@ test_that("assert breaks appropriately", {
                "no applicable method for 'select_' applied to an object of class \"character\"")
 })
 ######################################
+
+
+
+############### insist ###############
+test_that("insist returns data if verification passes", {
+  expect_equal(insist(our.iris, within_n_sds(3), Sepal.Length), our.iris)
+  expect_equal(insist(our.iris.3, within_n_sds(2), Sepal.Length), our.iris.3)
+  expect_equal(insist(our.iris, within_n_sds(4), Sepal.Length:Petal.Width),
+               our.iris)
+})
+
+test_that("insist raises error if verification fails", {
+  expect_error(insist(our.iris, within_n_sds(2), Sepal.Length),
+               "Error : Assertion 'within_n_sds' violated at index 106 of vector 'Sepal.Length' \\(value: 7.6)")
+  expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length),
+               "Error : Assertion 'within_n_sds' violated at index 118 of vector 'Sepal.Length' \\(value: 7.7)")
+  expect_error(insist(our.iris, within_n_sds(3), Sepal.Length:Petal.Width),
+               "Error : Assertion 'within_n_sds' violated at index 16 of vector 'Sepal.Width' \\(value: 4.4)")
+})
+
+test_that("insist breaks appropriately", {
+  expect_error(insist(within_n_sds(5), mtcars$vs),
+               "no applicable method for 'select_' applied to an object of class \"function\"")
+  expect_error(insist("tree"),
+               "no applicable method for 'select_' applied to an object of class \"character\"")
+  expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),
+               "argument must be a numeric vector")
+})
+######################################
+
+
+
+
+

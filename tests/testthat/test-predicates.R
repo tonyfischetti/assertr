@@ -1,5 +1,10 @@
 context("assertions about predicates in predicates.R")
 
+set.seed(1)
+test.vect <- rnorm(100, mean=100, sd=20)
+test.vect2 <- c(1, NA, 3)
+
+
 
 ############### not_na ###############
 test_that("not_na returns true if not NA", {
@@ -69,6 +74,45 @@ test_that("returned predicate fails appropriately", {
                "bounds must be checked on a single element")
 })
 #####################################
+
+
+############### within_n_sds ###############
+
+test_that("returned predicate works appropriately", {
+  expect_equal(within_n_sds(1)(test.vect)(84.3), TRUE)
+  expect_equal(within_n_sds(1)(test.vect)(84.2), FALSE)
+  expect_equal(within_n_sds(2)(test.vect)(138.1), TRUE)
+  expect_equal(within_n_sds(2)(test.vect)(138.11), FALSE)
+  expect_equal(within_n_sds(2)(test.vect)(test.vect2[2]), TRUE)
+  expect_equal(within_n_sds(2, allow.na=FALSE)(test.vect)(test.vect2[2]), FALSE)
+})
+
+# the returned predicate (third inner function) will fail appropriately
+# given that the above "within_bounds" checks work out
+
+test_that("first inner function fails appropriately", {
+  expect_error(within_n_sds(-1),
+               "'n' must be a positive number")
+  expect_error(within_n_sds(0),
+               "'n' must be a positive number")
+  expect_error(within_n_sds(NA),
+               "'n' must be a positive number")
+  expect_error(within_n_sds(c(1,2)),
+               "'n' must be a positive number")
+  expect_error(within_n_sds(),
+               "argument \"n\" is missing, with no default")
+})
+
+test_that("second inner function fails appropriately", {
+  expect_error(within_n_sds(1)(),
+               "argument \"a.vector\" is missing, with no default")
+  expect_error(within_n_sds(1)(1),
+               "standard deviations of vector is NA")
+  expect_error(within_n_sds(1)(c("johnny", "marr")),
+               "argument must be a numeric vector")
+})
+############################################
+
 
 
 ############### in_set ###############
