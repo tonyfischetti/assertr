@@ -9,7 +9,7 @@ There were no ERRORs, WARNINGs or NOTEs
 when checked locally with --no-manual
 
 This is my first package and this is a resubmission of this package.
-The first time I didnt use the license file right, but I fixed that now.
+I changed the title of the package to proper title case, as was requested.
 Additionally, there was a NOTE that I didnt see because of NEWS.md so I
 changed it to NEWS and I checked it and I got NO NOTES, ERRORS, or WARNINGS.
 
