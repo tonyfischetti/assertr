@@ -8,5 +8,8 @@
 There were no ERRORs, WARNINGs or NOTEs
 when checked locally with --no-manual
 
-but this is my first package and first submission of this package
+This is my first package and this is a resubmission of this package.
+The first time I didnt use the license file right, but I fixed that now.
+Additionally, there was a NOTE that I didnt see because of NEWS.md so I
+changed it to NEWS and I checked it and I got NO NOTES, ERRORS, or WARNINGS.
 
