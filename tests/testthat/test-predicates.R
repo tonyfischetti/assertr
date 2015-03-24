@@ -31,7 +31,7 @@ test_that("not_na errors out when appropriate", {
   expect_error(not_na(c()),
                "not_na must be called with single element")
   expect_error(not_na(),
-               "argument \"x\" is missing, with no default")
+               ".x. is missing")
 })
 ######################################
 
@@ -39,7 +39,7 @@ test_that("not_na errors out when appropriate", {
 ########### within_bounds ###########
 test_that("within_bounds fails appropriately", {
   expect_error(within_bounds(),
-               "argument \"lower.bound\" is missing, with no default")
+               ".lower.bound. is missing")
   expect_error(within_bounds(1, "tree"), "bounds must be numeric")
   expect_error(within_bounds(2, 1),
                "lower bound must be strictly lower than upper bound")
@@ -65,7 +65,7 @@ test_that("returned predicate works appropriately", {
 
 test_that("returned predicate fails appropriately", {
   expect_error(within_bounds(0,1)(),
-               "argument \"x\" is missing, with no default")
+               ".x. is missing")
   expect_error(within_bounds(0,1)("tree"),
                "bounds must only be checked on numerics")
   expect_error(within_bounds(0,1)(c(1,2)),
@@ -100,12 +100,12 @@ test_that("first inner function fails appropriately", {
   expect_error(within_n_sds(c(1,2)),
                "'n' must be a positive number")
   expect_error(within_n_sds(),
-               "argument \"n\" is missing, with no default")
+               ".n. is missing")
 })
 
 test_that("second inner function fails appropriately", {
   expect_error(within_n_sds(1)(),
-               "argument \"a.vector\" is missing, with no default")
+               "argument .a.vector. is missing")
   expect_error(within_n_sds(1)(1),
                "standard deviations of vector is NA")
   expect_error(within_n_sds(1)(c("johnny", "marr")),
@@ -120,7 +120,7 @@ test_that("in_set fails appropriately", {
   expect_error(in_set(),
                "can not test for membership in empty set")
   expect_error(in_set(,allow.na=FALSE),
-               "argument is missing, with no default")
+               "argument is missing")
 })
 
 test_that("returned predicate works appropriately", {
@@ -137,7 +137,7 @@ test_that("returned predicate works appropriately", {
 
 test_that("returned predicate fails appropriately", {
   expect_error(in_set(0,1)(),
-               "argument \"x\" is missing, with no default")
+               ".x. is missing")
   expect_error(in_set(0,1)(c(1,2)),
                "bounds must be checked on a single element")
   expect_error(in_set(0,1)(c()),

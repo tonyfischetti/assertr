@@ -12,11 +12,14 @@ data errors are spotted early and can be addressed quickly.
 
 ### Installation
 
+You can install the latest version on CRAN like this
+
+    install.packages("assertr")
+
+or you can install the bleeding-edge development version like this:
+
     install.packages("devtools")
     devtools::install_github("tonyfischetti/assertr")
-
-I also plan to make this package available on CRAN, too, in the
-near future.
 
 ### What does it look like?
 This package offers two assertion functions, `assert` and `verify`, that

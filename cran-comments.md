@@ -8,8 +8,11 @@
 There were no ERRORs, WARNINGs or NOTEs
 when checked locally with --no-manual
 
-This is my first package and this is a resubmission of this package.
-I changed the title of the package to proper title case, as was requested.
-Additionally, there was a NOTE that I didnt see because of NEWS.md so I
-changed it to NEWS and I checked it and I got NO NOTES, ERRORS, or WARNINGS.
+I got an email from Uwe.Ligges@R-project.org saying that assertr v0.4
+(which was just accepted into CRAN a few days ago) failed with the
+oldrelease (3.0.3). I was told to either fix or declare a proper version
+dependency.
 
+I fixed it, slightly incremented the version number and I am submitting it
+here. This is the proper thing to do, right? Please excuse my ignorance, as
+this is my first package.

@@ -84,9 +84,9 @@ test_that("assert raises error if verification fails", {
 
 test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
-               "no applicable method for 'select_' applied to an object of class \"function\"")
+               "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(assert("tree"),
-               "no applicable method for 'select_' applied to an object of class \"character\"")
+               "no applicable method for 'select.?' applied to an object of class \"character\"")
 })
 ######################################
 
@@ -111,9 +111,9 @@ test_that("insist raises error if verification fails", {
 
 test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
-               "no applicable method for 'select_' applied to an object of class \"function\"")
+               "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(insist("tree"),
-               "no applicable method for 'select_' applied to an object of class \"character\"")
+               "no applicable method for 'select.?' applied to an object of class \"character\"")
   expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),
                "argument must be a numeric vector")
 })
