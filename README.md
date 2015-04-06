@@ -90,3 +90,4 @@ For more info, check out the `assertr` vignette
     > vignette("assertr")
 
 Or [read it here](http://www.onthelambda.com/wp-content/uploads/2015/03/assertr.html)
+
