@@ -1,1 +1,2 @@
 vignettes/*.html linguist-documentation
+./inst/doc/*.html linguist-documentation
