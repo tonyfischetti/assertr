@@ -21,9 +21,9 @@ or you can install the bleeding-edge development version like this:
     devtools::install_github("tonyfischetti/assertr")
 
 ### What does it look like?
-This package offers two assertion functions, `assert` and `verify`, that
-are designed to be used shortly after data-loading in a dplyr/magrittr
-pipeline...
+This package offers three assertion functions, `assert`, `verify`, and
+`insist`, that are designed to be used shortly after data-loading in a
+dplyr/magrittr pipeline...
 
 Let’s say, for example, that the R’s built-in car dataset, mtcars, was not 
 built-in but rather procured from an external source that was known for making
@@ -88,5 +88,4 @@ For more info, check out the `assertr` vignette
 
     > vignette("assertr")
 
-Or [read it here](http://www.onthelambda.com/wp-content/uploads/2015/03/assertr.html)
-
+Or [read it here](http://cran.r-project.org/web/packages/assertr/vignettes/assertr.html)
