@@ -1,8 +1,6 @@
 assertr
 ===
 
-![assertr logo](http://statethatiamin.onlythisrose.com/assertrlogo.png)
-
 
 ### What is it?
 The assertr package supplies a suite of functions designed to verify
