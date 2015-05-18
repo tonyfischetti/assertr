@@ -9,7 +9,7 @@ test.vect2 <- c(1, NA, 3)
 ############### not_na ###############
 test_that("not_na returns true if not NA", {
   expect_equal(not_na("tree"), TRUE)
-  expect_equal(not_na(2.8),    TRUE)
+  expect_equal(not_na(2.8),    FALSE)
   expect_equal(not_na(8),      TRUE)
 })
 
