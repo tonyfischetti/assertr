@@ -23,15 +23,35 @@ test_that("not_na handles NaNs right", {
   expect_equal(not_na(NaN, allow.NaN=TRUE), TRUE)
 })
 
+test_that("not_na handles vectors correctly", {
+  expect_equal(not_na(c("tree", "arbol")), c(TRUE, TRUE))
+  # NaN in character string will convert to non-na string
+  expect_equal(not_na(c("tree", "árbol", NA, "δέντρο")),
+               c(TRUE, TRUE, FALSE, TRUE))
+  expect_equal(not_na(c("tree", "árbol", NA, NaN, "δέντρο")),
+               c(TRUE, TRUE, FALSE, TRUE, TRUE))
+  expect_equal(not_na(c("tree", "árbol", NA, NaN, "δέντρο")),
+               c(TRUE, TRUE, FALSE, TRUE, TRUE))
+  expect_equal(not_na(c("tree", "árbol", NA, NaN, "δέντρο"), allow.NaN=FALSE),
+               c(TRUE, TRUE, FALSE, TRUE, TRUE))
+  expect_equal(not_na(c("tree", "árbol", NA, NaN, "δέντρο"), allow.NaN=TRUE),
+               c(TRUE, TRUE, FALSE, TRUE, TRUE))
+  expect_equal(not_na(c(1, (1+1), 0/0, (6/2), NA)),
+               c(TRUE, TRUE, FALSE, TRUE, FALSE))
+  expect_equal(not_na(c(1, (1+1), 0/0, (6/2), NA), allow.NaN=TRUE),
+               c(TRUE, TRUE, TRUE, TRUE, FALSE))
+
+})
+
 test_that("not_na errors out when appropriate", {
-  expect_error(not_na(c(1,2)),
-               "not_na must be called with single element")
-  expect_error(not_na(diag(c(1,2))),
-               "not_na must be called with single element")
   expect_error(not_na(c()),
-               "not_na must be called with single element")
+               "not_na must be called on non-null object")
   expect_error(not_na(),
                ".x. is missing")
+})
+
+test_that("predicate is tagged for assert function to vectorize", {
+  expect_equal(comment(not_na), "assertr/vectorized")
 })
 ######################################
 
@@ -47,7 +67,7 @@ test_that("within_bounds fails appropriately", {
                "lower bound must be strictly lower than upper bound")
 })
 
-test_that("returned predicate works appropriately", {
+test_that("returned predicate works appropriately on scalars", {
   expect_equal(within_bounds(3, 4)(pi), TRUE)
   expect_equal(within_bounds(3, 4)(3), TRUE)
   expect_equal(within_bounds(3, 4, include.lower=FALSE)(3), FALSE)
@@ -63,15 +83,33 @@ test_that("returned predicate works appropriately", {
   expect_equal(within_bounds(0, Inf, include.upper=FALSE)(Inf), FALSE)
 })
 
+test_that("returned predicate works appropriately on vectors", {
+  expect_equal(within_bounds(1,3)(c(0,1,2,3,4)),
+               c(FALSE, TRUE, TRUE, TRUE, FALSE))
+  expect_equal(within_bounds(1,3, include.lower = FALSE)(c(0,1,2,3,4)),
+               c(FALSE, FALSE, TRUE, TRUE, FALSE))
+  expect_equal(within_bounds(1,3, include.lower = FALSE,
+                             include.upper = FALSE)(c(0,1,2,3,4)),
+               c(FALSE, FALSE, TRUE, FALSE, FALSE))
+  expect_equal(within_bounds(1,3)(c(0,1,2,3,4, NA, 5, NaN)),
+               c(FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE))
+  expect_equal(within_bounds(1,3, allow.na=FALSE)(c(0,1,2,3,4, NA, 5, NaN)),
+               c(FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE))
+})
+
 test_that("returned predicate fails appropriately", {
   expect_error(within_bounds(0,1)(),
                ".x. is missing")
   expect_error(within_bounds(0,1)("tree"),
                "bounds must only be checked on numerics")
-  expect_error(within_bounds(0,1)(c(1,2)),
-               "bounds must be checked on a single element")
+  expect_error(within_bounds(0,1)(c("tree", 1, 2)),
+               "bounds must only be checked on numerics")
   expect_error(within_bounds(0,1)(c()),
-               "bounds must be checked on a single element")
+               "bounds must be checked on non-null element")
+})
+
+test_that("returned predicate is tagged for assert function to vectorize", {
+  expect_equal(comment(within_bounds(1,2)), "assertr/vectorized")
 })
 #####################################
 

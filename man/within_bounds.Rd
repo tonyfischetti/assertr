@@ -22,14 +22,14 @@ should be inclusive (default TRUE)}
        should be permitted (default TRUE)}
 }
 \value{
-A function that takes one numeric and returns TRUE
-        if the value is within the bounds defined by the
+A function that takes numeric value or numeric vactor and returns
+        TRUE if the value(s) is/are within the bounds defined by the
         arguments supplied by \code{within_bounds} and FALSE
         otherwise
 }
 \description{
-This function returns a predicate function that will take a single
-numeric value and return TRUE if the value is within the bounds set.
+This function returns a predicate function that will take a numeric value
+or vector and return TRUE if the value(s) is/are within the bounds set.
 This does not actually check the bounds of anything--it only returns
 a function that actually does the checking when called with a number.
 This is a convenience function meant to return a predicate function to
@@ -53,7 +53,7 @@ positivep <- within_bounds(0, Inf, include.lower=FALSE)
 ## this is meant to be used as a predicate in an assert statement
 assert(mtcars, within_bounds(4,8), cyl)
 
-## or in a pipeline, like this was meant for
+## or in a pipeline
 
 library(magrittr)
 

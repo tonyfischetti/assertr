@@ -1,6 +1,6 @@
 PackratFormat: 1.4
 PackratVersion: 0.4.2.1
-RVersion: 3.1.2
+RVersion: 3.1.3
 Repos: CRAN=http://cran.rstudio.com
 
 Package: BH
@@ -18,12 +18,6 @@ Source: CRAN
 Version: 2.0.1
 Hash: 9a3ac4e5fd8059af0fc5156bcb019bbc
 
-Package: RCurl
-Source: CRAN
-Version: 1.95-4.5
-Hash: 1187c1ea73013abf25f362a7e6da1046
-Requires: bitops
-
 Package: Rcpp
 Source: CRAN
 Version: 0.11.3
@@ -33,33 +27,6 @@ Package: assertthat
 Source: CRAN
 Version: 0.1
 Hash: 4b419cfdc33a3019a7f3c6f0cdea6c38
-
-Package: bitops
-Source: CRAN
-Version: 1.0-6
-Hash: cb26464a8321628636b547518994c931
-
-Package: brew
-Source: CRAN
-Version: 1.0-6
-Hash: 9d92cc5ac60123fdb7b0daa3ae83bf99
-
-Package: caTools
-Source: CRAN
-Version: 1.17.1
-Hash: bb5fdc266f716b8a289a4f92007d53e3
-Requires: bitops
-
-Package: devtools
-Source: github
-Version: 1.7.0.9000
-Hash: 4d0964a1cb5b3371f3b5e3628cede3a979f36c90
-Requires: RCurl, digest, evaluate, httr, jsonlite, memoise, roxygen2,
-    rstudioapi, whisker
-GithubRepo: devtools
-GithubUsername: hadley
-GithubRef: master
-GithubSha1: 4d0964a1cb5b3371f3b5e3628cede3a979f36c90
 
 Package: digest
 Source: CRAN
@@ -88,28 +55,11 @@ Source: CRAN
 Version: 0.4
 Hash: 8c77cca8556e1501621b4a5ccb7999bd
 
-Package: htmltools
-Source: CRAN
-Version: 0.2.6
-Hash: 2c87108d130de261ac3c468d3316ae42
-Requires: digest
-
-Package: httr
-Source: CRAN
-Version: 0.6.1
-Hash: 3b082465d75a7a0c3d09ad06a0905aff
-Requires: R6, RCurl, digest, jsonlite, mime, stringr
-
-Package: jsonlite
-Source: CRAN
-Version: 0.9.14
-Hash: 1e949c7f0f926734e2ff498eddb2309a
-
 Package: knitr
 Source: CRAN
 Version: 1.8
 Hash: d00d7b314ca4c34f8a56ceacefb31b4f
-Requires: digest, evaluate, formatR, highr, markdown, stringr
+Requires: digest, formatR, highr, stringr, markdown, evaluate
 
 Package: lazyeval
 Source: CRAN
@@ -127,12 +77,6 @@ Version: 0.7.4
 Hash: 01d7f71ed6e3d9b1c17ba51cff91be72
 Requires: mime
 
-Package: memoise
-Source: CRAN
-Version: 0.2.1
-Hash: fc52fa39dfd216c44d64812ff31b1c67
-Requires: digest
-
 Package: mime
 Source: CRAN
 Version: 0.2
@@ -142,23 +86,6 @@ Package: packrat
 Source: CRAN
 Version: 0.4.2-1
 Hash: 085f944cec9b56e8a280222b5174c76e
-
-Package: rmarkdown
-Source: CRAN
-Version: 0.4.2
-Hash: c0a973db5a50da2b14afece2007984ab
-Requires: caTools, htmltools, knitr, yaml
-
-Package: roxygen2
-Source: CRAN
-Version: 4.1.0
-Hash: c3feaf4b9f8559778533f00763fad38f
-Requires: Rcpp, brew, digest, stringr
-
-Package: rstudioapi
-Source: CRAN
-Version: 0.2
-Hash: aa27b6b62b335717db16cb1de6336860
 
 Package: stringr
 Source: CRAN
@@ -170,13 +97,3 @@ Source: CRAN
 Version: 0.9.1
 Hash: 8b05e97c7401ae4f8b5dfbaa44cfcf20
 Requires: digest
-
-Package: whisker
-Source: CRAN
-Version: 0.3-2
-Hash: 186ab2937fec1694c8a63009a2389c4e
-
-Package: yaml
-Source: CRAN
-Version: 2.1.13
-Hash: e5d041c001f6d641fd009c1f6ef7d831

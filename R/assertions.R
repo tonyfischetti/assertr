@@ -113,7 +113,7 @@ insist <- function(data, predicate_generator, ...){
 
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),
-    function(column){predicate_generator(sub.frame[[column]])})
+                            function(column){predicate_generator(sub.frame[[column]])})
 
   # map each predicate to their respective function
   vapply(names(sub.frame),
@@ -187,10 +187,3 @@ verify <- function(data, expr){
   error.message <- make.verify.error.message(num.violations)
   stop(error.message)
 }
-
-
-
-
-
-
-

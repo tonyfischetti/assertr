@@ -7,25 +7,27 @@
 not_na(x, allow.NaN = FALSE)
 }
 \arguments{
-\item{x}{A single atomic value}
+\item{x}{A R object that supports \link{is.na} an \link{is.nan}}
 
 \item{allow.NaN}{A logical indicating whether NaNs should be allowed
 (default FALSE)}
 }
 \value{
-TRUE if x is not NA, FALSE otherwise
+A vector of the same length that is TRUE when the element is
+not NA and FALSE otherwise
 }
 \description{
-This is the inverse of \code{\link[base]{is.na}} if it is
-used on a atomic element. This is a convenience function meant
-to be used as a predicate in an \code{\link{assertr}} assertion.
+This is the inverse of \code{\link[base]{is.na}}. This is a convenience
+function meant to be used as a predicate in an \code{\link{assertr}}
+assertion.
 }
 \examples{
 not_na(NA)
 not_na(2.8)
 not_na("tree")
+not_na(c(1, 2, NA, 4))
 }
 \seealso{
-\code{\link{is.na}}
+\code{\link{is.na}} \code{\link{is.nan}}
 }
 

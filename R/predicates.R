@@ -6,34 +6,37 @@
 
 #' Returns TRUE if value is not NA
 #'
-#' This is the inverse of \code{\link[base]{is.na}} if it is
-#' used on a atomic element. This is a convenience function meant
-#' to be used as a predicate in an \code{\link{assertr}} assertion.
+#' This is the inverse of \code{\link[base]{is.na}}. This is a convenience
+#' function meant to be used as a predicate in an \code{\link{assertr}}
+#' assertion.
 #'
-#' @param x A single atomic value
+#' @param x A R object that supports \link{is.na} an \link{is.nan}
 #' @param allow.NaN A logical indicating whether NaNs should be allowed
 #'        (default FALSE)
-#' @return TRUE if x is not NA, FALSE otherwise
-#' @seealso \code{\link{is.na}}
+#' @return A vector of the same length that is TRUE when the element is
+#' not NA and FALSE otherwise
+#' @seealso \code{\link{is.na}} \code{\link{is.nan}}
 #' @examples
 #' not_na(NA)
 #' not_na(2.8)
 #' not_na("tree")
+#' not_na(c(1, 2, NA, 4))
 #'
 #' @export
 not_na <- function(x, allow.NaN=FALSE){
-  if(length(x)>1)            stop("not_na must be called with single element")
-  if(is.null(x))             stop("not_na must be called with single element")
-  if(allow.NaN && is.nan(x)) return(TRUE)
-  if(is.na(x))               return(FALSE)
-  return(TRUE)
+  if(is.null(x))    stop("not_na must be called on non-null object")
+  if(allow.NaN)     return((!is.na(x)) | is.nan(x))
+  return(!is.na(x))
 }
+# so assert function knows to vectorize the function for
+# substantial speed increase
+comment(not_na) <- "assertr/vectorized"
 
 
 #' Creates bounds checking predicate
 #'
-#' This function returns a predicate function that will take a single
-#' numeric value and return TRUE if the value is within the bounds set.
+#' This function returns a predicate function that will take a numeric value
+#' or vector and return TRUE if the value(s) is/are within the bounds set.
 #' This does not actually check the bounds of anything--it only returns
 #' a function that actually does the checking when called with a number.
 #' This is a convenience function meant to return a predicate function to
@@ -48,8 +51,8 @@ not_na <- function(x, allow.NaN=FALSE){
 #' @param allow.na A logical indicating whether NAs (including NaNs)
 #'        should be permitted (default TRUE)
 #'
-#' @return A function that takes one numeric and returns TRUE
-#'         if the value is within the bounds defined by the
+#' @return A function that takes numeric value or numeric vactor and returns
+#'         TRUE if the value(s) is/are within the bounds defined by the
 #'         arguments supplied by \code{within_bounds} and FALSE
 #'         otherwise
 #'
@@ -71,7 +74,7 @@ not_na <- function(x, allow.NaN=FALSE){
 #' ## this is meant to be used as a predicate in an assert statement
 #' assert(mtcars, within_bounds(4,8), cyl)
 #'
-#' ## or in a pipeline, like this was meant for
+#' ## or in a pipeline
 #'
 #' library(magrittr)
 #'
@@ -86,25 +89,26 @@ within_bounds <- function(lower.bound, upper.bound,
     stop("bounds must be numeric")
   if(lower.bound >= upper.bound)
     stop("lower bound must be strictly lower than upper bound")
-  function(x){
-    if(length(x)>1)      stop("bounds must be checked on a single element")
-    if(is.null(x))       stop("bounds must be checked on a single element")
+  fun <- function(x){
+    if(is.null(x))       stop("bounds must be checked on non-null element")
     if(!is.numeric(x))   stop("bounds must only be checked on numerics")
-    if(is.na(x)){
-      if(allow.na)    return(TRUE)
-      if(!allow.na)   return(FALSE)
-    }
     lower.operator <- `>=`
     if(!include.lower) lower.operator <- `>`
     upper.operator <- `<=`
     if(!include.upper) upper.operator <- `<`
-    if(lower.operator(x, lower.bound) && upper.operator(x, upper.bound))
-      return(TRUE)
-    return(FALSE)
+    if(allow.na){
+      return((lower.operator(x, lower.bound) &
+                upper.operator(x, upper.bound)) | is.na(x))
+    }
+    return((lower.operator(x, lower.bound) &
+              upper.operator(x, upper.bound)) & !(is.na(x)))
   }
+  comment(fun) <- "assertr/vectorized"
+  return(fun)
 }
 # so, this function returns a function to be used as argument to another
 # function
+
 
 
 #' Returns TRUE if value in set
