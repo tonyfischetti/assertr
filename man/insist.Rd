@@ -2,9 +2,12 @@
 % Please edit documentation in R/assertions.R
 \name{insist}
 \alias{insist}
+\alias{insist_}
 \title{Raises error if dynamically created predicate is FALSE in any columns selected}
 \usage{
 insist(data, predicate_generator, ...)
+
+insist_(data, predicate_generator, ..., .dots, .nameofpred = "")
 }
 \arguments{
 \item{data}{A data frame}
@@ -15,9 +18,14 @@ for every column, a true predicate function to be applied to
 every element in the column vectors selected}
 
 \item{...}{Comma separated list of unquoted expressions.
-           You can treat variable names like they are positions.
-           Use positive values to select variables; use negative
-           values to drop variables.}
+Uses dplyr's \code{select} to select
+columns from data.}
+
+\item{.dots}{Use insist_() to select columns using standard evaluation.}
+
+\item{.nameofpred}{Text representation of predicate for printing in case
+        of assertion violation. Will automatically be retrieved if left
+        blank (default)}
 }
 \value{
 data if dynamically created predicate assertion is TRUE. error if not.
@@ -36,6 +44,9 @@ See \code{vignette("assertr")} for how to use this in context
 }
 \examples{
 insist(iris, within_n_sds(3), Sepal.Length)   # returns iris
+
+# equivalent using standard evaluation
+insist_(iris, within_n_sds(3), "Sepal.Length")
 
 library(magrittr)
 

@@ -16,18 +16,33 @@
 #' @param data A data frame
 #' @param predicate A function that returns FALSE when violated
 #' @param ... Comma separated list of unquoted expressions.
-#'            You can treat variable names like they are positions.
-#'            Use positive values to select variables; use negative
-#'            values to drop variables.
+#'            Uses dplyr's \code{select} to select
+#'            columns from data.
+#' @param .dots Use assert_() to select columns using standard evaluation.
+#' @param .nameofpred Text representation of predicate for printing in case
+#'         of assertion violation. Will automatically be retrieved if left
+#'         blank (default)
+#'
 #'
 #' @return data if predicate assertion is TRUE. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{verify}} \code{\link{insist}}
 #' @examples
 #'
-#' assert(mtcars, not_na, vs)           # returns mtcars
+#' # returns mtcars
+#' assert(mtcars, not_na, vs)
 #'
-#' assert(mtcars, not_na, mpg:carb)     # return mtcars
+#' # equivalent statements using standard evaluation
+#' assert_(mtcars, not_na, "vs")
+#' var <- "vs"
+#' assert_(mtcars, not_na, var)
+#'
+#' # return mtcars
+#' assert(mtcars, not_na, mpg:carb)
+#'
+#' # equivalent using standard evaluation
+#' assert_(mtcars, not_na, "mpg:carb")
+
 #'
 #' library(magrittr)                    # for piping operator
 #'
@@ -43,9 +58,22 @@
 #'
 #' @export
 assert <- function(data, predicate, ...){
-  sub.frame <- dplyr::select(data, ...)
   name.of.predicate <- as.character(substitute(predicate))
   if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
+  assert_(data, predicate, .dots = lazyeval::lazy_dots(...),
+          .nameofpred = name.of.predicate)
+}
+
+#' @export
+#' @rdname assert
+assert_ <- function(data, predicate, ..., .dots, .nameofpred=""){
+  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  if(.nameofpred==""){
+    name.of.predicate <- as.character(substitute(predicate))
+    if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
+  }
+  else
+    name.of.predicate <- .nameofpred
   full.predicate <- make.predicate.proper(predicate)
   # ew! we have to use loops because we should stop
   # at the first violation and we need the index
@@ -79,9 +107,12 @@ assert <- function(data, predicate, ...){
 #'        for every column, a true predicate function to be applied to
 #'        every element in the column vectors selected
 #' @param ... Comma separated list of unquoted expressions.
-#'            You can treat variable names like they are positions.
-#'            Use positive values to select variables; use negative
-#'            values to drop variables.
+#'            Uses dplyr's \code{select} to select
+#'            columns from data.
+#' @param .dots Use insist_() to select columns using standard evaluation.
+#' @param .nameofpred Text representation of predicate for printing in case
+#'         of assertion violation. Will automatically be retrieved if left
+#'         blank (default)
 #'
 #' @return data if dynamically created predicate assertion is TRUE. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
@@ -89,6 +120,9 @@ assert <- function(data, predicate, ...){
 #' @examples
 #'
 #' insist(iris, within_n_sds(3), Sepal.Length)   # returns iris
+#'
+#' # equivalent using standard evaluation
+#' insist_(iris, within_n_sds(3), "Sepal.Length")
 #'
 #' library(magrittr)
 #'
@@ -106,10 +140,24 @@ assert <- function(data, predicate, ...){
 #'
 #' @export
 insist <- function(data, predicate_generator, ...){
-  sub.frame <- dplyr::select(data, ...)
   name.of.predicate.generator <- as.character(substitute(predicate_generator))
   if(length(name.of.predicate.generator)>1)
     name.of.predicate.generator <- name.of.predicate.generator[1]
+  insist_(data, predicate_generator, .dots = lazyeval::lazy_dots(...),
+          .nameofpred = name.of.predicate.generator)
+}
+
+#' @export
+#' @rdname insist
+insist_ <- function(data, predicate_generator, ..., .dots, .nameofpred=""){
+  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  if(.nameofpred==""){
+    name.of.predicate.generator <- as.character(substitute(predicate_generator))
+    if(length(name.of.predicate.generator)>1)
+      name.of.predicate.generator <- name.of.predicate.generator[1]
+  }
+  else
+    name.of.predicate.generator <- .nameofpred
 
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),

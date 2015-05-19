@@ -75,10 +75,31 @@ test_that("assert returns data if verification passes", {
                iris)
 })
 
+test_that("assert returns data if verification passes (using se)", {
+  expect_equal(assert_(mtcars, in_set(0,1), "vs", "am"), mtcars)
+  expect_equal(assert_(mtcars, within_bounds(3,5), "gear"), mtcars)
+  expect_equal(assert_(mtcars, is.numeric, "mpg:carb"), mtcars)
+  expect_equal(assert_(mtcars, not_na, "vs"), mtcars)
+  expect_equal(assert_(mtcars, not_na, "mpg:carb"), mtcars)
+  # lambdas
+  expect_equal(assert_(mtcars, function(x) x%%1==0, "cyl", "vs", "am",
+                       "gear", "carb"), mtcars)
+  expect_equal(assert_(mtcars, function(x) x%%1==0, "gear"), mtcars)
+  expect_equal(assert_(iris, function(x) nchar(as.character(x)) > 5, "Species"),
+               iris)
+})
+
 test_that("assert raises error if verification fails", {
   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear),
                "Error : Assertion 'within_bounds' violated at index 4 of vector 'gear' \\(value: 3)")
   expect_error(assert(mtcars, within_bounds(3,5), gear, carb),
+               "Error : Assertion 'within_bounds' violated at index 3 of vector 'carb' \\(value: 1)")
+})
+
+test_that("assert raises error if verification fails (using se)", {
+  expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear"),
+               "Error : Assertion 'within_bounds' violated at index 4 of vector 'gear' \\(value: 3)")
+  expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb"),
                "Error : Assertion 'within_bounds' violated at index 3 of vector 'carb' \\(value: 1)")
 })
 
@@ -88,6 +109,15 @@ test_that("assert breaks appropriately", {
   expect_error(assert("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
 })
+
+test_that("assert breaks appropriately (using se)", {
+  expect_error(assert_(in_set(0,1), mtcars$vs),
+               "no applicable method for 'select.?' applied to an object of class \"function\"")
+  expect_error(assert_("tree"),
+               "no applicable method for 'select.?' applied to an object of class \"character\"")
+})
+
+
 ######################################
 
 
@@ -100,6 +130,13 @@ test_that("insist returns data if verification passes", {
                our.iris)
 })
 
+test_that("insist returns data if verification passes (using se)", {
+  expect_equal(insist_(our.iris, within_n_sds(3), "Sepal.Length"), our.iris)
+  expect_equal(insist_(our.iris.3, within_n_sds(2), "Sepal.Length"), our.iris.3)
+  expect_equal(insist_(our.iris, within_n_sds(4), "Sepal.Length:Petal.Width"),
+               our.iris)
+})
+
 test_that("insist raises error if verification fails", {
   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length),
                "Error : Assertion 'within_n_sds' violated at index 106 of vector 'Sepal.Length' \\(value: 7.6)")
@@ -109,12 +146,30 @@ test_that("insist raises error if verification fails", {
                "Error : Assertion 'within_n_sds' violated at index 16 of vector 'Sepal.Width' \\(value: 4.4)")
 })
 
+test_that("insist raises error if verification fails", {
+  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length"),
+               "Error : Assertion 'within_n_sds' violated at index 106 of vector 'Sepal.Length' \\(value: 7.6)")
+  expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length"),
+               "Error : Assertion 'within_n_sds' violated at index 118 of vector 'Sepal.Length' \\(value: 7.7)")
+  expect_error(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width"),
+               "Error : Assertion 'within_n_sds' violated at index 16 of vector 'Sepal.Width' \\(value: 4.4)")
+})
+
 test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(insist("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
   expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),
+               "argument must be a numeric vector")
+})
+
+test_that("insist breaks appropriately (using se)", {
+  expect_error(insist_(within_n_sds(5), "mtcars$vs"),
+               "no applicable method for 'select.?' applied to an object of class \"function\"")
+  expect_error(insist_("tree"),
+               "no applicable method for 'select.?' applied to an object of class \"character\"")
+  expect_error(insist_(iris, within_n_sds(5), "Petal.Width:Species"),
                "argument must be a numeric vector")
 })
 ######################################

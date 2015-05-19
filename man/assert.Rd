@@ -2,9 +2,12 @@
 % Please edit documentation in R/assertions.R
 \name{assert}
 \alias{assert}
+\alias{assert_}
 \title{Raises error if predicate is FALSE in any columns selected}
 \usage{
 assert(data, predicate, ...)
+
+assert_(data, predicate, ..., .dots, .nameofpred = "")
 }
 \arguments{
 \item{data}{A data frame}
@@ -12,9 +15,14 @@ assert(data, predicate, ...)
 \item{predicate}{A function that returns FALSE when violated}
 
 \item{...}{Comma separated list of unquoted expressions.
-           You can treat variable names like they are positions.
-           Use positive values to select variables; use negative
-           values to drop variables.}
+Uses dplyr's \code{select} to select
+columns from data.}
+
+\item{.dots}{Use assert_() to select columns using standard evaluation.}
+
+\item{.nameofpred}{Text representation of predicate for printing in case
+        of assertion violation. Will automatically be retrieved if left
+        blank (default)}
 }
 \value{
 data if predicate assertion is TRUE. error if not.
@@ -31,9 +39,19 @@ error, effectively terminating the pipeline early.
 See \code{vignette("assertr")} for how to use this in context
 }
 \examples{
-assert(mtcars, not_na, vs)           # returns mtcars
+# returns mtcars
+assert(mtcars, not_na, vs)
 
-assert(mtcars, not_na, mpg:carb)     # return mtcars
+# equivalent statements using standard evaluation
+assert_(mtcars, not_na, "vs")
+var <- "vs"
+assert_(mtcars, not_na, var)
+
+# return mtcars
+assert(mtcars, not_na, mpg:carb)
+
+# equivalent using standard evaluation
+assert_(mtcars, not_na, "mpg:carb")
 
 library(magrittr)                    # for piping operator
 

@@ -1,3 +1,7 @@
+# assertr 0.4.9
+
+* provided standard evaluation versions of assert and insist
+
 # assertr 0.4.2
 
 * not_na and within_bounds are now vectorized and tagged
