@@ -74,19 +74,32 @@ assert_ <- function(data, predicate, ..., .dots, .nameofpred=""){
   }
   else
     name.of.predicate <- .nameofpred
+
   full.predicate <- make.predicate.proper(predicate)
-  # ew! we have to use loops because we should stop
-  # at the first violation and we need the index
-  vapply(names(sub.frame),
-         function(column){
-           this.vector <- sub.frame[[column]]
-           for(i in 1:length(this.vector)){
-             if(!(predicate(this.vector[i]))){
-               error.message <- make.assert.error.message(name.of.predicate, i,
-                                                          column, this.vector[i])
-               stop(error.message, call.=FALSE)}}
-           return(TRUE)}, logical(1))
-  return(data)
+
+
+  log.mat <- sapply(names(sub.frame),
+                    function(column){
+                      this.vector <- sub.frame[[column]]
+                      return(apply.predicate.to.vector(this.vector,
+                                                       predicate))})
+
+  if(all(log.mat))
+    return(data)
+
+  messages <- sapply(colnames(log.mat), function(col.name){
+    col <- log.mat[, col.name]
+    num.violations <- sum(!col)
+    if(num.violations==0)
+      return("")
+    index.of.first.violation <- which(!col)[1]
+    offending.element <- sub.frame[[col.name]][index.of.first.violation]
+    make.assert.error.message(name.of.predicate, col.name, num.violations,
+                              index.of.first.violation, offending.element)
+  })
+
+  messages <- paste0(messages[messages!=""])
+  stop(messages, call.=FALSE)
 }
 
 
@@ -163,18 +176,30 @@ insist_ <- function(data, predicate_generator, ..., .dots, .nameofpred=""){
   true.predicates <- sapply(names(sub.frame),
                             function(column){predicate_generator(sub.frame[[column]])})
 
-  # map each predicate to their respective function
-  vapply(names(sub.frame),
-         function(column){
-           this.vector <- sub.frame[[column]]
-           for(i in 1:length(this.vector)){
-             if(!(true.predicates[[column]](this.vector[i]))){
-               error.message <- make.assert.error.message(name.of.predicate.generator,
-                                                          i,
-                                                          column, this.vector[i])
-               stop(error.message, call.=FALSE)}}
-           return(TRUE)}, logical(1))
-  return(data)
+  log.mat <- sapply(names(sub.frame),
+                    function(column){
+                      this.vector <- sub.frame[[column]]
+                      predicate <- true.predicates[[column]]
+                      return(apply.predicate.to.vector(this.vector,
+                                                       predicate))})
+
+  if(all(log.mat))
+    return(data)
+
+  messages <- sapply(colnames(log.mat), function(col.name){
+    col <- log.mat[, col.name]
+    num.violations <- sum(!col)
+    if(num.violations==0)
+      return("")
+    index.of.first.violation <- which(!col)[1]
+    offending.element <- sub.frame[[col.name]][index.of.first.violation]
+    make.assert.error.message(name.of.predicate.generator, col.name,
+                              num.violations, index.of.first.violation,
+                              offending.element)
+  })
+
+  messages <- paste0(messages[messages!=""])
+  stop(messages, call.=FALSE)
 }
 
 

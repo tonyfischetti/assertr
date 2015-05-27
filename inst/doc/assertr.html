@@ -10,7 +10,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2015-05-19" />
+<meta name="date" content="2015-05-26" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2015-05-19</em></h4>
+<h4 class="date"><em>2015-05-26</em></h4>
 </div>
 
 
@@ -114,7 +114,8 @@ our.data %&gt;%
 <span class="st">  </span><span class="kw">assert</span>(<span class="kw">within_bounds</span>(<span class="dv">0</span>,<span class="ot">Inf</span>), mpg) %&gt;%
 <span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
-<pre><code>## Error: Assertion 'within_bounds' violated at index 5 of vector 'mpg' (value: -18.7)</code></pre>
+<pre><code>## Error: 
+## Vector 'mpg' violates assertion 'within_bounds' 1 time (value [-18.7] at index 5)</code></pre>
 <p>The <code>assert</code> function takes a data frame, a predicate function, and an arbitrary number of columns to apply the predicate function to. The predicate function (a function that returns a logical/boolean value) is then applied to every element of the columns selected, and will raise an error when it finds the first violation.</p>
 <p>Internally, the <code>assert</code> function uses <code>dplyr</code>’s <code>select</code> function to extract the columns to test the predicate function on. This allows for complex assertions. Let’s say we wanted to make sure that all values in the dataset are <em>greater</em> than zero (except <code>mpg</code>):</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(assertr)
@@ -123,7 +124,9 @@ our.data %&gt;%
 <span class="st">  </span><span class="kw">assert</span>(<span class="kw">within_bounds</span>(<span class="dv">0</span>,<span class="ot">Inf</span>, <span class="dt">include.lower=</span><span class="ot">FALSE</span>), -mpg) %&gt;%
 <span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
-<pre><code>## Error: Assertion 'within_bounds' violated at index 1 of vector 'vs' (value: 0)</code></pre>
+<pre><code>## Error: 
+## Vector 'vs' violates assertion 'within_bounds' 18 times (e.g. [0] at index 1)
+## Vector 'am' violates assertion 'within_bounds' 19 times (e.g. [0] at index 4)</code></pre>
 </div>
 <div id="verify-vs.assert" class="section level3">
 <h3>verify vs. assert</h3>
@@ -197,7 +200,8 @@ our.data %&gt;%
 <span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">2</span>), mpg) %&gt;%
 <span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre>
-<pre><code>## Error: Assertion 'within_n_sds' violated at index 18 of vector 'mpg' (value: 32.4)</code></pre>
+<pre><code>## Error: 
+## Vector 'mpg' violates assertion 'within_n_sds' 2 times (e.g. [32.4] at index 18)</code></pre>
 <p>Execution of the pipeline was halted. But now we know exactly which data point (and column) violated the predicate that <code>within_n_sds(3)(mtcars$mpg)</code> returned.</p>
 <p>Now that’s an efficient car!</p>
 <p>After the predicate generator, <code>insist</code> takes an arbitrary number of columns just like <code>assert</code> using the syntax of <code>dplyr</code>’s <code>select</code> function. If you wanted to check that everything in mtcars is within 10 standard deviations of the mean (of each column vector), you can do so like this:</p>

@@ -91,16 +91,20 @@ test_that("assert returns data if verification passes (using se)", {
 
 test_that("assert raises error if verification fails", {
   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear),
-               "Error : Assertion 'within_bounds' violated at index 4 of vector 'gear' \\(value: 3)")
+               "Vector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
   expect_error(assert(mtcars, within_bounds(3,5), gear, carb),
-               "Error : Assertion 'within_bounds' violated at index 3 of vector 'carb' \\(value: 1)")
+               "Vector 'carb' violates assertion 'within_bounds' 19 times \\(e.g. \\[1\\] at index 3\\)")
+  expect_error(assert(mtcars, within_bounds(3.5, 4.5), carb, gear),
+               "Vector 'carb' violates assertion 'within_bounds' 22 times \\(e.g. \\[1\\] at index 3\\)\nVector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
 })
 
 test_that("assert raises error if verification fails (using se)", {
   expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear"),
-               "Error : Assertion 'within_bounds' violated at index 4 of vector 'gear' \\(value: 3)")
+               "Vector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
   expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb"),
-               "Error : Assertion 'within_bounds' violated at index 3 of vector 'carb' \\(value: 1)")
+               "Vector 'carb' violates assertion 'within_bounds' 19 times \\(e.g. \\[1\\] at index 3\\)")
+  expect_error(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear"),
+               "Vector 'carb' violates assertion 'within_bounds' 22 times \\(e.g. \\[1\\] at index 3\\)\nVector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
 })
 
 test_that("assert breaks appropriately", {
@@ -139,20 +143,24 @@ test_that("insist returns data if verification passes (using se)", {
 
 test_that("insist raises error if verification fails", {
   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length),
-               "Error : Assertion 'within_n_sds' violated at index 106 of vector 'Sepal.Length' \\(value: 7.6)")
+               "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)")
   expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length),
-               "Error : Assertion 'within_n_sds' violated at index 118 of vector 'Sepal.Length' \\(value: 7.7)")
+               "Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)")
   expect_error(insist(our.iris, within_n_sds(3), Sepal.Length:Petal.Width),
-               "Error : Assertion 'within_n_sds' violated at index 16 of vector 'Sepal.Width' \\(value: 4.4)")
+               "Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)")
+  expect_error(insist(our.iris, within_n_sds(2), Sepal.Length:Petal.Width),
+               "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)")
 })
 
 test_that("insist raises error if verification fails", {
   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length"),
-               "Error : Assertion 'within_n_sds' violated at index 106 of vector 'Sepal.Length' \\(value: 7.6)")
+               "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)")
   expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length"),
-               "Error : Assertion 'within_n_sds' violated at index 118 of vector 'Sepal.Length' \\(value: 7.7)")
+               "Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)")
   expect_error(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width"),
-               "Error : Assertion 'within_n_sds' violated at index 16 of vector 'Sepal.Width' \\(value: 4.4)")
+               "Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)")
+  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width"),
+               "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)")
 })
 
 test_that("insist breaks appropriately", {
