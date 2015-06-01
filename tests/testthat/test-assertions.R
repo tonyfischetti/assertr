@@ -10,6 +10,16 @@ our.iris.2[106,1] <- 7
 our.iris.3 <- our.iris.2
 our.iris.3[c(118, 119, 123, 132, 131, 136), 1] <- 7
 
+# custom error messages
+
+yell <- function(message){
+  stop(toupper(message), call.=FALSE)
+}
+
+not.helpful <- function(message){
+  stop("unspecified error", call.=FALSE)
+}
+
 
 ############### verify ###############
 test_that("verify returns data if verification passes", {
@@ -107,6 +117,32 @@ test_that("assert raises error if verification fails (using se)", {
                "Vector 'carb' violates assertion 'within_bounds' 22 times \\(e.g. \\[1\\] at index 3\\)\nVector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
 })
 
+test_that("assert raises *custom error* if verification fails", {
+  expect_error(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun=yell),
+               "VECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
+  expect_error(assert(mtcars, within_bounds(3,5), gear, carb, error_fun=yell),
+               "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 19 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)")
+  expect_error(assert(mtcars, within_bounds(3.5, 4.5), carb, gear, error_fun=yell),
+               "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 22 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)\nVECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
+  expect_error(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun=not.helpful),
+               "unspecified error")
+  expect_error(assert(mtcars, within_bounds(3,5), gear, carb, error_fun=not.helpful),
+               "unspecified error")
+})
+
+test_that("assert raises *custom error* if verification fails (using se)", {
+  expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun=yell),
+               "VECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
+  expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun=yell),
+               "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 19 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)")
+  expect_error(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear", error_fun=yell),
+               "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 22 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)\nVECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
+  expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun=not.helpful),
+               "unspecified error")
+  expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun=not.helpful),
+               "unspecified error")
+})
+
 test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
@@ -152,7 +188,7 @@ test_that("insist raises error if verification fails", {
                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)")
 })
 
-test_that("insist raises error if verification fails", {
+test_that("insist raises error if verification fails (using se)", {
   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length"),
                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)")
   expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length"),
@@ -161,6 +197,36 @@ test_that("insist raises error if verification fails", {
                "Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)")
   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width"),
                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)")
+})
+
+test_that("insist raises *custom error* if verification fails", {
+  expect_error(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun=yell),
+               toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)"))
+  expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun=yell),
+               toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)"))
+  expect_error(insist(our.iris, within_n_sds(3), Sepal.Length:Petal.Width, error_fun=yell),
+               toupper("Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)"))
+  expect_error(insist(our.iris, within_n_sds(2), Sepal.Length:Petal.Width, error_fun=yell),
+               toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)"))
+  expect_error(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
+               "unspecified error")
+  expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
+               "unspecified error")
+})
+
+test_that("insist raises *custom error* if verification fails (using se)", {
+  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun=yell),
+               toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)"))
+  expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun=yell),
+               toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)"))
+  expect_error(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width", error_fun=yell),
+               toupper("Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)"))
+  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width", error_fun=yell),
+               toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)"))
+  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
+               "unspecified error")
+  expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
+               "unspecified error")
 })
 
 test_that("insist breaks appropriately", {

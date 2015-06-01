@@ -57,16 +57,18 @@
 #'   # nothing here will run}
 #'
 #' @export
-assert <- function(data, predicate, ...){
+assert <- function(data, predicate, ..., error_fun=assertr_stop){
   name.of.predicate <- as.character(substitute(predicate))
   if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
   assert_(data, predicate, .dots = lazyeval::lazy_dots(...),
+          error_fun = error_fun,
           .nameofpred = name.of.predicate)
 }
 
 #' @export
 #' @rdname assert
-assert_ <- function(data, predicate, ..., .dots, .nameofpred=""){
+assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
+                    .nameofpred=""){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   if(.nameofpred==""){
     name.of.predicate <- as.character(substitute(predicate))
@@ -98,8 +100,8 @@ assert_ <- function(data, predicate, ..., .dots, .nameofpred=""){
                               index.of.first.violation, offending.element)
   })
 
-  messages <- paste0(messages[messages!=""])
-  stop(messages, call.=FALSE)
+  messages <- paste0(messages[messages!=""], collapse = '')
+  error_fun(messages)
 }
 
 
@@ -152,17 +154,19 @@ assert_ <- function(data, predicate, ..., .dots, .nameofpred=""){
 #'   # is terminated so nothing after this statement will run}
 #'
 #' @export
-insist <- function(data, predicate_generator, ...){
+insist <- function(data, predicate_generator, ..., error_fun=assertr_stop){
   name.of.predicate.generator <- as.character(substitute(predicate_generator))
   if(length(name.of.predicate.generator)>1)
     name.of.predicate.generator <- name.of.predicate.generator[1]
   insist_(data, predicate_generator, .dots = lazyeval::lazy_dots(...),
+          error_fun = error_fun,
           .nameofpred = name.of.predicate.generator)
 }
 
 #' @export
 #' @rdname insist
-insist_ <- function(data, predicate_generator, ..., .dots, .nameofpred=""){
+insist_ <- function(data, predicate_generator, ..., .dots,
+                    error_fun=assertr_stop, .nameofpred=""){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   if(.nameofpred==""){
     name.of.predicate.generator <- as.character(substitute(predicate_generator))
@@ -198,8 +202,8 @@ insist_ <- function(data, predicate_generator, ..., .dots, .nameofpred=""){
                               offending.element)
   })
 
-  messages <- paste0(messages[messages!=""])
-  stop(messages, call.=FALSE)
+  messages <- paste0(messages[messages!=""], collapse = '')
+  error_fun(messages)
 }
 
 
