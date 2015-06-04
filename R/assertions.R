@@ -19,6 +19,8 @@
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
 #' @param .dots Use assert_() to select columns using standard evaluation.
+#' @param error_fun Function to call if assertion fails. Takes one error
+#'         string. Uses \code{stop} by default
 #' @param .nameofpred Text representation of predicate for printing in case
 #'         of assertion violation. Will automatically be retrieved if left
 #'         blank (default)
@@ -125,6 +127,8 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
 #' @param .dots Use insist_() to select columns using standard evaluation.
+#' @param error_fun Function to call if assertion fails. Takes one error
+#'         string. Uses \code{stop} by default
 #' @param .nameofpred Text representation of predicate for printing in case
 #'         of assertion violation. Will automatically be retrieved if left
 #'         blank (default)
@@ -218,6 +222,8 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #'
 #' @param data A data frame, list, or environment
 #' @param expr A logical expression
+#' @param error_fun Function to call if assertion fails. Takes one error
+#'         string. Uses \code{stop} by default
 #'
 #' @return data if verification passes. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
@@ -252,7 +258,7 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #'
 #'
 #' @export
-verify <- function(data, expr){
+verify <- function(data, expr, error_fun=stop){
   expr <- substitute(expr)
   # conform to terminology from subset
   envir <- data
@@ -262,5 +268,6 @@ verify <- function(data, expr){
     return(data)
   num.violations <- sum(!logical.results)
   error.message <- make.verify.error.message(num.violations)
-  stop(error.message)
+  error.message <- paste0(error.message, collapse = '')
+  error_fun(error.message)
 }

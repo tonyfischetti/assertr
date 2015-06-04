@@ -4,12 +4,15 @@
 \alias{verify}
 \title{Raises error if expression is FALSE anywhere}
 \usage{
-verify(data, expr)
+verify(data, expr, error_fun = stop)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}
 
 \item{expr}{A logical expression}
+
+\item{error_fun}{Function to call if assertion fails. Takes one error
+        string. Uses \code{stop} by default}
 }
 \value{
 data if verification passes. error if not.

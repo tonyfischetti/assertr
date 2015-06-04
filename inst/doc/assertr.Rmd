@@ -342,6 +342,55 @@ Awesome! Now we can add an arbitrary number of assertions, as the need arises,
 without touching the real logic.
 
 
+### advanced: send email reports using custom error functions
+
+One particularly cool application of `assertr` is to use it as a data integrity
+checker for frequently updated data sources. A script can download new data as
+it becomes available, and then run `assertr` checks on it. This makes assertr
+into a sort of "continuous integration" tool (but for data,
+not code.)
+
+In an unsupervised "continuous integration" environment, you need a way to
+discover that the assertions failed. In CI-as-a-service in the software world, 
+failed automated checks often send an email of reporting the maintainer of a
+botched build; why not bring that functionality to `assertr`?!
+
+All assertion verbs in `assertr` support a custom error function. By default,
+the error function is R's built-in `stop` function, which displays a message
+and halts execution. You can specify your own to hijack this behavior and
+redirect flow-of-control wherever you want. 
+
+All custom error functions take one argument: the actual error message that
+`assertr` assembles based on which assertions fail. In this case, we will
+build a function that takes that message and emails it to someone before
+halting execution. We will use the `mailR` package to send the mail.
+
+```{r eval=FALSE, purl = FALSE}
+
+library(mailR)
+
+email_me <- function(err_str){
+  send.mail(from="assertr@gmail.com", to="YOU@gmail.com",
+            subject="error from assertr", body=err_str,
+            smtp = list(host.name="aspmx.l.google.com", port=25),
+            authenticate = FALSE, send=TRUE)
+  stop(err_str, call.=FALSE)
+}
+
+questionable_mtcars %>%
+  verify(nrow(.) > 10, error_fun=email_me) %>%
+  verify(mpg > 0, error_fun=email_me) %>%
+  insist(within_n_sds(4), mpg, error_fun=email_me) %>%
+  assert(in_set(0,1), am, vs, error_fun=email_me)
+  # ...
+```
+
+(this particular `send.mail` formulation will only for gmail receptients;
+see the `mailR` documentation for more information)
+
+Now you'll get notified of any failed assertions via email. Groovy!
+
+
 ### advanced: creating your own predicate generators for `insist`
 
 `assertr` is build with robustness, correctness, and extensibility in mind.

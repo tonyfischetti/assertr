@@ -5,9 +5,10 @@
 \alias{assert_}
 \title{Raises error if predicate is FALSE in any columns selected}
 \usage{
-assert(data, predicate, ...)
+assert(data, predicate, ..., error_fun = assertr_stop)
 
-assert_(data, predicate, ..., .dots, .nameofpred = "")
+assert_(data, predicate, ..., .dots, error_fun = assertr_stop,
+  .nameofpred = "")
 }
 \arguments{
 \item{data}{A data frame}
@@ -17,6 +18,9 @@ assert_(data, predicate, ..., .dots, .nameofpred = "")
 \item{...}{Comma separated list of unquoted expressions.
 Uses dplyr's \code{select} to select
 columns from data.}
+
+\item{error_fun}{Function to call if assertion fails. Takes one error
+string. Uses \code{stop} by default}
 
 \item{.dots}{Use assert_() to select columns using standard evaluation.}
 

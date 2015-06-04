@@ -5,9 +5,10 @@
 \alias{insist_}
 \title{Raises error if dynamically created predicate is FALSE in any columns selected}
 \usage{
-insist(data, predicate_generator, ...)
+insist(data, predicate_generator, ..., error_fun = assertr_stop)
 
-insist_(data, predicate_generator, ..., .dots, .nameofpred = "")
+insist_(data, predicate_generator, ..., .dots, error_fun = assertr_stop,
+  .nameofpred = "")
 }
 \arguments{
 \item{data}{A data frame}
@@ -20,6 +21,9 @@ every element in the column vectors selected}
 \item{...}{Comma separated list of unquoted expressions.
 Uses dplyr's \code{select} to select
 columns from data.}
+
+\item{error_fun}{Function to call if assertion fails. Takes one error
+string. Uses \code{stop} by default}
 
 \item{.dots}{Use insist_() to select columns using standard evaluation.}
 

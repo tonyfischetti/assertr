@@ -10,7 +10,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2015-05-26" />
+<meta name="date" content="2015-06-03" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -54,7 +54,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <div id="header">
 <h1 class="title">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2015-05-26</em></h4>
+<h4 class="date"><em>2015-06-03</em></h4>
 </div>
 
 
@@ -258,6 +258,31 @@ mtcars %&gt;%
 ## 2   6 19.74286
 ## 3   8 15.10000</code></pre>
 <p>Awesome! Now we can add an arbitrary number of assertions, as the need arises, without touching the real logic.</p>
+</div>
+<div id="advanced-send-email-reports-using-custom-error-functions" class="section level3">
+<h3>advanced: send email reports using custom error functions</h3>
+<p>One particularly cool application of <code>assertr</code> is to use it as a data integrity checker for frequently updated data sources. A script can download new data as it becomes available, and then run <code>assertr</code> checks on it. This makes assertr into a sort of “continuous integration” tool (but for data, not code.)</p>
+<p>In an unsupervised “continuous integration” environment, you need a way to discover that the assertions failed. In CI-as-a-service in the software world, failed automated checks often send an email of reporting the maintainer of a botched build; why not bring that functionality to <code>assertr</code>?!</p>
+<p>All assertion verbs in <code>assertr</code> support a custom error function. By default, the error function is R’s built-in <code>stop</code> function, which displays a message and halts execution. You can specify your own to hijack this behavior and redirect flow-of-control wherever you want.</p>
+<p>All custom error functions take one argument: the actual error message that <code>assertr</code> assembles based on which assertions fail. In this case, we will build a function that takes that message and emails it to someone before halting execution. We will use the <code>mailR</code> package to send the mail.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mailR)
+
+email_me &lt;-<span class="st"> </span>function(err_str){
+  <span class="kw">send.mail</span>(<span class="dt">from=</span><span class="st">&quot;assertr@gmail.com&quot;</span>, <span class="dt">to=</span><span class="st">&quot;YOU@gmail.com&quot;</span>,
+            <span class="dt">subject=</span><span class="st">&quot;error from assertr&quot;</span>, <span class="dt">body=</span>err_str,
+            <span class="dt">smtp =</span> <span class="kw">list</span>(<span class="dt">host.name=</span><span class="st">&quot;aspmx.l.google.com&quot;</span>, <span class="dt">port=</span><span class="dv">25</span>),
+            <span class="dt">authenticate =</span> <span class="ot">FALSE</span>, <span class="dt">send=</span><span class="ot">TRUE</span>)
+  <span class="kw">stop</span>(err_str, <span class="dt">call.=</span><span class="ot">FALSE</span>)
+}
+
+questionable_mtcars %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(.) &gt;<span class="st"> </span><span class="dv">10</span>, <span class="dt">error_fun=</span>email_me) %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>, <span class="dt">error_fun=</span>email_me) %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg, <span class="dt">error_fun=</span>email_me) %&gt;%
+<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs, <span class="dt">error_fun=</span>email_me)
+  <span class="co"># ...</span></code></pre>
+<p>(this particular <code>send.mail</code> formulation will only for gmail receptients; see the <code>mailR</code> documentation for more information)</p>
+<p>Now you’ll get notified of any failed assertions via email. Groovy!</p>
 </div>
 <div id="advanced-creating-your-own-predicate-generators-for-insist" class="section level3">
 <h3>advanced: creating your own predicate generators for <code>insist</code></h3>
