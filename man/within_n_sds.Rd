@@ -49,7 +49,7 @@ within_n_sds(2)(test.vector)(as.numeric(NA))  # returns TRUE
 # because, by default, within_bounds() will accept
 # NA values. If we want to reject NAs, we have to
 # provide extra arguments to this function
-within_n_sds(2, allow.na=FALSE)(test.vector)(as.numeric(NA))  # returns TRUE
+within_n_sds(2, allow.na=FALSE)(test.vector)(as.numeric(NA))  # returns FALSE
 
 # or in a pipeline, like this was meant for
 
@@ -57,5 +57,8 @@ library(magrittr)
 
 iris \%>\%
   insist(within_n_sds(5), Sepal.Length)
+}
+\seealso{
+\code{\link{within_n_mads}}
 }
 

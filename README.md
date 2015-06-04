@@ -44,7 +44,7 @@ This could be written using `assertr` like this:
 
 
     mtcars %>%
-      verify(nrow(mtcars) > 10) %>%
+      verify(nrow(.) > 10) %>%
       verify(mpg > 0) %>%
       insist(within_n_sds(4), mpg) %>%
       assert(in_set(0,1), am, vs) %>%
@@ -81,9 +81,12 @@ value falls within the bounds supplied, and
 - `in_set` - that returns a predicate function that checks if an element is
 a member of the set supplied.
 
-and a predicate generator designed to be used with the `insist` function:
+and predicate generators designed to be used with the `insist` function:
 
 - `within_n_sds` - used to dynamically create bounds to check vector elements with
+based on standard z-scores
+- `within_n_mads` - better method for dynamically creating bounds to check vector
+elements with based on 'robust' z-scores (using median absolute deviation)
 
 ### More info
 

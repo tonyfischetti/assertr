@@ -135,8 +135,9 @@ our.data %&gt;%
 <p>Because <code>assert</code> applies the predicate function to each datum, one at a time, it can stop immediately after finding the first violation, and specify the location and the value of the offending element.</p>
 <p>This also means that <code>assert</code> will fail sooner than <code>verify</code>, potentially making it a faster, less time-consuming affair for data that are assumed to have errors.</p>
 <p>One important drawback to <code>assert</code>, and a consequence of its application of the predicate to <em>columns</em>, is that <code>assert</code> can’t confirm assertions about the data structure <em>itself</em>. For example, let’s say we were reading a dataset from disk that we know has more than 100 observations; we could write a check of that assumption like this:</p>
-<pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;a-data-file.csv&quot;</span>) %&gt;%
-<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(dat) &gt;<span class="st"> </span><span class="dv">100</span>) %&gt;%
+<pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;a-data-file.csv&quot;</span>)
+dat %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(.) &gt;<span class="st"> </span><span class="dv">100</span>) %&gt;%
 <span class="st">  </span>....</code></pre>
 <p>This is a powerful advantage over <code>assert</code>… but <code>assert</code> has one more advantage of its own that we heretofore ignored.</p>
 </div>
@@ -216,6 +217,19 @@ our.data %&gt;%
 ## 2   6 19.74286
 ## 3   8 15.10000</code></pre>
 <p>Aces!</p>
+<p>I chose to use <code>within_n_sds</code> in this example because people are familiar z-scores. However, for most practical purposes, the related predicate generator <code>within_n_mads</code> is more useful.</p>
+<p>The problem with <code>within_n_sds</code> is the mean and standard deviation are so heavily influenced by outliers, their very presence will compromise attempts to identify them using these statistics. In contrast with <code>within_n_sds</code>, <code>within_n_mads</code> uses the robust statistics, median and median absolute deviation, to identify potentially erroneous data points.</p>
+<p>For example, the vector <code>&lt;7.4, 7.1, 7.2, 72.1&gt;</code> almost certainly has an erroneous data point, but <code>within_n_sds(2)</code> will fail to detect it.</p>
+<pre class="sourceCode r"><code class="sourceCode r">example.vector &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">7.4</span>, <span class="fl">7.1</span>, <span class="fl">7.2</span>, <span class="fl">72.1</span>)
+<span class="kw">within_n_sds</span>(<span class="dv">2</span>)(example.vector)(example.vector)</code></pre>
+<pre><code>## [1] TRUE TRUE TRUE TRUE</code></pre>
+<p>whereas <code>within_n_mads</code> will detect it at even lower levels of power….</p>
+<pre class="sourceCode r"><code class="sourceCode r">example.vector &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">7.4</span>, <span class="fl">7.1</span>, <span class="fl">7.2</span>, <span class="fl">72.1</span>)
+<span class="kw">within_n_mads</span>(<span class="dv">2</span>)(example.vector)(example.vector)</code></pre>
+<pre><code>## [1]  TRUE  TRUE  TRUE FALSE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">within_n_mads</span>(<span class="dv">1</span>)(example.vector)(example.vector)</code></pre>
+<pre><code>## [1]  TRUE  TRUE  TRUE FALSE</code></pre>
+<p>Tubular!</p>
 </div>
 <div id="combining-chains-of-assertions" class="section level3">
 <h3>combining chains of assertions</h3>

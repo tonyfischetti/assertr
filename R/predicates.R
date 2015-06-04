@@ -192,7 +192,7 @@ in_set <- function(..., allow.na=TRUE){
 #' @return A function that takes a vector and returns a
 #'         \code{\link{within_bounds}} predicate based on the standard deviation
 #'         of that vector.
-#'
+#' @seealso \code{\link{within_n_mads}}
 #' @examples
 #' test.vector <- rnorm(100, mean=100, sd=20)
 #'
@@ -208,7 +208,7 @@ in_set <- function(..., allow.na=TRUE){
 #' # because, by default, within_bounds() will accept
 #' # NA values. If we want to reject NAs, we have to
 #' # provide extra arguments to this function
-#' within_n_sds(2, allow.na=FALSE)(test.vector)(as.numeric(NA))  # returns TRUE
+#' within_n_sds(2, allow.na=FALSE)(test.vector)(as.numeric(NA))  # returns FALSE
 #'
 #' # or in a pipeline, like this was meant for
 #'
@@ -230,6 +230,75 @@ within_n_sds <- function(n, ...){
     if(is.na(mu)) stop("mean of vector is NA")
     if(is.na(stdev)) stop("standard deviations of vector is NA")
     within_bounds((mu-(n*stdev)), (mu+(n*stdev)), ...)
+  }
+}
+
+
+#' Return a function to create robust z-score checking predicate
+#'
+#' This function takes one argument, the number of median absolute
+#' deviations within which to accept a particular data point. This is
+#' generally more useful than its sister function \code{\link{within_n_sds}}
+#' because it is more robust to the presence of outliers. It is therefore
+#' better suited to identify potentially erroneous data points.
+#'
+#' As an example, if '2' is passed into this function, this will return
+#' a function that takes a vector and figures out the bounds of two
+#' median absolute deviations (MADs) from the median. That function will then
+#' return a \code{\link{within_bounds}} function that can then be applied
+#' to a single datum. If the datum is within two MADs of the median of the
+#' vector given to the function returned by this function, it will return TRUE.
+#' If not, FALSE.
+#'
+#' This function isn't meant to be used on its own, although it can. Rather,
+#' this function is meant to be used with the \code{\link{insist}} function to
+#' search for potentially erroneous data points in a data set.
+#'
+#' @param n The number of median absolute deviations from the median
+#'        within which to accept a datum
+#' @param ... Additional arguments to be passed to \code{\link{within_bounds}}
+#'
+#' @return A function that takes a vector and returns a
+#'         \code{\link{within_bounds}} predicate based on the MAD
+#'         of that vector.
+#' @seealso \code{\link{within_n_sds}}
+#' @examples
+#' test.vector <- rnorm(100, mean=100, sd=20)
+#'
+#' within.one.mad <- within_n_mads(1)
+#' custom.bounds.checker <- within.one.mad(test.vector)
+#' custom.bounds.checker(105)     # returns TRUE
+#' custom.bounds.checker(40)      # returns FALSE
+#'
+#' # same as
+#' within_n_mads(1)(test.vector)(40)    # returns FALSE
+#'
+#' within_n_mads(2)(test.vector)(as.numeric(NA))  # returns TRUE
+#' # because, by default, within_bounds() will accept
+#' # NA values. If we want to reject NAs, we have to
+#' # provide extra arguments to this function
+#' within_n_mads(2, allow.na=FALSE)(test.vector)(as.numeric(NA))  # returns FALSE
+#'
+#' # or in a pipeline, like this was meant for
+#'
+#' library(magrittr)
+#'
+#' iris %>%
+#'   insist(within_n_mads(5), Sepal.Length)
+#'
+#' @export
+within_n_mads <- function(n, ...){
+  if(!is.numeric(n) || length(n)!=1 || n<=0){
+    stop("'n' must be a positive number")
+  }
+  function(a.vector){
+    if(!is.vector(a.vector) || !is.numeric(a.vector))
+      stop("argument must be a numeric vector")
+    dmad <- mad(a.vector, na.rm=TRUE)
+    dmed <- median(a.vector, na.rm=TRUE)
+    if(is.na(dmad)) stop("MAD of vector is NA")
+    if(is.na(dmed)) stop("median of vector is NA")
+    within_bounds((dmed-(n*dmad)), (dmed+(n*dmad)), ...)
   }
 }
 

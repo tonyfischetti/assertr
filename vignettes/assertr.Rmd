@@ -144,8 +144,9 @@ from disk that we know has more than 100 observations; we could write a check
 of that assumption like this:
 
 ```{r eval=FALSE, purl = FALSE}
-dat <- read.csv("a-data-file.csv") %>%
-  verify(nrow(dat) > 100) %>%
+dat <- read.csv("a-data-file.csv")
+dat %>%
+  verify(nrow(.) > 100) %>%
   ....
 ```
 
@@ -295,6 +296,33 @@ mtcars %>%
 
 Aces!
 
+I chose to use `within_n_sds` in this example because people are familiar
+z-scores. However, for most practical purposes, the related predicate generator
+`within_n_mads` is more useful.
+
+The problem with `within_n_sds` is the mean and standard deviation are so
+heavily influenced by outliers, their very presence will compromise attempts
+to identify them using these statistics. In contrast with `within_n_sds`, 
+`within_n_mads` uses the robust statistics, median and median absolute
+deviation, to identify potentially erroneous data points.
+
+For example, the vector `<7.4, 7.1, 7.2, 72.1>` almost certainly has an erroneous
+data point, but `within_n_sds(2)` will fail to detect it.
+
+```{r purl = FALSE}
+example.vector <- c(7.4, 7.1, 7.2, 72.1)
+within_n_sds(2)(example.vector)(example.vector)
+```
+
+whereas `within_n_mads` will detect it at even lower levels of power....
+
+```{r purl = FALSE}
+example.vector <- c(7.4, 7.1, 7.2, 72.1)
+within_n_mads(2)(example.vector)(example.vector)
+within_n_mads(1)(example.vector)(example.vector)
+```
+
+Tubular!
 
 ### combining chains of assertions
 
