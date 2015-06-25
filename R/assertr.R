@@ -30,11 +30,11 @@
 #' # this confirms that
 #'   # - that the dataset contains more than 10 observations
 #'   # - that the column for 'miles per gallon' (mpg) is a positive number
-#'   # - that the column for ‘miles per gallon’ (mpg) does not contain a datum
+#'   # - that the column for 'miles per gallon' (mpg) does not contain a datum
 #'   #   that is outside 4 standard deviations from its mean, and
 #'   # - that the am and vs columns (automatic/manual and v/straight engine,
 #'   #    respectively) contain 0s and 1s only
-#'   # - each column contains at most 2 NAs
+#'   # - each row contains at most 2 NAs
 #'   # - each row's mahalanobis distance is within 10 median absolute deviations of
 #'   #   all the distance (for outlier detection)
 #'

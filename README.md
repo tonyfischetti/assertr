@@ -42,7 +42,7 @@ confirm
 that is outside 4 standard deviations from its mean, and
 - that the am and vs columns (automatic/manual and v/straight engine,
 respectively) contain 0s and 1s only
-- each column contains at most 2 NAs
+- each row contains at most 2 NAs
 - each row's mahalanobis distance is within 10 median absolute deviations of
 all the distance (for outlier detection)
 
@@ -80,7 +80,7 @@ violations. Internally, the `assert` function uses `dplyr`'s
 `select` function to extract the columns to test the predicate function on.
 
 - `insist` - takes a data frame, a predicate-generating function, and an
-arbitrary number of columns. For each column, the the predicated-generating
+arbitrary number of columns. For each column, the the predicate-generating
 function is applied, returning a predicate. The predicate is then applied to
 every element of the columns selected, and will raise an error if it finds any
 violations. The reason for using a predicate-generating function to return a
@@ -137,6 +137,9 @@ and `insist_rows`:
 - `num_row_NAs` - counts number of missing values in each row
 - `maha_dist` - computes the mahalanobis distance of each row (for outlier
 detection)
+
+Finally, each assertion function has a counterpart that using standard
+evaluation. The counterpart functions are postfixed by "_" (an underscore).
 
 ### More info
 
