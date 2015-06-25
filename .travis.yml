@@ -3,6 +3,7 @@ language: r
 r_binary_packages:
  - dplyr
  - magrittr
+ - MASS
 
 sudo: required
 
