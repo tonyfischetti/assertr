@@ -16,8 +16,8 @@ License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
     dplyr,
-    lazyeval,
-    MASS
+    MASS,
+    lazyeval
 Suggests:
     knitr,
     testthat,
