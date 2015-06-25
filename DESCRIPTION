@@ -1,7 +1,7 @@
 Package: assertr
 Type: Package
 Title: Assertive Programming for R Analysis Pipelines
-Version: 0.5.7
+Version: 0.9.7
 Authors@R: person("Tony", "Fischetti", email="tony.fischetti@gmail.com",
   role = c("aut", "cre"))
 Maintainer: Tony Fischetti <tony.fischetti@gmail.com>
@@ -16,7 +16,8 @@ License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
     dplyr,
-    lazyeval
+    lazyeval,
+    MASS
 Suggests:
     knitr,
     testthat,

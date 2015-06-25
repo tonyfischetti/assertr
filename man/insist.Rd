@@ -67,6 +67,7 @@ iris \%>\%
   # is terminated so nothing after this statement will run}
 }
 \seealso{
-\code{\link{assert}} \code{\link{verify}}
+\code{\link{assert}} \code{\link{verify}} \code{\link{insist_rows}}
+         \code{\link{assert_rows}}
 }
 

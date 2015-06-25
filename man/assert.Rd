@@ -57,6 +57,7 @@ assert(mtcars, not_na, mpg:carb)
 # equivalent using standard evaluation
 assert_(mtcars, not_na, "mpg:carb")
 
+
 library(magrittr)                    # for piping operator
 
 mtcars \%>\%
@@ -71,5 +72,6 @@ mtcars \%>\%
 }
 \seealso{
 \code{\link{verify}} \code{\link{insist}}
+         \code{\link{assert_rows}} \code{\link{insist_rows}}
 }
 

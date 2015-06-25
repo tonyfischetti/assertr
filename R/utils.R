@@ -51,6 +51,18 @@ make.assert.error.message <- function(name.of.predicate, column,
 }
 
 
+
+make.assert_rows.error.message <- function(name.of.predicate, num.violations,
+                                           loc.violations){
+  time.or.times <- ifelse(num.violations==1, "time", "times")
+  eg.or.value <- ifelse(num.violations==1, "", "e.g. ")
+
+  paste0("Data frame row reduction violates predicate '",
+         name.of.predicate, "' ", num.violations, " ", time.or.times, " (",
+         eg.or.value, "at row number ", loc.violations[1], ")")
+}
+
+
 is.vectorized.predicate <- function(predicate){
   if(!is.null(comment(predicate)) && comment(predicate)=="assertr/vectorized")
     return(TRUE)

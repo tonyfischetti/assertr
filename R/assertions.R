@@ -29,6 +29,7 @@
 #' @return data if predicate assertion is TRUE. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{verify}} \code{\link{insist}}
+#'          \code{\link{assert_rows}} \code{\link{insist_rows}}
 #' @examples
 #'
 #' # returns mtcars
@@ -44,7 +45,7 @@
 #'
 #' # equivalent using standard evaluation
 #' assert_(mtcars, not_na, "mpg:carb")
-
+#'
 #'
 #' library(magrittr)                    # for piping operator
 #'
@@ -79,7 +80,8 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
   else
     name.of.predicate <- .nameofpred
 
-  full.predicate <- make.predicate.proper(predicate)
+  if(!is.vectorized.predicate(predicate))
+    predicate <- make.predicate.proper(predicate)
 
 
   log.mat <- sapply(names(sub.frame),
@@ -104,6 +106,103 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
 
   messages <- paste0(messages[messages!=""], collapse = '')
   error_fun(messages)
+}
+
+
+
+#' Raises error if predicate is FALSE for any row after applying
+#' row reduction function
+#'
+#' Meant for use in a data analysis pipeline, this function applies a
+#' function to a data frame that reduces each row to a single value. Then,
+#' a predicate function is applied to each of the row reduction values. If
+#' any of these predicate applications yield FALSE, this function will raise
+#' an error, effectively terminating the pipeline early. If there are no
+#' FALSEs, this function will just return the data that it was supplied for
+#' further use in later parts of the pipeline.
+#'
+#' @param data A data frame
+#' @param row_reduction_fn A function that returns a value for each row of
+#'                          the provided data frame
+#' @param predicate A function that returns FALSE when violated
+#' @param ... Comma separated list of unquoted expressions.
+#'            Uses dplyr's \code{select} to select
+#'            columns from data.
+#' @param .dots Use assert_rows_() to select columns using standard evaluation.
+#' @param error_fun Function to call if assertion fails. Takes one error
+#'         string. Uses \code{stop} by default
+#' @param .nameofpred Text representation of predicate for printing in case
+#'         of assertion violation. Will automatically be retrieved if left
+#'         blank (default)
+#'
+#'
+#' @return data if predicate assertions are TRUE. error if not.
+#' @note See \code{vignette("assertr")} for how to use this in context
+#' @seealso \code{\link{insist_rows}} \code{\link{assert}}
+#'          \code{\link{verify}} \code{\link{insist}}
+#'
+#' @examples
+#'
+#' # returns mtcars
+#' assert_rows(mtcars, num_row_NAs, within_bounds(0,2), mpg:carb)
+#'
+#' # equivalent using standard evaluation
+#' assert_rows_(mtcars, num_row_NAs, within_bounds(0,2), "mpg:carb")
+#'
+#'
+#' library(magrittr)                    # for piping operator
+#'
+#' mtcars %>%
+#'   assert_rows(rowSums, within_bounds(0,2), vs:am)
+#'   # anything here will run
+#'
+#' \dontrun{
+#' mtcars %>%
+#'   assert_rows(rowSums, within_bounds(0,1), vs:am)
+#'   # the assertion is untrue so
+#'   # nothing here will run}
+#'
+#' @export
+#'
+assert_rows <- function(data, row_reduction_fn, predicate, ...,
+                        error_fun=assertr_stop){
+  name.of.predicate <- as.character(substitute(predicate))
+  if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
+  assert_rows_(data, row_reduction_fn, predicate,
+               .dots = lazyeval::lazy_dots(...), error_fun = error_fun,
+               .nameofpred = name.of.predicate)
+}
+
+#' @export
+#' @rdname assert_rows
+assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
+                         error_fun=assertr_stop, .nameofpred=""){
+  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  if(.nameofpred==""){
+    name.of.predicate <- as.character(substitute(predicate))
+    if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
+  }
+  else
+    name.of.predicate <- .nameofpred
+
+  if(!is.vectorized.predicate(predicate))
+    predicate <- make.predicate.proper(predicate)
+
+  redux <- row_reduction_fn(sub.frame)
+
+  log.vec <- apply.predicate.to.vector(redux, predicate)
+
+  if(all(log.vec))
+    return(data)
+
+  num.violations <- sum(!log.vec)
+  if(num.violations==0)
+    return("")
+  loc.violations <- which(!log.vec)
+
+  message <- make.assert_rows.error.message(name.of.predicate, num.violations,
+                                            loc.violations)
+  error_fun(message)
 }
 
 
@@ -135,7 +234,8 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
 #'
 #' @return data if dynamically created predicate assertion is TRUE. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
-#' @seealso \code{\link{assert}} \code{\link{verify}}
+#' @seealso \code{\link{assert}} \code{\link{verify}} \code{\link{insist_rows}}
+#'          \code{\link{assert_rows}}
 #' @examples
 #'
 #' insist(iris, within_n_sds(3), Sepal.Length)   # returns iris
@@ -209,6 +309,111 @@ insist_ <- function(data, predicate_generator, ..., .dots,
   messages <- paste0(messages[messages!=""], collapse = '')
   error_fun(messages)
 }
+
+
+
+#' Raises error if dynamically created predicate is FALSE for any row
+#' after applying row reduction function
+#'
+#' Meant for use in a data analysis pipeline, this function applies a
+#' function to a data frame that reduces each row to a single value. Then,
+#' a predicate generating function is applied to row reduction values. It will
+#' then use these predicates to check each of the row reduction values. If any
+#' of these predicate applications yield FALSE, this function will raise
+#' an error, effectively terminating the pipeline early. If there are no
+#' FALSEs, this function will just return the data that it was supplied for
+#' further use in later parts of the pipeline.
+#'
+#' @param data A data frame
+#' @param row_reduction_fn A function that returns a value for each row of
+#'                          the provided data frame
+#' @param predicate_generator A function that is applied to the results of
+#'                            the row reduction function. This will produce,
+#'                            a true predicate function to be applied to every
+#'                            element in the vector that the row reduction
+#'                            function returns.
+#' @param ... Comma separated list of unquoted expressions.
+#'            Uses dplyr's \code{select} to select
+#'            columns from data.
+#' @param .dots Use insist_rows_() to select columns using standard evaluation.
+#' @param error_fun Function to call if assertion fails. Takes one error
+#'         string. Uses \code{stop} by default
+#' @param .nameofpred Text representation of predicate for printing in case
+#'         of assertion violation. Will automatically be retrieved if left
+#'         blank (default)
+#'
+#'
+#' @return data if dynamically created predicate assertion is TRUE. error if not.
+#' @note See \code{vignette("assertr")} for how to use this in context
+#' @seealso \code{\link{insist}} \code{\link{assert_rows}}
+#'          \code{\link{assert}} \code{\link{verify}}
+#' @examples
+#'
+#' # returns mtcars
+#' insist_rows(mtcars, maha_dist, within_n_mads(30), mpg:carb)
+#'
+#' # equivalent using standard evaluation
+#' insist_rows_(mtcars, maha_dist, within_n_mads(30), "mpg:carb")
+#'
+#'
+#' library(magrittr)                    # for piping operator
+#'
+#' mtcars %>%
+#'   insist_rows(maha_dist, within_n_mads(10), vs:am)
+#'   # anything here will run
+#'
+#' \dontrun{
+#' mtcars %>%
+#'   insist_rows(maha_dist, within_n_mads(1), everything())
+#'   # the assertion is untrue so
+#'   # nothing here will run}
+#'
+#' @export
+#'
+insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
+                   error_fun=assertr_stop){
+  name.of.predicate.generator <- as.character(substitute(predicate_generator))
+  if(length(name.of.predicate.generator)>1)
+    name.of.predicate.generator <- name.of.predicate.generator[1]
+  insist_rows_(data, row_reduction_fn, predicate_generator,
+               .dots = lazyeval::lazy_dots(...), error_fun = error_fun,
+               .nameofpred = name.of.predicate.generator)
+}
+
+#' @export
+#' @rdname insist_rows
+insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots,
+                    error_fun=assertr_stop, .nameofpred=""){
+  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  if(.nameofpred==""){
+    name.of.predicate.generator <- as.character(substitute(predicate_generator))
+    if(length(name.of.predicate.generator)>1)
+      name.of.predicate.generator <- name.of.predicate.generator[1]
+  }
+  else
+    name.of.predicate.generator <- .nameofpred
+
+  redux <- row_reduction_fn(sub.frame)
+
+  predicate <- predicate_generator(redux)
+
+  log.vec <- apply.predicate.to.vector(redux, predicate)
+
+  if(all(log.vec))
+    return(data)
+
+  num.violations <- sum(!log.vec)
+  if(num.violations==0)
+    return("")
+  loc.violations <- which(!log.vec)
+
+  message <- make.assert_rows.error.message(name.of.predicate.generator,
+                                            num.violations,loc.violations)
+  error_fun(message)
+}
+
+
+
 
 
 
