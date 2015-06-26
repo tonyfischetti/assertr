@@ -6,12 +6,12 @@
 #' Computes mahalanobis distance for each row of data frame
 #'
 #' This function will return a vector, with the same length as the number
-#' of rows of the provided data frame, corresponding to the mahalanobis
-#' distances of each row.
+#' of rows of the provided data frame, corresponding to the average
+#' mahalanobis distances of each row from the whole data set.
 #'
-#' This is useful for finding anomalous row-wise observations.
+#' This is useful for finding anomalous observations, row-wise.
 #'
-#' It will convert strings into numerics.
+#' It will convert any categorical variables in the data frame into numerics.
 #'
 #' @param data A data frame
 #' @param keep.NA Ensure that every row with missing data remains NA in

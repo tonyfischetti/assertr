@@ -21,17 +21,17 @@ without error, remain undetected, and produce inaccurate results.
 
 The solution to the problem is to provide as much information as you can about
 how you expect the data to look up front so that any deviation from this
-expectation can be dealt with immediately. This is what the assertr package
-tries to make dead simple.
+expectation can be dealt with immediately. This is what the `assertr` package
+tries to make dead simple. 
 
-Essentially, assertr provides a suite of functions designed to verify
-assumptions about data early in an analysis pipeline. assertr is meant to be
-used with the piping constructs of the `magrittr` package and fits right in with
-the structure and data manipulation verbs of the `dplyr` package.
+Essentially, `assertr` provides a suite of functions designed to verify
+assumptions about data early in an analysis pipeline. This package needn't
+be used with the `magrittr`/`dplyr` piping mechanism but the examples in this
+vignette will use them to enhance clarity.
 
 ### concrete data errors
 
-Let’s say, for example, that the R’s built-in car dataset, mtcars, was not 
+Let’s say, for example, that the R’s built-in car dataset, `mtcars`, was not 
 built-in but rather procured from an external source that was known for making
 errors in data entry or coding.
 
@@ -101,8 +101,8 @@ our.data %>%
 The `assert` function takes a data frame, a predicate function, and an arbitrary
 number of columns to apply the predicate function to. The predicate function
 (a function that returns a logical/boolean value) is then applied to every
-element of the columns selected, and will raise an error when it finds the
-first violation.
+element of the columns selected, and will raise an error when if it finds 
+violations.
 
 Internally, the `assert` function uses `dplyr`'s `select` function to extract
 the columns to test the predicate function on. This allows for complex
@@ -123,19 +123,9 @@ our.data %>%
 The first noticable difference between `verify` and `assert` is that `verify`
 takes an expression, and `assert` takes a predicate and columns to apply it to.
 This might make the `verify` function look more elegant--but there's an
-important drawback. 
-
-`verify` has to evaluate the entire expression first, and *then* check if there
-were any violations. Because of this, `verify` can't tell you the offending
-datum. That brings us to the second difference.
-
-Because `assert` applies the predicate function to each datum, one at a time,
-it can stop immediately after finding the first violation, and specify the
-location and the value of the offending element.
-
-This also means that `assert` will fail sooner than `verify`, potentially
-making it a faster, less time-consuming affair for data that are assumed to
-have errors. 
+important drawback. `verify` has to evaluate the entire expression first, and
+*then* check if there were any violations. Because of this, `verify` can't
+tell you the offending datum.
 
 One important drawback to `assert`, and a consequence of its application of
 the predicate to *columns*, is that `assert` can't confirm assertions about
@@ -250,8 +240,8 @@ predicate. This is precisely what `insist` does.
 This is all much simpler than it may sound. Hopefully, the examples will clear
 up any confusion.
 
-The primary use case for `insist` is in conjunction with the `within_n_sds`
-predicate generator.
+The primary use case for `insist` is in conjunction with the `within_n_sds` or
+`within_n_mads` predicate generator.
 
 Suppose we wanted to check that every `mpg` value in the `mtcars` data set was
 within 3 standard deviations of the mean before finding the average miles
@@ -324,6 +314,152 @@ within_n_mads(1)(example.vector)(example.vector)
 
 Tubular!
 
+
+### row-wise assertions and row reduction functions
+
+As cool as it's been so far, this still isn't enough to consitute a complete
+grammar of data integrity checking. To see why, check out the following
+small example data set:
+
+```{r perl=FALSE}
+example.data <- data.frame(x=c(8, 9, 6, 5, 9, 5, 6, 7,
+                             8, 9, 6, 5, 5, 6, 7),
+                         y=c(82, 91, 61, 49, 40, 49, 57,
+                             74, 78, 90, 61, 49, 51, 62, 68))
+(example.data)
+```
+
+Can you spot the brazen outlier? You're certainly not going to find it by
+checking the distribution of each *column*! All elements from both columns are
+within 2 standard deviations of their respective means.
+
+Unless you have a *really* good eye, the only way you're going to catch this
+mistake is by plotting the data set.
+
+```{r purl=FALSE}
+plot(example.data$x, example.data$y, xlab="", ylab="")
+```
+
+Ok, so all the `y`s are roughly 10 times the `x`s except the outlying data
+point.
+
+The problem having to plot data sets to catch anomalies is that it is *really*
+hard to visualize 4-dimensions at once, and it is near impossible with
+high-dimensional data.
+
+There's no way of catching this anomaly by looking at each individual
+column separately; the only way to catch it is to view each row as a complete
+observation and compare it to the rest.
+
+To this end, `assertr` provides two functions that take a data frame, and
+reduce each row into a single value. We'll call them *row reduction functions*.
+
+The first one we'll look at is called `maha_dist`. It computes the average
+mahalanobis distance (kind of like multivariate z-scoring for outlier
+detection) of each row from the whole data set. The big idea is that in the
+resultant vector, big/distant values are potential anomalous entries. Let's
+look at the distribution of mahalanobis distances for this data set...
+
+```{r purl=FALSE}
+maha_dist(example.data)
+
+maha_dist(example.data) %>% hist(main="", xlab="")
+```
+
+There's no question here as to whether there's an anomalous entry! But how do
+you check for this sort of thing using `assertr` constructs?
+
+Well, `maha_dist` will typically be used with the `insist_rows` function.
+`insist_rows` takes a data frame, a row reduction function, a
+predicate-generating function, and an arbitrary number of columns to apply
+the predicate function to. The row reduction function (`maha_dist` in this case)
+is applied to the data frame, and returns a value for each row. The
+predicate-generating function is then applied to the vector returned from
+the row reduction function and the resultant predicate is applied to each
+element of that vector. It will raise an error if it finds any violations.
+
+As always, this undoubtedly sounds far more confusing than it really is. Here's
+an example of it in use
+
+```{r purl=FALSE, error=TRUE}
+example.data %>%
+  insist_rows(maha_dist, within_n_mads(3), everything())
+
+```
+ 
+Check that out! To be clear, this function is running the supplied data frame
+through the `maha_dist` function which returns a value for each row
+corresponding to its mahalanobis distance. (The whole data frame is used because
+we used the `everything()` selection function.) Then, `within_n_mads(3)` computes
+on that vector and returns a bounds checking predicate. The bounds checking predicate
+checks to see that all mahalanobis distances are within 3 median absolute deviations
+of each other. They are not, and the pipeline errors out.
+
+This is probably the most powerful construct in `assertr`--it can find a whole
+lot of nasty errors that would be very difficult to check for by hand.
+
+Part of what makes it so powerful is how flexible `maha_dist` is. We only used
+it, so far, on a data frame of numerics, but it can handle all sorts of data
+frames. To really see it shine, let's use it on the iris data set, that contains
+a categorical variable in its right-most column...
+
+```{r purl=FALSE}
+head(iris)
+
+iris %>% maha_dist %>% hist(main="", xlab="")
+```
+
+Looks ok, but what happens when we accidently enter a row as a different
+species...
+
+```{r purl=FALSE}
+mistake <- iris
+(mistake[149,5])
+mistake[149,5] <- "setosa"
+
+mistake %>% maha_dist %>% hist(main="", xlab="")
+
+mistake %>% maha_dist %>% which.max
+```
+
+Look at that! This mistake can easily be picked up by any reasonable bounds
+checker...
+
+```{r purl=FALSE, error=TRUE}
+mistake %>% insist_rows(maha_dist, within_n_mads(7), everything())
+```
+
+`insist` and `insist_rows` are both similar in that they both take predicate
+generators and not actual predicates. What makes `insist_rows` different is
+its usage of a row-reduce data frame.
+
+`assert` has a row-oriented counterpart, too; it's called `assert_rows`. 
+`insist` is to `assert` as `insist_rows` is to `assert_rows`.
+
+`assert_rows` works the same as `insist_rows`, except that instead of using
+a predicate generator on the row-reduced data frame, it uses a regular-old
+predicate.
+
+For an example of a `assert_rows` use case, let's say that we got a data set
+(`another-dataset.csv`) from the web and we don't want to continue processing
+the data set if any row contains more than two missing values (NAs). You
+can use the row reduction function `num_row_NAs` to reduce all the rows into
+the number of NAs they contain. Then, a simple bounds checker will suffice for
+ensuring that no element is higher than 2...
+
+
+```{r, eval=FALSE, purl = FALSE}
+read.csv("another-dataset.csv") %>%
+  assert_rows(num_row_NAs, within_bounds(0,2), everything()) %>%
+  ...
+```
+
+`assert_rows` can be used for anomaly detection as well. A future version of
+`assertr` may contain a cosine distance row reduction function. Since all
+cosine distances are contrained from -1 to 1, it is easy to use a non-dynamic
+predicate to disallow certain values.
+
+
 ### combining chains of assertions
 
 Let's say that as part of an automated pipeline that grabs mtcars from an
@@ -374,7 +510,7 @@ without touching the real logic.
 
 One particularly cool application of `assertr` is to use it as a data integrity
 checker for frequently updated data sources. A script can download new data as
-it becomes available, and then run `assertr` checks on it. This makes assertr
+it becomes available, and then run `assertr` checks on it. This makes `assertr`
 into a sort of "continuous integration" tool (but for data,
 not code.)
 
@@ -481,3 +617,33 @@ mtcars %>%
 ```
 
 Super!
+
+
+### advanced: programming with assertion functions
+
+The assertion functions we have been using so far have been using non-standard
+evaluation (we haven't been quoting the column names, for example).
+Though very very nice in most cases, non-standard evaluation causes issues when
+trying to programmatically use assertion functions. Let's say you want to check
+the z-scores of a column from `mtcars` of the user's choice; you ask the user
+for a column and store that in a variable. If you try to use that variable in
+an `insist` (or `assert`, etc...) you'll get an error
+
+
+```{r error=TRUE,  purl = FALSE}
+# a.column <- readline("Enter a column name: ")
+# pretend user said "vs"
+a.column <- "vs"
+insist(mtcars, within_n_sds(3), a.column)
+```
+
+Good thing all of `assertr`'s assertion verbs have standard evaluation
+counterparts! All you have to do to use them is put an underscore ("_") at
+the end of the function name...
+
+```{r error=TRUE,  purl = FALSE}
+insist_(mtcars, within_n_sds(3), a.column) %>%
+  head(n=2)
+```
+
+Nifty!

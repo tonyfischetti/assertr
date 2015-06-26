@@ -16,7 +16,7 @@
 #'   \item \code{\link{insist_rows}}
 #'   \item \code{\link{not_na}}
 #'   \item \code{\link{in_set}}
-#'   \item \code{\link{num_rows_NAs}}
+#'   \item \code{\link{num_row_NAs}}
 #'   \item \code{\link{maha_dist}}
 #'   \item \code{\link{within_bounds}}
 #'   \item \code{\link{within_n_sds}}
@@ -26,6 +26,7 @@
 #'
 #' @examples
 #' library(magrittr)     # for the piping operator
+#' library(dplyr)
 #'
 #' # this confirms that
 #'   # - that the dataset contains more than 10 observations

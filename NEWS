@@ -1,3 +1,11 @@
+# assertr 1.0.0
+
+* added row reduction functions like mahalanobis distnace
+
+* added assert_rows and insist_rows assert verbs
+
+* bug fixes
+
 # assertr 0.5.7
 
 * added within_n_mads predicate generator

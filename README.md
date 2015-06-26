@@ -12,7 +12,7 @@ The assertr package supplies a suite of functions designed to verify
 assumptions about data early in an analysis pipeline so that
 data errors are spotted early and can be addressed quickly.
 
-This package in no way needs to be used with the magrittr/dplyr piping
+This package does not need to be used with the magrittr/dplyr piping
 mechanism but the examples in this README use them for clarity.
 
 ### Installation
@@ -31,7 +31,7 @@ This package offers five assertion functions, `assert`, `verify`,
 `insist`, `assert_rows`, and `insist_rows`, that are designed to be used
 shortly after data-loading in an analysis pipeline...
 
-Let’s say, for example, that the R’s built-in car dataset, mtcars, was not 
+Let’s say, for example, that the R’s built-in car dataset, `mtcars`, was not 
 built-in but rather procured from an external source that was known for making
 errors in data entry or coding. Pretend we wanted to find the average
 miles per gallon for each number of engine cylinders. We might want to first,
@@ -44,7 +44,7 @@ that is outside 4 standard deviations from its mean, and
 respectively) contain 0s and 1s only
 - each row contains at most 2 NAs
 - each row's mahalanobis distance is within 10 median absolute deviations of
-all the distance (for outlier detection)
+all the distances (for outlier detection)
 
 
 This could be written (in order) using `assertr` like this:
@@ -102,7 +102,8 @@ missing values in each row. Internally, the `assert_rows` function uses
 `dplyr`'s`select` function to extract the columns to test the predicate
 function on.
 
-- `insist_rows` - takes a data frame, a row reduction function, a predicate
+- `insist_rows` - takes a data frame, a row reduction function, a
+predicate-generating
 function, and an arbitrary number of columns to apply the predicate function
 to. The row reduction function is applied to the data frame, and returns a value
 for each row. The predicate-generating function is then applied to the vector
@@ -136,7 +137,7 @@ and `insist_rows`:
 
 - `num_row_NAs` - counts number of missing values in each row
 - `maha_dist` - computes the mahalanobis distance of each row (for outlier
-detection)
+detection). It will coerce categorical variables into numerics if it needs to.
 
 Finally, each assertion function has a counterpart that using standard
 evaluation. The counterpart functions are postfixed by "_" (an underscore).
