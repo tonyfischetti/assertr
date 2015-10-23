@@ -60,26 +60,6 @@ This could be written (in order) using `assertr` like this:
       group_by(cyl) %>%
       summarise(avg.mpg=mean(mpg))
 ```
-A sequence of assertions can even be named and reused where appropriate thanks to the `magrtittr` package's named sequences.
-```{r}
-    general_asserts <- . %>% 
-      verify(nrow(.) > 10) %>%
-      assert_rows(num_row_NAs, within_bounds(0,2), everything()) %>%
-      insist_rows(maha_dist, within_n_mads(10), everything())
-    
-    mtcars_asserts <- . %>%  
-      insist(within_n_sds(4), mpg) %>%
-      assert(in_set(0,1), am, vs) 
-    
-    mtcars %>%
-      general_asserts %>% 
-      mtcars_asserts %>% 
-      group_by(cyl) %>%
-      summarise(avg.mpg=mean(mpg))
-  
-  
-    iris %>% general_asserts
-```      
 
 If any of these assertions were violated, an error would have been raised
 and the pipeline would have been terminated early.
