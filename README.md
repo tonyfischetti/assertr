@@ -18,14 +18,14 @@ mechanism but the examples in this README use them for clarity.
 ### Installation
 
 You can install the latest version on CRAN like this
-
+  
     install.packages("assertr")
 
 or you can install the bleeding-edge development version like this:
-
+```{r}
     install.packages("devtools")
     devtools::install_github("tonyfischetti/assertr")
-
+```
 ### What does it look like?
 This package offers five assertion functions, `assert`, `verify`,
 `insist`, `assert_rows`, and `insist_rows`, that are designed to be used
@@ -49,7 +49,7 @@ all the distances (for outlier detection)
 
 This could be written (in order) using `assertr` like this:
 
-
+```{r}
     mtcars %>%
       verify(nrow(.) > 10) %>%
       verify(mpg > 0) %>%
@@ -59,7 +59,27 @@ This could be written (in order) using `assertr` like this:
       insist_rows(maha_dist, within_n_mads(10), everything()) %>%
       group_by(cyl) %>%
       summarise(avg.mpg=mean(mpg))
-
+```
+A sequence of assertions can even be named and reused where appropriate thanks to the `magrtittr` package's named sequences.
+```{r}
+    general_asserts <- . %>% 
+      verify(nrow(.) > 10) %>%
+      assert_rows(num_row_NAs, within_bounds(0,2), everything()) %>%
+      insist_rows(maha_dist, within_n_mads(10), everything())
+    
+    mtcars_asserts <- . %>%  
+      insist(within_n_sds(4), mpg) %>%
+      assert(in_set(0,1), am, vs) 
+    
+    mtcars %>%
+      general_asserts %>% 
+      mtcars_asserts %>% 
+      group_by(cyl) %>%
+      summarise(avg.mpg=mean(mpg))
+  
+  
+    iris %>% general_asserts
+```      
 
 If any of these assertions were violated, an error would have been raised
 and the pipeline would have been terminated early.
@@ -145,7 +165,8 @@ evaluation. The counterpart functions are postfixed by "_" (an underscore).
 ### More info
 
 For more info, check out the `assertr` vignette
-
+```{r}
     > vignette("assertr")
-
+```
 Or [read it here](http://cran.r-project.org/web/packages/assertr/vignettes/assertr.html)
+
