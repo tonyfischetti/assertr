@@ -3,6 +3,7 @@ packrat/lib*/
 .DS_Store
 .Rproj.user
 .Rproj
+.Rapp.history
 
 # Object files
 *.o

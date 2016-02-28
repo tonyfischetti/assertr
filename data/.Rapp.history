@@ -1,2 +1,0 @@
-load("/Users/tonyfischetti/Desktop/assertr/data/mtcars.rda")
-q()
