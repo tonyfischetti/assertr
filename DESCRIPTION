@@ -10,8 +10,8 @@ Description: Provides functionality to assert conditions
     analysis pipelines can fail quickly. Similar to
     'stopifnot()' but more powerful, friendly, and easier
     for use in pipelines.
-URL: https://github.com/tonyfischetti/assertr
-BugReports: https://github.com/tonyfischetti/assertr/issues
+URL: https://github.com/ropenscilabs/assertr
+BugReports: https://github.com/ropenscilabs/assertr/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
