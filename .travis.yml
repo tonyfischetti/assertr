@@ -1,11 +1,11 @@
 language: r
+sudo: false
+cache: packages
 
 r_binary_packages:
  - dplyr
  - magrittr
  - MASS
-
-sudo: required
 
 after_failure:
   - ./travis-tool.sh dump_logs
