@@ -11,7 +11,10 @@
 #'
 #' This is useful for finding anomalous observations, row-wise.
 #'
-#' It will convert any categorical variables in the data frame into numerics.
+#' It will convert any categorical variables in the data frame into numerics
+#' as long as they are factors. For example, in order for a character
+#' column to be used as a component in the distance calculations, it must
+#' either be a factor, or converted to a factor.
 #'
 #' @param data A data frame
 #' @param keep.NA Ensure that every row with missing data remains NA in
@@ -41,7 +44,7 @@
 maha_dist <- function(data, keep.NA=TRUE, robust=FALSE){
   # this implementation is heavily inspired by the implementation
   # in the "psych" package written by William Revelle
-  if(!(class(data) %in% c("matrix", "data.frame")))
+  if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
   a.matrix <- data.matrix(data)
   if(ncol(a.matrix)<2)
@@ -53,7 +56,7 @@ maha_dist <- function(data, keep.NA=TRUE, robust=FALSE){
       stop("cannot use robust maha_dist with missing values", call.=FALSE)
     dcov <- MASS::cov.mcd(a.matrix)$cov
   } else{
-    dcov <- cov(a.matrix, use="pairwise")
+    dcov <- stats::cov(a.matrix, use="pairwise")
   }
   inv <- MASS::ginv(dcov)
   dists <- t(apply(a.matrix, 1,
