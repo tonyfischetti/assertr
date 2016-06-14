@@ -4,8 +4,8 @@ assertr
 ![assertr logo](http://statethatiamin.onlythisrose.com/assertrlogo.png)
 
 [![Build Status](https://travis-ci.org/tonyfischetti/assertr.svg?branch=master)](https://travis-ci.org/tonyfischetti/assertr)
-[![](http://www.r-pkg.org/badges/version/assertr)](http://cran.rstudio.com/web/packages/assertr/index.html)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/assertr)](http://cran.r-project.org/web/packages/assertr/index.html)
+[![](http://www.r-pkg.org/badges/version/assertr)](https://cran.r-project.org/package=assertr)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/assertr)](https://cran.r-project.org/package=assertr)
 
 ### What is it?
 The assertr package supplies a suite of functions designed to verify
