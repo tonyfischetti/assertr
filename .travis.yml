@@ -6,6 +6,7 @@ r_binary_packages:
  - dplyr
  - magrittr
  - MASS
+ - rmarkdown
 
 after_failure:
   - ./travis-tool.sh dump_logs
