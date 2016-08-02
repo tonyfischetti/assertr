@@ -32,6 +32,7 @@
 #'
 #'
 #' library(magrittr)            # for piping operator
+#' library(dplyr)               # for "everything()" function
 #'
 #' # using every column from mtcars, compute mahalanobis distance
 #' # for each observation, and ensure that each distance is within 10
@@ -84,6 +85,7 @@ maha_dist <- function(data, keep.NA=TRUE, robust=FALSE){
 #'
 #'
 #' library(magrittr)            # for piping operator
+#' library(dplyr)               # for "everything()" function
 #'
 #' # using every column from mtcars, make sure there are at most
 #' # 2 NAs in each row. If there are any more than two, error out

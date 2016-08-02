@@ -186,16 +186,16 @@ test_that("assert breaks appropriately (using se)", {
 ############### assert_rows ###############
 test_that("assert_rows returns data if verification passes", {
   expect_equal(assert_rows(mtcars, rowSums, within_bounds(0,2), vs, am), mtcars)
-  expect_equal(assert_rows(mtcars, num_row_NAs, within_bounds(0,.1), everything()),
+  expect_equal(assert_rows(mtcars, num_row_NAs, within_bounds(0,.1), dplyr::everything()),
                mtcars)
   expect_equal(assert_rows(mtcars, rowSums, within_bounds(5,16), cyl, carb),
                mtcars)
   expect_equal(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,2),
-                           everything()), mnexmpl.data)
+                           dplyr::everything()), mnexmpl.data)
   # newest version of R broke this
   # expect_equal(assert_rows(mtcars, `|`, in_set(0,1), vs, am), mtcars)
   expect_equal(assert_rows(nexmpl.data, num_row_NAs, function(x) x < 2,
-                           everything()), nexmpl.data)
+                           dplyr::everything()), nexmpl.data)
   expect_equal(assert_rows(mtcars, rowSums, function(x) if(x>16) return(FALSE), carb, cyl),
                mtcars)
 })
@@ -214,11 +214,11 @@ test_that("assert_rows returns data if verification passes (using se)", {
 test_that("assert_rows raises error if verification fails", {
   expect_error(assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am),
                "Data frame row reduction violates predicate 'within_bounds' 12 times \\(e.g. at row number 5\\)")
-  expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), everything()),
+  expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything()),
                "Data frame row reduction violates predicate 'within_bounds' 32 times \\(e.g. at row number 1\\)")
   expect_error(assert_rows(mtcars, rowSums, function(x) if(x==10) return(FALSE), carb, cyl),
                "Data frame row reduction violates predicate 'function' 8 times \\(e.g. at row number 1\\)")
-  expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), everything()),
+  expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything()),
                "Data frame row reduction violates predicate 'within_bounds' 1 time \\(at row number 12\\)")
 })
 
@@ -234,11 +234,11 @@ test_that("assert_rows raises error if verification fails (using se)", {
 test_that("assert_rows raises *custom error* if verification fails", {
   expect_error(assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am, error_fun=yell),
                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'WITHIN_BOUNDS' 12 TIMES \\(E.G. AT ROW NUMBER 5\\)")
-  expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), everything(), error_fun=yell),
+  expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun=yell),
                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'WITHIN_BOUNDS' 32 TIMES \\(E.G. AT ROW NUMBER 1\\)")
   expect_error(assert_rows(mtcars, rowSums, function(x) if(x==10) return(FALSE), carb, cyl, error_fun=yell),
                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'FUNCTION' 8 TIMES \\(E.G. AT ROW NUMBER 1\\)")
-  expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), everything(), error_fun=not.helpful),
+  expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything(), error_fun=not.helpful),
                "unspecified error")
 })
 
@@ -374,7 +374,7 @@ test_that("insist breaks appropriately (using se)", {
 
 ############### insist rows ###############
 test_that("insist_rows returns data if verification passes", {
-  expect_equal(insist_rows(our.iris, maha_dist, within_n_sds(6), everything()), our.iris)
+  expect_equal(insist_rows(our.iris, maha_dist, within_n_sds(6), dplyr::everything()), our.iris)
   expect_equal(insist_rows(our.iris, maha_dist, within_n_mads(10), Sepal.Length:Species), our.iris)
   expect_equal(insist_rows(our.iris, maha_dist, within_n_mads(11), Sepal.Length:Petal.Width),
                our.iris)
@@ -388,9 +388,9 @@ test_that("insist_rows returns data if verification passes (using se)", {
 })
 
 test_that("insist_rows raises error if verification fails", {
-  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(4), everything()),
+  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(4), dplyr::everything()),
                "Data frame row reduction violates predicate 'within_n_sds' 1 time \\(at row number 135\\)")
-  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(2), everything()),
+  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(2), dplyr::everything()),
                "Data frame row reduction violates predicate 'within_n_sds' 8 times \\(e.g. at row number 42\\)")
   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Species),
                "Data frame row reduction violates predicate 'within_n_mads' 1 time \\(at row number 135\\)")
@@ -411,9 +411,9 @@ test_that("insist_rows raises error if verification fails (using se)", {
 
 
 test_that("insist_rows raises *custom error* if verification fails", {
-  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(4), everything(), error_fun = yell),
+  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(4), dplyr::everything(), error_fun = yell),
                toupper("Data frame row reduction violates predicate 'within_n_sds' 1 time \\(at row number 135\\)"))
-  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(2), everything(), error_fun = yell),
+  expect_error(insist_rows(our.iris, maha_dist, within_n_sds(2), dplyr::everything(), error_fun = yell),
                toupper("Data frame row reduction violates predicate 'within_n_sds' 8 times \\(e.g. at row number 42\\)"))
   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Species, error_fun = yell),
                toupper("Data frame row reduction violates predicate 'within_n_mads' 1 time \\(at row number 135\\)"))
