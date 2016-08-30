@@ -95,7 +95,7 @@ maha_dist <- function(data, keep.NA=TRUE, robust=FALSE){
 #'
 #' @export
 num_row_NAs <- function(data, allow.NaN=FALSE){
-  if(!(class(data) %in% c("matrix", "data.frame")))
+  if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
   pred <- function(x){ sum((is.na(x)&(!(is.nan(x))))) }
   if(allow.NaN){
