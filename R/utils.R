@@ -30,7 +30,7 @@ make.predicate.proper <- function(improper.predicate){
     return(TRUE)
   }
   if(is.vectorized.predicate(improper.predicate)){
-    comment(ret.fun) <- "assertr/vectorized"
+    attr(ret.fun, "assertr_vectorized") <- TRUE
   }
   return(ret.fun)
 }
@@ -64,10 +64,12 @@ make.assert_rows.error.message <- function(name.of.predicate, num.violations,
 
 
 is.vectorized.predicate <- function(predicate){
-  if(!is.null(comment(predicate)) && comment(predicate)=="assertr/vectorized")
+  if(!is.null(attr(predicate, "assertr_vectorized")) &&
+     attr(predicate, "assertr_vectorized")==TRUE)
     return(TRUE)
   return(FALSE)
 }
+
 
 
 apply.predicate.to.vector <- function(a.column, predicate){

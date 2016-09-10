@@ -30,7 +30,7 @@ not_na <- function(x, allow.NaN=FALSE){
 }
 # so assert function knows to vectorize the function for
 # substantial speed increase
-comment(not_na) <- "assertr/vectorized"
+attr(not_na, "assertr_vectorized") <- TRUE
 
 
 #' Creates bounds checking predicate
@@ -103,7 +103,7 @@ within_bounds <- function(lower.bound, upper.bound,
     return((lower.operator(x, lower.bound) &
               upper.operator(x, upper.bound)) & !(is.na(x)))
   }
-  comment(fun) <- "assertr/vectorized"
+  attr(fun, "assertr_vectorized") <- TRUE
   return(fun)
 }
 # so, this function returns a function to be used as argument to another
