@@ -85,6 +85,7 @@ attr(not_na, "assertr_vectorized") <- TRUE
 within_bounds <- function(lower.bound, upper.bound,
                           include.lower=TRUE, include.upper=TRUE,
                           allow.na=TRUE){
+  the_call <- deparse(sys.call())
   if(!(is.numeric(lower.bound) && is.numeric(upper.bound)))
     stop("bounds must be numeric")
   if(lower.bound >= upper.bound)
@@ -104,6 +105,7 @@ within_bounds <- function(lower.bound, upper.bound,
               upper.operator(x, upper.bound)) & !(is.na(x)))
   }
   attr(fun, "assertr_vectorized") <- TRUE
+  attr(fun, "call") <- the_call
   return(fun)
 }
 # so, this function returns a function to be used as argument to another
@@ -153,9 +155,10 @@ within_bounds <- function(lower.bound, upper.bound,
 #'
 #' @export
 in_set <- function(..., allow.na=TRUE){
+  the_call <- deparse(sys.call())
   set <- c(...)
   if(!length(set)) stop("can not test for membership in empty set")
-  function(x){
+  fun<- function(x){
     if(length(x)>1)      stop("bounds must be checked on a single element")
     if(is.null(x))       stop("bounds must be checked on a single element")
     if(x %in% set)
@@ -165,6 +168,8 @@ in_set <- function(..., allow.na=TRUE){
         return(TRUE)
     return(FALSE)
   }
+  attr(fun, "call") <- the_call
+  return(fun)
 }
 
 
@@ -219,10 +224,11 @@ in_set <- function(..., allow.na=TRUE){
 #'
 #' @export
 within_n_sds <- function(n, ...){
+  the_call <- deparse(sys.call())
   if(!is.numeric(n) || length(n)!=1 || n<=0){
     stop("'n' must be a positive number")
   }
-  function(a.vector){
+  fun <- function(a.vector){
     if(!is.vector(a.vector) || !is.numeric(a.vector))
       stop("argument must be a numeric vector")
     mu <- mean(a.vector, na.rm=TRUE)
@@ -231,6 +237,9 @@ within_n_sds <- function(n, ...){
     if(is.na(stdev)) stop("standard deviations of vector is NA")
     within_bounds((mu-(n*stdev)), (mu+(n*stdev)), ...)
   }
+  attr(fun, "call") <- the_call
+  return(fun)
+
 }
 
 
@@ -288,10 +297,11 @@ within_n_sds <- function(n, ...){
 #'
 #' @export
 within_n_mads <- function(n, ...){
+  the_call <- deparse(sys.call())
   if(!is.numeric(n) || length(n)!=1 || n<=0){
     stop("'n' must be a positive number")
   }
-  function(a.vector){
+  fun <- function(a.vector){
     if(!is.vector(a.vector) || !is.numeric(a.vector))
       stop("argument must be a numeric vector")
     dmad <- stats::mad(a.vector, na.rm=TRUE)
@@ -300,6 +310,8 @@ within_n_mads <- function(n, ...){
     if(is.na(dmed)) stop("median of vector is NA")
     within_bounds((dmed-(n*dmad)), (dmed+(n*dmad)), ...)
   }
+  attr(fun, "call") <- the_call
+  return(fun)
 }
 
 
