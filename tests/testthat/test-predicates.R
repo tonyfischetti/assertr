@@ -52,7 +52,7 @@ test_that("not_na errors out when appropriate", {
 })
 
 test_that("predicate is tagged for assert function to vectorize", {
-  expect_equal(comment(not_na), "assertr/vectorized")
+  expect_true(attr(not_na, "assertr_vectorized"))
 })
 ######################################
 
@@ -110,7 +110,7 @@ test_that("returned predicate fails appropriately", {
 })
 
 test_that("returned predicate is tagged for assert function to vectorize", {
-  expect_equal(comment(within_bounds(1,2)), "assertr/vectorized")
+  expect_true(attr(within_bounds(1,2), "assertr_vectorized"))
 })
 #####################################
 
@@ -150,6 +150,10 @@ test_that("second inner function fails appropriately", {
                "standard deviations of vector is NA")
   expect_error(within_n_sds(1)(c("johnny", "marr")),
                "argument must be a numeric vector")
+})
+
+test_that("returned predicate is tagged for assert function to vectorize", {
+  expect_true(attr(within_n_sds(1)(test.vect), "assertr_vectorized"))
 })
 ############################################
 
