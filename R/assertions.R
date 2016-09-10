@@ -21,9 +21,6 @@
 #' @param .dots Use assert_() to select columns using standard evaluation.
 #' @param error_fun Function to call if assertion fails. Takes one error
 #'         string. Uses \code{stop} by default
-#' @param .nameofpred Text representation of predicate for printing in case
-#'         of assertion violation. Will automatically be retrieved if left
-#'         blank (default)
 #'
 #'
 #' @return data if predicate assertion is TRUE. error if not.
@@ -61,24 +58,23 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., error_fun=assertr_stop){
-  name.of.predicate <- as.character(substitute(predicate))
-  if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
   assert_(data, predicate, .dots = lazyeval::lazy_dots(...),
-          error_fun = error_fun,
-          .nameofpred = name.of.predicate)
+          error_fun = error_fun)
 }
 
 #' @export
 #' @rdname assert
-assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
-                    .nameofpred=""){
+assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-  if(.nameofpred==""){
-    name.of.predicate <- as.character(substitute(predicate))
-    if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
+  if(!is.null(attr(predicate, "call"))){
+    name.of.predicate <- attr(predicate, "call")
   }
-  else
-    name.of.predicate <- .nameofpred
+  else {
+    name.of.predicate <- deparse(substitute(predicate))
+    if(length(name.of.predicate)>1)
+      name.of.predicate <- gsub("\\s{2,}", " ",
+                                paste0(name.of.predicate, collapse=""))
+  }
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
@@ -131,9 +127,6 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
 #' @param .dots Use assert_rows_() to select columns using standard evaluation.
 #' @param error_fun Function to call if assertion fails. Takes one error
 #'         string. Uses \code{stop} by default
-#' @param .nameofpred Text representation of predicate for printing in case
-#'         of assertion violation. Will automatically be retrieved if left
-#'         blank (default)
 #'
 #'
 #' @return data if predicate assertions are TRUE. error if not.
@@ -166,24 +159,24 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop,
 #'
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
                         error_fun=assertr_stop){
-  name.of.predicate <- as.character(substitute(predicate))
-  if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
   assert_rows_(data, row_reduction_fn, predicate,
-               .dots = lazyeval::lazy_dots(...), error_fun = error_fun,
-               .nameofpred = name.of.predicate)
+               .dots = lazyeval::lazy_dots(...), error_fun = error_fun)
 }
 
 #' @export
 #' @rdname assert_rows
 assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
-                         error_fun=assertr_stop, .nameofpred=""){
+                         error_fun=assertr_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-  if(.nameofpred==""){
-    name.of.predicate <- as.character(substitute(predicate))
-    if(length(name.of.predicate)>1) name.of.predicate <- name.of.predicate[1]
+  if(!is.null(attr(predicate, "call"))){
+    name.of.predicate <- attr(predicate, "call")
   }
-  else
-    name.of.predicate <- .nameofpred
+  else {
+    name.of.predicate <- deparse(substitute(predicate))
+    if(length(name.of.predicate)>1)
+      name.of.predicate <- gsub("\\s{2,}", " ",
+                                paste0(name.of.predicate, collapse=""))
+  }
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
@@ -228,9 +221,6 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #' @param .dots Use insist_() to select columns using standard evaluation.
 #' @param error_fun Function to call if assertion fails. Takes one error
 #'         string. Uses \code{stop} by default
-#' @param .nameofpred Text representation of predicate for printing in case
-#'         of assertion violation. Will automatically be retrieved if left
-#'         blank (default)
 #'
 #' @return data if dynamically created predicate assertion is TRUE. error if not.
 #' @note See \code{vignette("assertr")} for how to use this in context
@@ -259,26 +249,25 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #'
 #' @export
 insist <- function(data, predicate_generator, ..., error_fun=assertr_stop){
-  name.of.predicate.generator <- as.character(substitute(predicate_generator))
-  if(length(name.of.predicate.generator)>1)
-    name.of.predicate.generator <- name.of.predicate.generator[1]
   insist_(data, predicate_generator, .dots = lazyeval::lazy_dots(...),
-          error_fun = error_fun,
-          .nameofpred = name.of.predicate.generator)
+          error_fun = error_fun)
 }
 
 #' @export
 #' @rdname insist
 insist_ <- function(data, predicate_generator, ..., .dots,
-                    error_fun=assertr_stop, .nameofpred=""){
+                    error_fun=assertr_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-  if(.nameofpred==""){
-    name.of.predicate.generator <- as.character(substitute(predicate_generator))
-    if(length(name.of.predicate.generator)>1)
-      name.of.predicate.generator <- name.of.predicate.generator[1]
+  if(!is.null(attr(predicate, "call"))){
+    name.of.predicate.generator <- attr(predicate, "call")
   }
-  else
-    name.of.predicate.generator <- .nameofpred
+  else {
+    name.of.predicate.generator <- deparse(substitute(predicate))
+    if(length(name.of.predicate.generator)>1)
+      name.of.predicate.generator <- gsub("\\s{2,}", " ",
+                                          paste0(name.of.predicate.generator,
+                                                 collapse=""))
+  }
 
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),
@@ -338,9 +327,6 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #' @param .dots Use insist_rows_() to select columns using standard evaluation.
 #' @param error_fun Function to call if assertion fails. Takes one error
 #'         string. Uses \code{stop} by default
-#' @param .nameofpred Text representation of predicate for printing in case
-#'         of assertion violation. Will automatically be retrieved if left
-#'         blank (default)
 #'
 #'
 #' @return data if dynamically created predicate assertion is TRUE. error if not.
@@ -372,26 +358,25 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #'
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                    error_fun=assertr_stop){
-  name.of.predicate.generator <- as.character(substitute(predicate_generator))
-  if(length(name.of.predicate.generator)>1)
-    name.of.predicate.generator <- name.of.predicate.generator[1]
   insist_rows_(data, row_reduction_fn, predicate_generator,
-               .dots = lazyeval::lazy_dots(...), error_fun = error_fun,
-               .nameofpred = name.of.predicate.generator)
+               .dots = lazyeval::lazy_dots(...), error_fun = error_fun)
 }
 
 #' @export
 #' @rdname insist_rows
 insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots,
-                    error_fun=assertr_stop, .nameofpred=""){
+                    error_fun=assertr_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-  if(.nameofpred==""){
-    name.of.predicate.generator <- as.character(substitute(predicate_generator))
-    if(length(name.of.predicate.generator)>1)
-      name.of.predicate.generator <- name.of.predicate.generator[1]
+  if(!is.null(attr(predicate, "call"))){
+    name.of.predicate.generator <- attr(predicate, "call")
   }
-  else
-    name.of.predicate.generator <- .nameofpred
+  else {
+    name.of.predicate.generator <- deparse(substitute(predicate))
+    if(length(name.of.predicate.generator)>1)
+      name.of.predicate.generator <- gsub("\\s{2,}", " ",
+                                          paste0(name.of.predicate.generator,
+                                                 collapse=""))
+  }
 
   redux <- row_reduction_fn(sub.frame)
 
