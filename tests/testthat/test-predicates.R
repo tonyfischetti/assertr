@@ -54,6 +54,10 @@ test_that("not_na errors out when appropriate", {
 test_that("predicate is tagged for assert function to vectorize", {
   expect_true(attr(not_na, "assertr_vectorized"))
 })
+
+test_that("predicate appropriately assigns the 'call' attribute", {
+  expect_equal(attr(not_na, "call"), "not_na")
+})
 ######################################
 
 
@@ -112,6 +116,11 @@ test_that("returned predicate fails appropriately", {
 test_that("returned predicate is tagged for assert function to vectorize", {
   expect_true(attr(within_bounds(1,2), "assertr_vectorized"))
 })
+
+test_that("predicate appropriately assigns the 'call' attribute", {
+  expect_equal(attr(within_bounds(0, test.vect[1]), "call"),
+               "within_bounds(0, test.vect[1])")
+})
 #####################################
 
 
@@ -155,6 +164,11 @@ test_that("second inner function fails appropriately", {
 test_that("returned predicate is tagged for assert function to vectorize", {
   expect_true(attr(within_n_sds(1)(test.vect), "assertr_vectorized"))
 })
+
+test_that("predicate appropriately assigns the 'call' attribute", {
+  expect_equal(attr(within_n_sds(100*test.vect[1]), "call"),
+               "within_n_sds(100 * test.vect[1])")
+})
 ############################################
 
 
@@ -197,6 +211,11 @@ test_that("second inner function fails appropriately", {
   expect_error(within_n_mads(1)(c("johnny", "marr")),
                "argument must be a numeric vector")
 })
+
+test_that("predicate appropriately assigns the 'call' attribute", {
+  expect_equal(attr(within_n_mads(test.vect[2]*test.vect[1]), "call"),
+               "within_n_mads(test.vect[2] * test.vect[1])")
+})
 ############################################
 
 
@@ -228,5 +247,11 @@ test_that("returned predicate fails appropriately", {
                "bounds must be checked on a single element")
   expect_error(in_set(0,1)(c()),
                "bounds must be checked on a single element")
+})
+
+test_that("predicate appropriately assigns the 'call' attribute", {
+  expect_equal(attr(in_set(0,  1), "call"), "in_set(0, 1)")
+  expect_equal(attr(in_set("ένα", "δύο", "τρία", "δέκατέσσερα"), "call"),
+               "in_set(\"ένα\", \"δύο\", \"τρία\", \"δέκατέσσερα\")")
 })
 ######################################
