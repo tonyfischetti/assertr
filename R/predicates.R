@@ -24,6 +24,7 @@
 #'
 #' @export
 not_na <- function(x, allow.NaN=FALSE){
+  the_call <- deparse(sys.call())
   if(is.null(x))    stop("not_na must be called on non-null object")
   if(allow.NaN)     return((!is.na(x)) | is.nan(x))
   return(!is.na(x))
@@ -31,7 +32,7 @@ not_na <- function(x, allow.NaN=FALSE){
 # so assert function knows to vectorize the function for
 # substantial speed increase
 attr(not_na, "assertr_vectorized") <- TRUE
-
+attr(not_na, "call") <- "not_na"
 
 #' Creates bounds checking predicate
 #'
