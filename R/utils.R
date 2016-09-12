@@ -4,20 +4,6 @@
 ##
 
 
-# for error messages, it's useful if the function
-# name can be used (so the useR can tell what)
-# predicate function failed. The problem is,
-# assertions lend themselves to use with unnamed
-# lambda functions so we have to make a better
-# way to represent that
-# stringify() used on a lamda will return a vector
-# of character
-get.name.of.function <- function(stringified.function){
-  if(length(stringified.function) > 1)
-    return("(lambda expression)")
-  return(stringified.function)
-}
-
 
 # as a convenience, this package allows for the creation
 # of predicates that only define a false condition. we
