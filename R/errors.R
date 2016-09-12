@@ -1,6 +1,6 @@
 
 ##
-##  defines some error object constructors, error functions, and 
+##  defines some error object constructors, error functions, and
 ##  error chaining functions
 ##
 
@@ -31,12 +31,34 @@ make.assertr.assert.error <- function(name.of.predicate,
   return(this_error)
 }
 
+#' Printing assertr's assert errors
+#'
+#' `print` method for class "assertr_assert_error"
+#' This prints the error message and the entire two-column
+#' `data.frame` holding the indexes and values of the offending
+#' data.
+#'
+#' @param x An assertr_assert_error object
+#' @seealso \code{\link{summary.assertr_assert_error}}
+#'
+#' @export
 print.assertr_assert_error <- function(error){
   cat(error$message)
   cat("\n")
   print(error$error_df)
 }
 
+#' Summarizing assertr's assert errors
+#'
+#' `summary` method for class "assertr_assert_error"
+#' This prints the error message and the first five
+#' rows of the two-column `data.frame` holding the
+#' indexes and values of the offending data.
+#'
+#' @param x An assertr_assert_error object
+#' @seealso \code{\link{print.assertr_assert_error}}
+#'
+#' @export
 summary.assertr_assert_error <- function(error){
   cat(error$message)
   cat("\n")
@@ -45,4 +67,6 @@ summary.assertr_assert_error <- function(error){
   if(numrows > 5)
     cat(paste0("  [omitted ", numrows-5, " rows]\n\n"))
 }
+
+
 
