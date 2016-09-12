@@ -31,6 +31,30 @@ make.assertr.assert.error <- function(name.of.predicate,
   return(this_error)
 }
 
+# used by "assert_rows" and "insist_rows"
+make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
+                                           name.of.predicate,
+                                           num.violations,
+                                           loc.violations){
+  time.or.times <- ifelse(num.violations==1, "time", "times")
+
+  msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
+                "' violates predicate '", name.of.predicate,
+                "' ", num.violations, " ", time.or.times)
+  this_error <- list()
+
+  this_error$error_df <- data.frame(rownumber=loc.violations)
+
+  this_error$message <- msg
+  this_error$num.violations <- num.violations
+  this_error$call <- name.of.predicate
+
+  class(this_error) <- c("assertr_assert_error", "assertr_error",
+                         "error", "condition")
+  return(this_error)
+}
+
+
 #' Printing assertr's assert errors
 #'
 #' `print` method for class "assertr_assert_error"
@@ -67,6 +91,4 @@ summary.assertr_assert_error <- function(error){
   if(numrows > 5)
     cat(paste0("  [omitted ", numrows-5, " rows]\n\n"))
 }
-
-
 
