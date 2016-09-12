@@ -92,3 +92,54 @@ summary.assertr_assert_error <- function(error){
     cat(paste0("  [omitted ", numrows-5, " rows]\n\n"))
 }
 
+
+#####################
+#   verify errors   #
+#####################
+# used by "verify"
+
+make.assertr.verify.error <- function(num.violations, the_call){
+  sing.plur <- ifelse(num.violations==1, " failure)", " failures)")
+  msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
+  this_error <- list()
+  this_error$message <- msg
+  this_error$num.violations <- num.violations
+  this_error$call <- the_call
+  class(this_error) <- c("assertr_verify_error", "assertr_error",
+                         "error", "condition")
+  return(this_error)
+}
+
+#' Printing assertr's verify errors
+#'
+#' `summary` method for class "assertr_verify_error"
+#'
+#' @param x An assertr_verify_error object
+#' @seealso \code{\link{summary.assertr_verify_error}}
+#'
+#' @export
+print.assertr_verify_error <- function(error){
+  cat(error$message)
+  cat("\n\n")
+}
+
+#' Summarizing assertr's verify errors
+#'
+#' `summary` method for class "assertr_verify_error"
+#'
+#' @param x An assertr_verify_error object
+#' @seealso \code{\link{print.assertr_verify_error}}
+#'
+#' @export
+summary.assertr_verify_error <- function(error){ print(error) }
+
+
+
+#######################
+#   error functions   #
+#######################
+
+success_logical <- function(data, ...){ return(TRUE) }
+
+success_continue <- function(data, ...){ return(data) }
+
