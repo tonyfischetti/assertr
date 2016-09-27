@@ -135,11 +135,53 @@ summary.assertr_verify_error <- function(error){ print(error) }
 
 
 
-#######################
-#   error functions   #
-#######################
+
+## DO THESE NEED TO BE EXPORTED!?!!?!
+
+#########################
+#   success functions   #
+#########################
 
 success_logical <- function(data, ...){ return(TRUE) }
 
 success_continue <- function(data, ...){ return(data) }
+
+
+#######################
+#   error functions   #
+#######################
+
+error_stop <- function(errors, data=NULL, ...){
+  if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
+    errors <- append(attr(data, "assertr_errors"), errors)
+  lapply(errors, summary)
+  stop("assertr stopped execution", call.=FALSE)
+}
+# for backwards compatibility
+assertr_stop <- error_stop
+
+error_report <- function(errors, data=NULL, ...){
+  if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
+    errors <- append(attr(data, "assertr_errors"), errors)
+  cat(sprintf("There are %d errors:\n\n", length(errors)))   #### plural
+  lapply(errors, function(x){cat("- "); print(x)})
+  stop("assertr stopped execution", call.=FALSE)
+}
+
+error_append <- function(errors, data=NULL){
+  if(is.null(attr(data, "assertr_errors")))
+    attr(data, "assertr_errors") <- list()
+  attr(data, "assertr_errors") <- append(attr(data, "assertr_errors"), errors)
+  return(data)
+}
+
+error_return <- function(errors, data=NULL){
+  if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
+    errors <- append(attr(data, "assertr_errors"), errors)
+  return(errors)
+}
+
+error_logical <- function(errors, data=NULL, ...){
+  return(FALSE)
+}
 
