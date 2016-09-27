@@ -151,25 +151,39 @@ success_continue <- function(data, ...){ return(data) }
 #   error functions   #
 #######################
 
-error_stop <- function(errors, data=NULL, ...){
+error_stop <- function(errors, data=NULL, warn=FALSE...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
   lapply(errors, summary)
-  stop("assertr stopped execution", call.=FALSE)
+  if(!warn)
+    stop("assertr stopped execution", call.=FALSE)
+  warning("assertr encountered errors", call.=FALSE)
+  return(data)
 }
 # for backwards compatibility
 assertr_stop <- error_stop
 
-error_report <- function(errors, data=NULL, ...){
+just_warn <- function(errors, data=NULL){
+  error_stop(errors, data, warn=TRUE)
+}
+
+error_report <- function(errors, data=NULL, warn=FALSE...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
   num.of.errors <- length(errors)
-  cat(sprintf("There %s %d error%s:\n\n",
+  cat(sprintf("There %s %d error%s:\n",
               ifelse(num.of.errors==1,"is", "are"),
               num.of.errors,
               ifelse(num.of.errors==1,"", "s")))
-  lapply(errors, function(x){cat("- "); print(x)})
-  stop("assertr stopped execution", call.=FALSE)
+  lapply(errors, function(x){cat("\n- "); print(x)})
+  if(!warn)
+    stop("assertr stopped execution", call.=FALSE)
+  warning("assertr encountered errors", call.=FALSE)
+  return(data)
+}
+
+warn_report <- function(errors, data=NULL){
+  error_report(errors, data, warn=TRUE)
 }
 
 error_append <- function(errors, data=NULL){
@@ -187,5 +201,24 @@ error_return <- function(errors, data=NULL){
 
 error_logical <- function(errors, data=NULL, ...){
   return(FALSE)
+}
+
+
+##########################
+#   chaining functions   #
+##########################
+chain_end <- function(data, success_fun=success_continue,
+                      error_fun=error_report){
+  list_of_errors <- attr(data, "assertr_errors")
+  attr(data, "assertr_errors") <- NULL
+  if(is.null(list_of_errors))
+    return(success_fun(data))
+  error_fun(list_of_errors, data=data)
+}
+
+chain_start <- function(data, ...){
+  attr(data, "assertr_in_chain_success_fun_override") <- success_continue
+  attr(data, "assertr_in_chain_error_fun_override") <- error_append
+  return(data)
 }
 

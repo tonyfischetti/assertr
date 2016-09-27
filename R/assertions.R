@@ -119,7 +119,7 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
   if(!is.null(error_fun_override)){
-    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+    if(!identical(error_fun, error_fun_override))
       warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
@@ -278,7 +278,7 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
   if(!is.null(error_fun_override)){
-    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+    if(!identical(error_fun, error_fun_override))
       warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
@@ -423,7 +423,7 @@ insist_ <- function(data, predicate_generator, ..., .dots,
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
   if(!is.null(error_fun_override)){
-    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+    if(!identical(error_fun, error_fun_override))
       warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
@@ -586,7 +586,7 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
   if(!is.null(error_fun_override)){
-    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+    if(!identical(error_fun, error_fun_override))
       warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
@@ -713,7 +713,7 @@ verify <- function(data, expr, success_fun=success_continue,
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
   if(!is.null(error_fun_override)){
-    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+    if(!identical(error_fun, error_fun_override))
       warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
