@@ -19,11 +19,44 @@
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
 #' @param .dots Use assert_() to select columns using standard evaluation.
-#' @param error_fun Function to call if assertion fails. Takes one error
-#'         string. Uses \code{stop} by default
+#' @param success_fun Function to call if assertion passes. Defaults to
+#'                    returning \code{data}.
+#' @param error_fun Function to call if assertion fails. Defaults to printing
+#'                  a summary of all errors.
 #'
+#' @details The behavior of this function when the assertion passes or fails
+#'          is configurable via the \code{success_fun} and \code{error_fun}
+#'          parameters, respectively.
+#'          The \code{success_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{success_continue} - just returns the data that was
+#'                  passed into the assertion function
+#'            \item \code{success_logical} - returns TRUE
+#'          }
+#'          The \code{error_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{error_stop} - Prints a summary of the errors and
+#'            halts execution.
+#'            \item \code{error_report} - Prints all the information available
+#'            about the errors and halts execution.
+#'            \item \code{error_append} - Attaches the errors to a special
+#'            attribute of \code{data} and returns the data. This is chiefly
+#'            to allow assertr errors to be accumulated in a pipeline so that
+#'            all assertions can have a chance to be checked and so that all
+#'            the errors can be displayed at the end of the chain.
+#'            \item \code{error_logical} - returns FALSE
+#'          }
 #'
-#' @return data if predicate assertion is TRUE. error if not.
+#' @return By default, the \code{data} is returned if predicate assertion
+#'         is TRUE and and error is thrown if not. If a non-default
+#'         \code{success_fun} or \code{error_fun} is used, the return
+#'         values of these function will be returned.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{verify}} \code{\link{insist}}
 #'          \code{\link{assert_rows}} \code{\link{insist_rows}}
@@ -57,14 +90,17 @@
 #'   # nothing here will run}
 #'
 #' @export
-assert <- function(data, predicate, ..., error_fun=assertr_stop){
+assert <- function(data, predicate, ..., success_fun=success_continue,
+                   error_fun=error_stop){
   assert_(data, predicate, .dots = lazyeval::lazy_dots(...),
+          success_fun=success_fun,
           error_fun = error_fun)
 }
 
 #' @export
 #' @rdname assert
-assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop){
+assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
+                      error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -86,8 +122,9 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop){
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
-  if(all(log.mat))
-    return(data)
+  # if all checks pass *and* there are no leftover errors
+  if(all(log.mat) && is.null(attr(data, "assertr_errors")))
+    return(success_fun(data))
 
   messages <- sapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
@@ -125,11 +162,44 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop){
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
 #' @param .dots Use assert_rows_() to select columns using standard evaluation.
-#' @param error_fun Function to call if assertion fails. Takes one error
-#'         string. Uses \code{stop} by default
+#' @param success_fun Function to call if assertion passes. Defaults to
+#'                    returning \code{data}.
+#' @param error_fun Function to call if assertion fails. Defaults to printing
+#'                  a summary of all errors.
 #'
+#' @details The behavior of this function when the assertion passes or fails
+#'          is configurable via the \code{success_fun} and \code{error_fun}
+#'          parameters, respectively.
+#'          The \code{success_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{success_continue} - just returns the data that was
+#'                  passed into the assertion function
+#'            \item \code{success_logical} - returns TRUE
+#'          }
+#'          The \code{error_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{error_stop} - Prints a summary of the errors and
+#'            halts execution.
+#'            \item \code{error_report} - Prints all the information available
+#'            about the errors and halts execution.
+#'            \item \code{error_append} - Attaches the errors to a special
+#'            attribute of \code{data} and returns the data. This is chiefly
+#'            to allow assertr errors to be accumulated in a pipeline so that
+#'            all assertions can have a chance to be checked and so that all
+#'            the errors can be displayed at the end of the chain.
+#'            \item \code{error_logical} - returns FALSE
+#'          }
 #'
-#' @return data if predicate assertions are TRUE. error if not.
+#' @return By default, the \code{data} is returned if predicate assertion
+#'         is TRUE and and error is thrown if not. If a non-default
+#'         \code{success_fun} or \code{error_fun} is used, the return
+#'         values of these function will be returned.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{insist_rows}} \code{\link{assert}}
 #'          \code{\link{verify}} \code{\link{insist}}
@@ -158,15 +228,19 @@ assert_ <- function(data, predicate, ..., .dots, error_fun=assertr_stop){
 #' @export
 #'
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
-                        error_fun=assertr_stop){
+                        success_fun=success_continue,
+                        error_fun=error_stop){
   assert_rows_(data, row_reduction_fn, predicate,
-               .dots = lazyeval::lazy_dots(...), error_fun = error_fun)
+               .dots = lazyeval::lazy_dots(...),
+               success_fun = success_fun,
+               error_fun = error_fun)
 }
 
 #' @export
 #' @rdname assert_rows
 assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
-                         error_fun=assertr_stop){
+                         success_fun=success_continue,
+                         error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -185,8 +259,9 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
 
-  if(all(log.vec))
-    return(data)
+  # if all checks pass *and* there are no leftover errors
+  if(all(log.vec) && is.null(attr(data, "assertr_errors")))
+    return(success_fun(data))
 
   num.violations <- sum(!log.vec)
   if(num.violations==0)
@@ -219,10 +294,44 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
 #' @param .dots Use insist_() to select columns using standard evaluation.
-#' @param error_fun Function to call if assertion fails. Takes one error
-#'         string. Uses \code{stop} by default
+#' @param success_fun Function to call if assertion passes. Defaults to
+#'                    returning \code{data}.
+#' @param error_fun Function to call if assertion fails. Defaults to printing
+#'                  a summary of all errors.
 #'
-#' @return data if dynamically created predicate assertion is TRUE. error if not.
+#' @details The behavior of this function when the assertion passes or fails
+#'          is configurable via the \code{success_fun} and \code{error_fun}
+#'          parameters, respectively.
+#'          The \code{success_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{success_continue} - just returns the data that was
+#'                  passed into the assertion function
+#'            \item \code{success_logical} - returns TRUE
+#'          }
+#'          The \code{error_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{error_stop} - Prints a summary of the errors and
+#'            halts execution.
+#'            \item \code{error_report} - Prints all the information available
+#'            about the errors and halts execution.
+#'            \item \code{error_append} - Attaches the errors to a special
+#'            attribute of \code{data} and returns the data. This is chiefly
+#'            to allow assertr errors to be accumulated in a pipeline so that
+#'            all assertions can have a chance to be checked and so that all
+#'            the errors can be displayed at the end of the chain.
+#'            \item \code{error_logical} - returns FALSE
+#'          }
+#'
+#' @return By default, the \code{data} is returned if dynamically created
+#'         predicate assertion is TRUE and and error is thrown if not. If a
+#'         non-default \code{success_fun} or \code{error_fun} is used, the
+#'         return values of these function will be returned.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{assert}} \code{\link{verify}} \code{\link{insist_rows}}
 #'          \code{\link{assert_rows}}
@@ -248,21 +357,25 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #'   # is terminated so nothing after this statement will run}
 #'
 #' @export
-insist <- function(data, predicate_generator, ..., error_fun=assertr_stop){
+insist <- function(data, predicate_generator, ...,
+                   success_fun=success_continue,
+                   error_fun=error_stop){
   insist_(data, predicate_generator, .dots = lazyeval::lazy_dots(...),
+          success_fun=success_fun,
           error_fun = error_fun)
 }
 
 #' @export
 #' @rdname insist
 insist_ <- function(data, predicate_generator, ..., .dots,
-                    error_fun=assertr_stop){
+                    success_fun=success_continue,
+                    error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-  if(!is.null(attr(predicate, "call"))){
-    name.of.predicate.generator <- attr(predicate, "call")
+  if(!is.null(attr(predicate_generator, "call"))){
+    name.of.predicate.generator <- attr(predicate_generator, "call")
   }
   else {
-    name.of.predicate.generator <- deparse(substitute(predicate))
+    name.of.predicate.generator <- deparse(substitute(predicate_generator))
     if(length(name.of.predicate.generator)>1)
       name.of.predicate.generator <- gsub("\\s{2,}", " ",
                                           paste0(name.of.predicate.generator,
@@ -280,8 +393,9 @@ insist_ <- function(data, predicate_generator, ..., .dots,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
-  if(all(log.mat))
-    return(data)
+  # if all checks pass *and* there are no leftover errors
+  if(all(log.mat) && is.null(attr(data, "assertr_errors")))
+    return(success_fun(data))
 
   messages <- sapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
@@ -325,11 +439,44 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
 #' @param .dots Use insist_rows_() to select columns using standard evaluation.
-#' @param error_fun Function to call if assertion fails. Takes one error
-#'         string. Uses \code{stop} by default
+#' @param success_fun Function to call if assertion passes. Defaults to
+#'                    returning \code{data}.
+#' @param error_fun Function to call if assertion fails. Defaults to printing
+#'                  a summary of all errors.
 #'
+#' @details The behavior of this function when the assertion passes or fails
+#'          is configurable via the \code{success_fun} and \code{error_fun}
+#'          parameters, respectively.
+#'          The \code{success_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{success_continue} - just returns the data that was
+#'                  passed into the assertion function
+#'            \item \code{success_logical} - returns TRUE
+#'          }
+#'          The \code{error_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{error_stop} - Prints a summary of the errors and
+#'            halts execution.
+#'            \item \code{error_report} - Prints all the information available
+#'            about the errors and halts execution.
+#'            \item \code{error_append} - Attaches the errors to a special
+#'            attribute of \code{data} and returns the data. This is chiefly
+#'            to allow assertr errors to be accumulated in a pipeline so that
+#'            all assertions can have a chance to be checked and so that all
+#'            the errors can be displayed at the end of the chain.
+#'            \item \code{error_logical} - returns FALSE
+#'          }
 #'
-#' @return data if dynamically created predicate assertion is TRUE. error if not.
+#' @return By default, the \code{data} is returned if dynamically created
+#'         predicate assertion is TRUE and and error is thrown if not. If a
+#'         non-default \code{success_fun} or \code{error_fun} is used, the
+#'         return values of these function will be returned.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{insist}} \code{\link{assert_rows}}
 #'          \code{\link{assert}} \code{\link{verify}}
@@ -357,21 +504,24 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #' @export
 #'
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
-                   error_fun=assertr_stop){
+                        success_fun=success_continue,
+                        error_fun=error_stop){
   insist_rows_(data, row_reduction_fn, predicate_generator,
-               .dots = lazyeval::lazy_dots(...), error_fun = error_fun)
+               .dots = lazyeval::lazy_dots(...),
+               success_fun=success_fun, error_fun = error_fun)
 }
 
 #' @export
 #' @rdname insist_rows
-insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots,
-                    error_fun=assertr_stop){
+insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
+                         .dots, success_fun=success_continue,
+                         error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-  if(!is.null(attr(predicate, "call"))){
-    name.of.predicate.generator <- attr(predicate, "call")
+  if(!is.null(attr(predicate_generator, "call"))){
+    name.of.predicate.generator <- attr(predicate_generator, "call")
   }
   else {
-    name.of.predicate.generator <- deparse(substitute(predicate))
+    name.of.predicate.generator <- deparse(substitute(predicate_generator))
     if(length(name.of.predicate.generator)>1)
       name.of.predicate.generator <- gsub("\\s{2,}", " ",
                                           paste0(name.of.predicate.generator,
@@ -384,8 +534,9 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
 
-  if(all(log.vec))
-    return(data)
+  # if all checks pass *and* there are no leftover errors
+  if(all(log.vec) && is.null(attr(data, "assertr_errors")))
+    return(success_fun(data))
 
   num.violations <- sum(!log.vec)
   if(num.violations==0)
@@ -401,7 +552,6 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots
 
 
 
-
 #' Raises error if expression is FALSE anywhere
 #'
 #' Meant for use in a data analysis pipeline, this function will
@@ -412,10 +562,44 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots
 #'
 #' @param data A data frame, list, or environment
 #' @param expr A logical expression
-#' @param error_fun Function to call if assertion fails. Takes one error
-#'         string. Uses \code{stop} by default
+#' @param success_fun Function to call if assertion passes. Defaults to
+#'                    returning \code{data}.
+#' @param error_fun Function to call if assertion fails. Defaults to printing
+#'                  a summary of all errors.
 #'
-#' @return data if verification passes. error if not.
+#' @details The behavior of this function when the assertion passes or fails
+#'          is configurable via the \code{success_fun} and \code{error_fun}
+#'          parameters, respectively.
+#'          The \code{success_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{success_continue} - just returns the data that was
+#'                  passed into the assertion function
+#'            \item \code{success_logical} - returns TRUE
+#'          }
+#'          The \code{error_fun} parameter takes a function that takes
+#'          the data passed to the assertion function as a parameter. You can
+#'          write your own success handler function, but there are two
+#'          provided by this package:
+#'          \enumerate{
+#'            \item \code{error_stop} - Prints a summary of the errors and
+#'            halts execution.
+#'            \item \code{error_report} - Prints all the information available
+#'            about the errors and halts execution.
+#'            \item \code{error_append} - Attaches the errors to a special
+#'            attribute of \code{data} and returns the data. This is chiefly
+#'            to allow assertr errors to be accumulated in a pipeline so that
+#'            all assertions can have a chance to be checked and so that all
+#'            the errors can be displayed at the end of the chain.
+#'            \item \code{error_logical} - returns FALSE
+#'          }
+#'
+#' @return By default, the \code{data} is returned if predicate assertion
+#'         is TRUE and and error is thrown if not. If a non-default
+#'         \code{success_fun} or \code{error_fun} is used, the return
+#'         values of these function will be returned.
 #' @note See \code{vignette("assertr")} for how to use this in context
 #' @seealso \code{\link{assert}} \code{\link{insist}}
 #' @examples
@@ -448,14 +632,16 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ..., .dots
 #'
 #'
 #' @export
-verify <- function(data, expr, error_fun=stop){
+verify <- function(data, expr, success_fun=success_continue,
+                   error_fun=error_stop){
   expr <- substitute(expr)
   # conform to terminology from subset
   envir <- data
   enclos <- parent.frame()
   logical.results <- eval(expr, envir, enclos)
-  if(all(logical.results))
-    return(data)
+  # if all checks pass *and* there are no leftover errors
+  if(all(logical.results) && is.null(attr(data, "assertr_errors")))
+    return(success_fun(data))
   num.violations <- sum(!logical.results)
   error.message <- make.verify.error.message(num.violations)
   error.message <- paste0(error.message, collapse = '')
