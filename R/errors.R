@@ -163,7 +163,11 @@ assertr_stop <- error_stop
 error_report <- function(errors, data=NULL, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
-  cat(sprintf("There are %d errors:\n\n", length(errors)))   #### plural
+  num.of.errors <- length(errors)
+  cat(sprintf("There %s %d error%s:\n\n",
+              ifelse(num.of.errors==1,"is", "are"),
+              num.of.errors,
+              ifelse(num.of.errors==1,"", "s")))
   lapply(errors, function(x){cat("- "); print(x)})
   stop("assertr stopped execution", call.=FALSE)
 }
