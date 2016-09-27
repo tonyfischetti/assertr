@@ -111,6 +111,19 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
       name.of.predicate <- gsub("\\s{2,}", " ",
                                 paste0(name.of.predicate, collapse=""))
   }
+  success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
+  if(!is.null(success_fun_override)){
+    if(!identical(success_fun, success_fun_override))
+      warning("user defined success_fun overridden by assertr chain")
+    success_fun <- success_fun_override
+  }
+  error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
+  if(!is.null(error_fun_override)){
+    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+      warning("user defined error_fun overriden by assertr chain")
+    error_fun <- error_fun_override
+  }
+
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
@@ -257,6 +270,18 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
       name.of.predicate <- gsub("\\s{2,}", " ",
                                 paste0(name.of.predicate, collapse=""))
   }
+  success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
+  if(!is.null(success_fun_override)){
+    if(!identical(success_fun, success_fun_override))
+      warning("user defined success_fun overridden by assertr chain")
+    success_fun <- success_fun_override
+  }
+  error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
+  if(!is.null(error_fun_override)){
+    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+      warning("user defined error_fun overriden by assertr chain")
+    error_fun <- error_fun_override
+  }
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
@@ -389,6 +414,18 @@ insist_ <- function(data, predicate_generator, ..., .dots,
       name.of.predicate.generator <- gsub("\\s{2,}", " ",
                                           paste0(name.of.predicate.generator,
                                                  collapse=""))
+  }
+  success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
+  if(!is.null(success_fun_override)){
+    if(!identical(success_fun, success_fun_override))
+      warning("user defined success_fun overridden by assertr chain")
+    success_fun <- success_fun_override
+  }
+  error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
+  if(!is.null(error_fun_override)){
+    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+      warning("user defined error_fun overriden by assertr chain")
+    error_fun <- error_fun_override
   }
 
   # get true predicates (not the generator)
@@ -541,6 +578,18 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
                                           paste0(name.of.predicate.generator,
                                                  collapse=""))
   }
+  success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
+  if(!is.null(success_fun_override)){
+    if(!identical(success_fun, success_fun_override))
+      warning("user defined success_fun overridden by assertr chain")
+    success_fun <- success_fun_override
+  }
+  error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
+  if(!is.null(error_fun_override)){
+    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+      warning("user defined error_fun overriden by assertr chain")
+    error_fun <- error_fun_override
+  }
 
   redux <- row_reduction_fn(sub.frame)
 
@@ -655,6 +704,20 @@ verify <- function(data, expr, success_fun=success_continue,
   envir <- data
   enclos <- parent.frame()
   logical.results <- eval(expr, envir, enclos)
+
+  success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
+  if(!is.null(success_fun_override)){
+    if(!identical(success_fun, success_fun_override))
+      warning("user defined success_fun overridden by assertr chain")
+    success_fun <- success_fun_override
+  }
+  error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
+  if(!is.null(error_fun_override)){
+    if(!identical(error_fun, error_fun_override) && !identical(error_fun, assertr_error_stop))
+      warning("user defined error_fun overriden by assertr chain")
+    error_fun <- error_fun_override
+  }
+
   # if all checks pass *and* there are no leftover errors
   if(all(logical.results) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
