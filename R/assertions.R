@@ -126,19 +126,25 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
   if(all(log.mat) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
 
-  messages <- sapply(colnames(log.mat), function(col.name){
+  errors <- lapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
     num.violations <- sum(!col)
     if(num.violations==0)
-      return("")
-    index.of.first.violation <- which(!col)[1]
-    offending.element <- sub.frame[[col.name]][index.of.first.violation]
-    make.assert.error.message(name.of.predicate, col.name, num.violations,
-                              index.of.first.violation, offending.element)
+      return(NULL)
+    index.of.violations <- which(!col)
+    offending.elements <- sub.frame[[col.name]][index.of.violations]
+    an_error <- make.assertr.assert.error(name.of.predicate,
+                                          col.name,
+                                          num.violations,
+                                          index.of.violations,
+                                          offending.elements)
+    return(an_error)
   })
 
-  messages <- paste0(messages[messages!=""], collapse = '')
-  error_fun(messages)
+  # remove the elements corresponding to the columns without errors
+  errors <- Filter(function(x) !is.null(x), errors)
+
+  error_fun(errors, data=data)
 }
 
 
@@ -268,9 +274,12 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
     return("")
   loc.violations <- which(!log.vec)
 
-  message <- make.assert_rows.error.message(name.of.predicate, num.violations,
-                                            loc.violations)
-  error_fun(message)
+  error <- make.assertr.assert_rows.error(name.of.rowredux.fn,
+                                          name.of.predicate.generator,
+                                          num.violations,
+                                          loc.violations)
+  error_fun(list(error), data=data)
+
 }
 
 
@@ -397,20 +406,25 @@ insist_ <- function(data, predicate_generator, ..., .dots,
   if(all(log.mat) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
 
-  messages <- sapply(colnames(log.mat), function(col.name){
+  errors <- lapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
     num.violations <- sum(!col)
     if(num.violations==0)
-      return("")
-    index.of.first.violation <- which(!col)[1]
-    offending.element <- sub.frame[[col.name]][index.of.first.violation]
-    make.assert.error.message(name.of.predicate.generator, col.name,
-                              num.violations, index.of.first.violation,
-                              offending.element)
+      return(NULL)
+    index.of.violations <- which(!col)
+    offending.elements <- sub.frame[[col.name]][index.of.violations]
+    an_error <- make.assertr.assert.error(name.of.predicate.generator,
+                                          col.name,
+                                          num.violations,
+                                          index.of.violations,
+                                          offending.elements)
+    return(an_error)
   })
 
-  messages <- paste0(messages[messages!=""], collapse = '')
-  error_fun(messages)
+  # remove the elements corresponding to the columns without errors
+  errors <- Filter(function(x) !is.null(x), errors)
+
+  error_fun(errors, data=data)
 }
 
 
@@ -543,9 +557,11 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
     return("")
   loc.violations <- which(!log.vec)
 
-  message <- make.assert_rows.error.message(name.of.predicate.generator,
-                                            num.violations,loc.violations)
-  error_fun(message)
+  error <- make.assertr.assert_rows.error(name.of.rowredux.fn,
+                                          name.of.predicate.generator,
+                                          num.violations,
+                                          loc.violations)
+  error_fun(list(error), data=data)
 }
 
 
@@ -643,7 +659,6 @@ verify <- function(data, expr, success_fun=success_continue,
   if(all(logical.results) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
   num.violations <- sum(!logical.results)
-  error.message <- make.verify.error.message(num.violations)
-  error.message <- paste0(error.message, collapse = '')
-  error_fun(error.message)
+  error <- make.assertr.verify.error(num.violations, the_call)
+  error_fun(list(error), data=data)
 }
