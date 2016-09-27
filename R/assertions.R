@@ -31,16 +31,16 @@
 #'          the data passed to the assertion function as a parameter. You can
 #'          write your own success handler function, but there are two
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{success_continue} - just returns the data that was
 #'                  passed into the assertion function
 #'            \item \code{success_logical} - returns TRUE
 #'          }
 #'          The \code{error_fun} parameter takes a function that takes
 #'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
+#'          write your own error handler function, but there are a few
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{error_stop} - Prints a summary of the errors and
 #'            halts execution.
 #'            \item \code{error_report} - Prints all the information available
@@ -174,16 +174,16 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
 #'          the data passed to the assertion function as a parameter. You can
 #'          write your own success handler function, but there are two
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{success_continue} - just returns the data that was
 #'                  passed into the assertion function
 #'            \item \code{success_logical} - returns TRUE
 #'          }
 #'          The \code{error_fun} parameter takes a function that takes
 #'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
+#'          write your own error handler function, but there are a few
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{error_stop} - Prints a summary of the errors and
 #'            halts execution.
 #'            \item \code{error_report} - Prints all the information available
@@ -306,16 +306,16 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #'          the data passed to the assertion function as a parameter. You can
 #'          write your own success handler function, but there are two
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{success_continue} - just returns the data that was
 #'                  passed into the assertion function
 #'            \item \code{success_logical} - returns TRUE
 #'          }
 #'          The \code{error_fun} parameter takes a function that takes
 #'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
+#'          write your own error handler function, but there are a few
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{error_stop} - Prints a summary of the errors and
 #'            halts execution.
 #'            \item \code{error_report} - Prints all the information available
@@ -451,16 +451,16 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #'          the data passed to the assertion function as a parameter. You can
 #'          write your own success handler function, but there are two
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{success_continue} - just returns the data that was
 #'                  passed into the assertion function
 #'            \item \code{success_logical} - returns TRUE
 #'          }
 #'          The \code{error_fun} parameter takes a function that takes
 #'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
+#'          write your own error handler function, but there are a few
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{error_stop} - Prints a summary of the errors and
 #'            halts execution.
 #'            \item \code{error_report} - Prints all the information available
@@ -574,16 +574,16 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
 #'          the data passed to the assertion function as a parameter. You can
 #'          write your own success handler function, but there are two
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{success_continue} - just returns the data that was
 #'                  passed into the assertion function
 #'            \item \code{success_logical} - returns TRUE
 #'          }
 #'          The \code{error_fun} parameter takes a function that takes
 #'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
+#'          write your own error handler function, but there are a few
 #'          provided by this package:
-#'          \enumerate{
+#'          \itemize{
 #'            \item \code{error_stop} - Prints a summary of the errors and
 #'            halts execution.
 #'            \item \code{error_report} - Prints all the information available
