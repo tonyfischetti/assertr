@@ -151,7 +151,7 @@ success_continue <- function(data, ...){ return(data) }
 #   error functions   #
 #######################
 
-error_stop <- function(errors, data=NULL, warn=FALSE...){
+error_stop <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
   lapply(errors, summary)
@@ -167,7 +167,7 @@ just_warn <- function(errors, data=NULL){
   error_stop(errors, data, warn=TRUE)
 }
 
-error_report <- function(errors, data=NULL, warn=FALSE...){
+error_report <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
   num.of.errors <- length(errors)

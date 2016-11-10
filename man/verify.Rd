@@ -4,18 +4,24 @@
 \alias{verify}
 \title{Raises error if expression is FALSE anywhere}
 \usage{
-verify(data, expr, error_fun = stop)
+verify(data, expr, success_fun = success_continue, error_fun = error_stop)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}
 
 \item{expr}{A logical expression}
 
-\item{error_fun}{Function to call if assertion fails. Takes one error
-string. Uses \code{stop} by default}
+\item{success_fun}{Function to call if assertion passes. Defaults to
+returning \code{data}.}
+
+\item{error_fun}{Function to call if assertion fails. Defaults to printing
+a summary of all errors.}
 }
 \value{
-data if verification passes. error if not.
+By default, the \code{data} is returned if predicate assertion
+        is TRUE and and error is thrown if not. If a non-default
+        \code{success_fun} or \code{error_fun} is used, the return
+        values of these function will be returned.
 }
 \description{
 Meant for use in a data analysis pipeline, this function will
@@ -23,6 +29,36 @@ just return the data it's supplied if all the logicals in the
 expression supplied are TRUE. If at least one is FALSE, this
 function will raise a error, effectively terminating the pipeline
 early
+}
+\details{
+The behavior of this function when the assertion passes or fails
+         is configurable via the \code{success_fun} and \code{error_fun}
+         parameters, respectively.
+         The \code{success_fun} parameter takes a function that takes
+         the data passed to the assertion function as a parameter. You can
+         write your own success handler function, but there are two
+         provided by this package:
+         \itemize{
+           \item \code{success_continue} - just returns the data that was
+                 passed into the assertion function
+           \item \code{success_logical} - returns TRUE
+         }
+         The \code{error_fun} parameter takes a function that takes
+         the data passed to the assertion function as a parameter. You can
+         write your own error handler function, but there are a few
+         provided by this package:
+         \itemize{
+           \item \code{error_stop} - Prints a summary of the errors and
+           halts execution.
+           \item \code{error_report} - Prints all the information available
+           about the errors and halts execution.
+           \item \code{error_append} - Attaches the errors to a special
+           attribute of \code{data} and returns the data. This is chiefly
+           to allow assertr errors to be accumulated in a pipeline so that
+           all assertions can have a chance to be checked and so that all
+           the errors can be displayed at the end of the chain.
+           \item \code{error_logical} - returns FALSE
+         }
 }
 \note{
 See \code{vignette("assertr")} for how to use this in context

@@ -72,11 +72,3 @@ make.verify.error.message <- function(num.violations){
   sing.plur <- ifelse(num.violations==1, " failure)", " failures)")
   paste0(c("verification failed! (", num.violations, sing.plur))
 }
-
-
-## assertr stop
-# stop() with call.=FALSE
-assertr_stop <- function(message){
-  stop(message, call.=FALSE)
-}
-

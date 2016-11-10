@@ -6,10 +6,11 @@
 \title{Raises error if predicate is FALSE for any row after applying
 row reduction function}
 \usage{
-assert_rows(data, row_reduction_fn, predicate, ..., error_fun = assertr_stop)
+assert_rows(data, row_reduction_fn, predicate, ...,
+  success_fun = success_continue, error_fun = error_stop)
 
 assert_rows_(data, row_reduction_fn, predicate, ..., .dots,
-  error_fun = assertr_stop, .nameofpred = "")
+  success_fun = success_continue, error_fun = error_stop)
 }
 \arguments{
 \item{data}{A data frame}
@@ -23,17 +24,19 @@ the provided data frame}
 Uses dplyr's \code{select} to select
 columns from data.}
 
-\item{error_fun}{Function to call if assertion fails. Takes one error
-string. Uses \code{stop} by default}
+\item{success_fun}{Function to call if assertion passes. Defaults to
+returning \code{data}.}
+
+\item{error_fun}{Function to call if assertion fails. Defaults to printing
+a summary of all errors.}
 
 \item{.dots}{Use assert_rows_() to select columns using standard evaluation.}
-
-\item{.nameofpred}{Text representation of predicate for printing in case
-of assertion violation. Will automatically be retrieved if left
-blank (default)}
 }
 \value{
-data if predicate assertions are TRUE. error if not.
+By default, the \code{data} is returned if predicate assertion
+        is TRUE and and error is thrown if not. If a non-default
+        \code{success_fun} or \code{error_fun} is used, the return
+        values of these function will be returned.
 }
 \description{
 Meant for use in a data analysis pipeline, this function applies a
@@ -43,6 +46,36 @@ any of these predicate applications yield FALSE, this function will raise
 an error, effectively terminating the pipeline early. If there are no
 FALSEs, this function will just return the data that it was supplied for
 further use in later parts of the pipeline.
+}
+\details{
+The behavior of this function when the assertion passes or fails
+         is configurable via the \code{success_fun} and \code{error_fun}
+         parameters, respectively.
+         The \code{success_fun} parameter takes a function that takes
+         the data passed to the assertion function as a parameter. You can
+         write your own success handler function, but there are two
+         provided by this package:
+         \itemize{
+           \item \code{success_continue} - just returns the data that was
+                 passed into the assertion function
+           \item \code{success_logical} - returns TRUE
+         }
+         The \code{error_fun} parameter takes a function that takes
+         the data passed to the assertion function as a parameter. You can
+         write your own error handler function, but there are a few
+         provided by this package:
+         \itemize{
+           \item \code{error_stop} - Prints a summary of the errors and
+           halts execution.
+           \item \code{error_report} - Prints all the information available
+           about the errors and halts execution.
+           \item \code{error_append} - Attaches the errors to a special
+           attribute of \code{data} and returns the data. This is chiefly
+           to allow assertr errors to be accumulated in a pipeline so that
+           all assertions can have a chance to be checked and so that all
+           the errors can be displayed at the end of the chain.
+           \item \code{error_logical} - returns FALSE
+         }
 }
 \note{
 See \code{vignette("assertr")} for how to use this in context
