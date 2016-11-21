@@ -37,7 +37,6 @@ make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
                                            num.violations,
                                            loc.violations){
   time.or.times <- ifelse(num.violations==1, "time", "times")
-
   msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
                 "' violates predicate '", name.of.predicate,
                 "' ", num.violations, " ", time.or.times)

@@ -261,6 +261,15 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
                          success_fun=success_continue,
                          error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  if(!is.null(attr(row_reduction_fn, "call"))){
+    name.of.row.redux.fn <- attr(row_reduction_fn, "call")
+  }
+  else {
+    name.of.row.redux.fn <- deparse(substitute(row_reduction_fn))
+    if(length(name.of.row.redux.fn)>1)
+      name.of.row.redux.fn <- gsub("\\s{2,}", " ",
+                                   paste0(name.of.row.redux.fn, collapse=""))
+  }
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
   }
@@ -299,7 +308,7 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
     return("")
   loc.violations <- which(!log.vec)
 
-  error <- make.assertr.assert_rows.error(name.of.rowredux.fn,
+  error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
                                           name.of.predicate.generator,
                                           num.violations,
                                           loc.violations)
@@ -568,6 +577,15 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
                          .dots, success_fun=success_continue,
                          error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  if(!is.null(attr(row_reduction_fn, "call"))){
+    name.of.row.redux.fn <- attr(row_reduction_fn, "call")
+  }
+  else {
+    name.of.row.redux.fn <- deparse(substitute(row_reduction_fn))
+    if(length(name.of.row.redux.fn)>1)
+      name.of.row.redux.fn <- gsub("\\s{2,}", " ",
+                                   paste0(name.of.row.redux.fn, collapse=""))
+  }
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
   }
@@ -606,7 +624,7 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
     return("")
   loc.violations <- which(!log.vec)
 
-  error <- make.assertr.assert_rows.error(name.of.rowredux.fn,
+  error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
                                           name.of.predicate.generator,
                                           num.violations,
                                           loc.violations)
@@ -722,6 +740,6 @@ verify <- function(data, expr, success_fun=success_continue,
   if(all(logical.results) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
   num.violations <- sum(!logical.results)
-  error <- make.assertr.verify.error(num.violations, the_call)
+  error <- make.assertr.verify.error(num.violations, deparse(expr))
   error_fun(list(error), data=data)
 }

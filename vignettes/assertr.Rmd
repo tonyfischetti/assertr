@@ -72,7 +72,7 @@ results look reasonable.
 To combat this, we might want to use assertr's `verify` function to make sure
 that `mpg` is a positive number:
 
-```{r error=TRUE, purl = FALSE}
+```{r error=TRUE, purl = FALSE, include=TRUE}
 library(assertr)
 
 our.data %>%

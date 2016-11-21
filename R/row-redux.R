@@ -67,6 +67,7 @@ maha_dist <- function(data, keep.NA=TRUE, robust=FALSE){
     dists[ apply(data, 1, function(x) any(is.na(x))) ] <- NA
   return(dists)
 }
+attr(maha_dist, "call") <- "maha_dist"
 
 
 #' Counts number of NAs in each row
@@ -104,5 +105,5 @@ num_row_NAs <- function(data, allow.NaN=FALSE){
   ret.vec <- apply(data, 1, pred)
   return(ret.vec)
 }
-
+attr(num_row_NAs, "call") <- "num_row_NAs"
 
