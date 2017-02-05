@@ -105,4 +105,3 @@ iris \%>\%
 \code{\link{assert}} \code{\link{verify}} \code{\link{insist_rows}}
          \code{\link{assert_rows}}
 }
-

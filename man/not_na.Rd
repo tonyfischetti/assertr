@@ -31,4 +31,3 @@ not_na(c(1, 2, NA, 4))
 \seealso{
 \code{\link{is.na}} \code{\link{is.nan}}
 }
-

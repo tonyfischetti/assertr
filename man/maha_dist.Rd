@@ -52,4 +52,3 @@ mtcars \%>\%
 \seealso{
 \code{\link{insist_rows}}
 }
-

@@ -65,4 +65,3 @@ iris \%>\%
 \seealso{
 \code{\link{within_n_sds}}
 }
-

@@ -53,4 +53,3 @@ mtcars \%>\%
 \seealso{
 \code{\link{\%in\%}}
 }
-

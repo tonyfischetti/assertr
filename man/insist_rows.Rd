@@ -111,4 +111,3 @@ mtcars \%>\%
 \code{\link{insist}} \code{\link{assert_rows}}
          \code{\link{assert}} \code{\link{verify}}
 }
-

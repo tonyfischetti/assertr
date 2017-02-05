@@ -15,4 +15,3 @@
 \seealso{
 \code{\link{summary.assertr_verify_error}}
 }
-

@@ -18,4 +18,3 @@ indexes and values of the offending data.
 \seealso{
 \code{\link{print.assertr_assert_error}}
 }
-

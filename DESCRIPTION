@@ -24,4 +24,4 @@ Suggests:
     testthat,
     magrittr
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.0

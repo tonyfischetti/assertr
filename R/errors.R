@@ -137,12 +137,57 @@ summary.assertr_verify_error <- function(error){ print(error) }
 
 ## DO THESE NEED TO BE EXPORTED!?!!?!
 
+
+#' Success and error functions
+#'
+#' The behavior of functions like \code{assert}, \code{assert_rows},
+#' \code{insist}, \code{insist_rows}, \code{verify} when the assertion
+#' passes or fails is configurable via the \code{success_fun}
+#' and \code{error_fun} parameters, respectively.
+#' The \code{success_fun} parameter takes a function that takes
+#' the data passed to the assertion function as a parameter. You can
+#' write your own success handler function, but there are two
+#' provided by this package:
+#' \itemize{
+#'   \item \code{success_continue} - just returns the data that was
+#'                                    passed into the assertion function
+#'   \item \code{success_logical} - returns TRUE
+#' }
+#' The \code{error_fun} parameter takes a function that takes
+#' the data passed to the assertion function as a parameter. You can
+#' write your own error handler function, but there are a few
+#' provided by this package:
+#' \itemize{
+#'   \item \code{error_stop} - Prints a summary of the errors and
+#'                             halts execution.
+#'   \item \code{error_report} - Prints all the information available
+#'                               about the errors and halts execution.
+#'   \item \code{error_append} - Attaches the errors to a special
+#'    attribute of \code{data} and returns the data. This is chiefly
+#'    to allow assertr errors to be accumulated in a pipeline so that
+#'    all assertions can have a chance to be checked and so that all
+#'    the errors can be displayed at the end of the chain.
+#'   \item \code{error_logical} - returns FALSE
+#'   \item \code{just_warn} - Prints a summary of the errors but does
+#'    not halt execution, it just issues a warning.
+#'   \item \code{warn_report} - Prints all the information available
+#'   about the errors but does not halt execution, it just issues a warning.
+#'  }
+#' @name success_and_error_functions
+NULL
+
+
+
 #########################
 #   success functions   #
 #########################
 
+#' @export
+#' @rdname success_and_error_functions
 success_logical <- function(data, ...){ return(TRUE) }
 
+#' @export
+#' @rdname success_and_error_functions
 success_continue <- function(data, ...){ return(data) }
 
 
@@ -150,6 +195,8 @@ success_continue <- function(data, ...){ return(data) }
 #   error functions   #
 #######################
 
+#' @export
+#' @rdname success_and_error_functions
 error_stop <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
@@ -162,10 +209,14 @@ error_stop <- function(errors, data=NULL, warn=FALSE, ...){
 # for backwards compatibility
 assertr_stop <- error_stop
 
+#' @export
+#' @rdname success_and_error_functions
 just_warn <- function(errors, data=NULL){
   error_stop(errors, data, warn=TRUE)
 }
 
+#' @export
+#' @rdname success_and_error_functions
 error_report <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
@@ -181,10 +232,14 @@ error_report <- function(errors, data=NULL, warn=FALSE, ...){
   return(data)
 }
 
+#' @export
+#' @rdname success_and_error_functions
 warn_report <- function(errors, data=NULL){
   error_report(errors, data, warn=TRUE)
 }
 
+#' @export
+#' @rdname success_and_error_functions
 error_append <- function(errors, data=NULL){
   if(is.null(attr(data, "assertr_errors")))
     attr(data, "assertr_errors") <- list()
@@ -192,12 +247,16 @@ error_append <- function(errors, data=NULL){
   return(data)
 }
 
+#' @export
+#' @rdname success_and_error_functions
 error_return <- function(errors, data=NULL){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
   return(errors)
 }
 
+#' @export
+#' @rdname success_and_error_functions
 error_logical <- function(errors, data=NULL, ...){
   return(FALSE)
 }

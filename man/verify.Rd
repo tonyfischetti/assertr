@@ -96,4 +96,3 @@ alist \%>\%
 \seealso{
 \code{\link{assert}} \code{\link{insist}}
 }
-

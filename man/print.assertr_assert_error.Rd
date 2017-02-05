@@ -18,4 +18,3 @@ data.
 \seealso{
 \code{\link{summary.assertr_assert_error}}
 }
-

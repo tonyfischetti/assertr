@@ -37,4 +37,3 @@ mtcars \%>\%
 \seealso{
 \code{\link{is.na}} \code{\link{is.nan}} \code{\link{not_na}}
 }
-
