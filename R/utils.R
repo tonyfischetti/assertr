@@ -24,38 +24,12 @@ make.predicate.proper <- function(improper.predicate){
 # marvel at this function's dedication to the FP paradigm!
 
 
-# abstract out creation of error messages
-# so we can make it prettier in future versions
-make.assert.error.message <- function(name.of.predicate, column,
-                                      num.violations, index.of.first.violation,
-                                      offending.element){
-  time.or.times <- ifelse(num.violations==1, "time", "times")
-  eg.or.value <- ifelse(num.violations==1, "value", "e.g.")
-  paste0("\nVector '", column, "' violates assertion '", name.of.predicate,
-         "' ", num.violations, " ", time.or.times, " (", eg.or.value, " [",
-         offending.element, "] at index ", index.of.first.violation, ")")
-}
-
-
-
-make.assert_rows.error.message <- function(name.of.predicate, num.violations,
-                                           loc.violations){
-  time.or.times <- ifelse(num.violations==1, "time", "times")
-  eg.or.value <- ifelse(num.violations==1, "", "e.g. ")
-
-  paste0("Data frame row reduction violates predicate '",
-         name.of.predicate, "' ", num.violations, " ", time.or.times, " (",
-         eg.or.value, "at row number ", loc.violations[1], ")")
-}
-
-
 is.vectorized.predicate <- function(predicate){
   if(!is.null(attr(predicate, "assertr_vectorized")) &&
      attr(predicate, "assertr_vectorized")==TRUE)
     return(TRUE)
   return(FALSE)
 }
-
 
 
 apply.predicate.to.vector <- function(a.column, predicate){
@@ -67,8 +41,3 @@ apply.predicate.to.vector <- function(a.column, predicate){
   return(res)
 }
 
-
-make.verify.error.message <- function(num.violations){
-  sing.plur <- ifelse(num.violations==1, " failure)", " failures)")
-  paste0(c("verification failed! (", num.violations, sing.plur))
-}
