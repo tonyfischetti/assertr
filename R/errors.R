@@ -62,13 +62,14 @@ make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
 #' data.
 #'
 #' @param x An assertr_assert_error object
+#' @param ... Further arguments passed to or from other methods
 #' @seealso \code{\link{summary.assertr_assert_error}}
 #'
 #' @export
-print.assertr_assert_error <- function(error){
-  cat(error$message)
+print.assertr_assert_error <- function(x, ...){
+  cat(x$message)
   cat("\n")
-  print(error$error_df)
+  print(x$error_df)
 }
 
 #' Summarizing assertr's assert errors
@@ -78,15 +79,16 @@ print.assertr_assert_error <- function(error){
 #' rows of the two-column `data.frame` holding the
 #' indexes and values of the offending data.
 #'
-#' @param x An assertr_assert_error object
+#' @param object An assertr_assert_error object
+#' @param ... Additional arguments affecting the summary produced
 #' @seealso \code{\link{print.assertr_assert_error}}
 #'
 #' @export
-summary.assertr_assert_error <- function(error){
-  cat(error$message)
+summary.assertr_assert_error <- function(object, ...){
+  cat(object$message)
   cat("\n")
-  numrows <- nrow(error$error_df)
-  print(head(error$error_df, n=5))
+  numrows <- nrow(object$error_df)
+  print(utils::head(object$error_df, n=5))
   if(numrows > 5)
     cat(paste0("  [omitted ", numrows-5, " rows]\n\n"))
 }
@@ -113,12 +115,13 @@ make.assertr.verify.error <- function(num.violations, the_call){
 #'
 #' `summary` method for class "assertr_verify_error"
 #'
-#' @param x An assertr_verify_error object
+#' @param x An assertr_verify_error object.
+#' @param ... Further arguments passed to or from other methods
 #' @seealso \code{\link{summary.assertr_verify_error}}
 #'
 #' @export
-print.assertr_verify_error <- function(error){
-  cat(error$message)
+print.assertr_verify_error <- function(x, ...){
+  cat(x$message)
   cat("\n\n")
 }
 
@@ -126,16 +129,15 @@ print.assertr_verify_error <- function(error){
 #'
 #' `summary` method for class "assertr_verify_error"
 #'
-#' @param x An assertr_verify_error object
+#' @param object An assertr_verify_error object
+#' @param ... Additional arguments affecting the summary produced
 #' @seealso \code{\link{print.assertr_verify_error}}
 #'
 #' @export
-summary.assertr_verify_error <- function(error){ print(error) }
+summary.assertr_verify_error <- function(object, ...){ print(object) }
 
 
 
-
-## DO THESE NEED TO BE EXPORTED!?!!?!
 
 
 #' Success and error functions
@@ -184,6 +186,7 @@ NULL
 
 #' @export
 #' @rdname success_and_error_functions
+#' @param data A data frame
 success_logical <- function(data, ...){ return(TRUE) }
 
 #' @export
@@ -197,6 +200,8 @@ success_continue <- function(data, ...){ return(data) }
 
 #' @export
 #' @rdname success_and_error_functions
+#' @param errors A list of objects of class \code{assertr_errors}
+#' @param warn If TRUE, assertr will issue a warning instead of an error
 error_stop <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
@@ -257,6 +262,7 @@ error_return <- function(errors, data=NULL){
 
 #' @export
 #' @rdname success_and_error_functions
+#' @param ... Further arguments passed to or from other methods
 error_logical <- function(errors, data=NULL, ...){
   return(FALSE)
 }
@@ -265,6 +271,48 @@ error_logical <- function(errors, data=NULL, ...){
 ##########################
 #   chaining functions   #
 ##########################
+
+#' Chaining functions
+#'
+#' These functions are for starting and ending a sequence of assertr
+#' assertions and overriding the default behavior of assertr halting
+#' execution on the first error.
+#'
+#' For more information, read the relevant section in this package's
+#' vignette using, \code{vignette("assertr")}
+#'
+#' For examples of possible choices for the \code{success_fun} and
+#' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
+#'
+#' @name chaining_functions
+#'
+#' @examples
+#' library(magrittr)
+#'
+#' mtcars %>%
+#'   chain_start() %>%
+#'   verify(nrow(mtcars) > 10) %>%
+#'   verify(mpg > 0) %>%
+#'   insist(within_n_sds(4), mpg) %>%
+#'   assert(in_set(0,1), am, vs) %>%
+#'   chain_end()
+NULL
+
+#' @export
+#' @rdname chaining_functions
+chain_start <- function(data){
+  attr(data, "assertr_in_chain_success_fun_override") <- success_continue
+  attr(data, "assertr_in_chain_error_fun_override") <- error_append
+  return(data)
+}
+
+#' @param data A data frame
+#' @param success_fun Function to call if assertion passes. Defaults to
+#'                    returning \code{data}.
+#' @param error_fun Function to call if assertion fails. Defaults to printing
+#'                  a summary of all errors.
+#' @export
+#' @rdname chaining_functions
 chain_end <- function(data, success_fun=success_continue,
                       error_fun=error_report){
   list_of_errors <- attr(data, "assertr_errors")
@@ -274,9 +322,4 @@ chain_end <- function(data, success_fun=success_continue,
   error_fun(list_of_errors, data=data)
 }
 
-chain_start <- function(data, ...){
-  attr(data, "assertr_in_chain_success_fun_override") <- success_continue
-  attr(data, "assertr_in_chain_error_fun_override") <- error_append
-  return(data)
-}
 

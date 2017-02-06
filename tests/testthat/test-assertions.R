@@ -528,7 +528,7 @@ test_that("insist_rows breaks appropriately", {
   expect_error(insist_rows(mtcars, maha_dist, within_bound(0, 10), vs, am),
                "could not find function \"within_bound\"")
   expect_error(insist_rows(), "argument \"data\" is missing, with no default")
-  expect_error(insist_rows(mtcars), "argument \"predicate_generator\" is missing, with no default")
+  expect_error(insist_rows(mtcars), "argument \"row_reduction_fn\" is missing, with no default")
   expect_error(insist_rows(mtcars, maha_dist, am, vs),
                "object 'am' not found")
   expect_error(insist_rows(mtcars, maha_dist, am, vs, carb),
@@ -548,7 +548,7 @@ test_that("insist_rows breaks appropriately (using se)", {
   expect_error(insist_rows_(mtcars, maha_dist, within_bound(0, 10), "vs", "am"),
                "could not find function \"within_bound\"")
   expect_error(insist_rows_(), "argument \"data\" is missing, with no default")
-  expect_error(insist_rows_(mtcars), "argument \"predicate_generator\" is missing, with no default")
+  expect_error(insist_rows_(mtcars), "argument \"row_reduction_fn\" is missing, with no default")
   expect_error(insist_rows_(mtcars, maha_dist, "am", "vs"),
                "\"data\" needs to have at least two columns")
   expect_error(insist_rows_(mtcars, maha_dist, "am", "vs", "carb"),

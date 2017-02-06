@@ -4,10 +4,12 @@
 \alias{print.assertr_verify_error}
 \title{Printing assertr's verify errors}
 \usage{
-\method{print}{assertr_verify_error}(error)
+\method{print}{assertr_verify_error}(x, ...)
 }
 \arguments{
-\item{x}{An assertr_verify_error object}
+\item{x}{An assertr_verify_error object.}
+
+\item{...}{Further arguments passed to or from other methods}
 }
 \description{
 `summary` method for class "assertr_verify_error"

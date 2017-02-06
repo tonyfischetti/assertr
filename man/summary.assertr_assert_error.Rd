@@ -4,10 +4,12 @@
 \alias{summary.assertr_assert_error}
 \title{Summarizing assertr's assert errors}
 \usage{
-\method{summary}{assertr_assert_error}(error)
+\method{summary}{assertr_assert_error}(object, ...)
 }
 \arguments{
-\item{x}{An assertr_assert_error object}
+\item{object}{An assertr_assert_error object}
+
+\item{...}{Additional arguments affecting the summary produced}
 }
 \description{
 `summary` method for class "assertr_assert_error"

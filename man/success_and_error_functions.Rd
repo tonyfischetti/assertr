@@ -31,6 +31,15 @@ error_return(errors, data = NULL)
 
 error_logical(errors, data = NULL, ...)
 }
+\arguments{
+\item{data}{A data frame}
+
+\item{...}{Further arguments passed to or from other methods}
+
+\item{errors}{A list of objects of class \code{assertr_errors}}
+
+\item{warn}{If TRUE, assertr will issue a warning instead of an error}
+}
 \description{
 The behavior of functions like \code{assert}, \code{assert_rows},
 \code{insist}, \code{insist_rows}, \code{verify} when the assertion

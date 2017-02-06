@@ -4,10 +4,12 @@
 \alias{print.assertr_assert_error}
 \title{Printing assertr's assert errors}
 \usage{
-\method{print}{assertr_assert_error}(error)
+\method{print}{assertr_assert_error}(x, ...)
 }
 \arguments{
 \item{x}{An assertr_assert_error object}
+
+\item{...}{Further arguments passed to or from other methods}
 }
 \description{
 `print` method for class "assertr_assert_error"

@@ -43,34 +43,8 @@ to the predicate, is FALSE, then this function will raise an
 error, effectively terminating the pipeline early.
 }
 \details{
-The behavior of this function when the assertion passes or fails
-         is configurable via the \code{success_fun} and \code{error_fun}
-         parameters, respectively.
-         The \code{success_fun} parameter takes a function that takes
-         the data passed to the assertion function as a parameter. You can
-         write your own success handler function, but there are two
-         provided by this package:
-         \itemize{
-           \item \code{success_continue} - just returns the data that was
-                 passed into the assertion function
-           \item \code{success_logical} - returns TRUE
-         }
-         The \code{error_fun} parameter takes a function that takes
-         the data passed to the assertion function as a parameter. You can
-         write your own error handler function, but there are a few
-         provided by this package:
-         \itemize{
-           \item \code{error_stop} - Prints a summary of the errors and
-           halts execution.
-           \item \code{error_report} - Prints all the information available
-           about the errors and halts execution.
-           \item \code{error_append} - Attaches the errors to a special
-           attribute of \code{data} and returns the data. This is chiefly
-           to allow assertr errors to be accumulated in a pipeline so that
-           all assertions can have a chance to be checked and so that all
-           the errors can be displayed at the end of the chain.
-           \item \code{error_logical} - returns FALSE
-         }
+For examples of possible choices for the \code{success_fun} and
+\code{error_fun} parameters, run \code{help("success_and_error_functions")}
 }
 \note{
 See \code{vignette("assertr")} for how to use this in context

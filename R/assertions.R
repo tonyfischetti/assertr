@@ -24,34 +24,8 @@
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
 #'
-#' @details The behavior of this function when the assertion passes or fails
-#'          is configurable via the \code{success_fun} and \code{error_fun}
-#'          parameters, respectively.
-#'          The \code{success_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{success_continue} - just returns the data that was
-#'                  passed into the assertion function
-#'            \item \code{success_logical} - returns TRUE
-#'          }
-#'          The \code{error_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own error handler function, but there are a few
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{error_stop} - Prints a summary of the errors and
-#'            halts execution.
-#'            \item \code{error_report} - Prints all the information available
-#'            about the errors and halts execution.
-#'            \item \code{error_append} - Attaches the errors to a special
-#'            attribute of \code{data} and returns the data. This is chiefly
-#'            to allow assertr errors to be accumulated in a pipeline so that
-#'            all assertions can have a chance to be checked and so that all
-#'            the errors can be displayed at the end of the chain.
-#'            \item \code{error_logical} - returns FALSE
-#'          }
+#' @details For examples of possible choices for the \code{success_fun} and
+#' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
 #'
 #' @return By default, the \code{data} is returned if predicate assertion
 #'         is TRUE and and error is thrown if not. If a non-default
@@ -186,34 +160,8 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
 #'
-#' @details The behavior of this function when the assertion passes or fails
-#'          is configurable via the \code{success_fun} and \code{error_fun}
-#'          parameters, respectively.
-#'          The \code{success_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{success_continue} - just returns the data that was
-#'                  passed into the assertion function
-#'            \item \code{success_logical} - returns TRUE
-#'          }
-#'          The \code{error_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own error handler function, but there are a few
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{error_stop} - Prints a summary of the errors and
-#'            halts execution.
-#'            \item \code{error_report} - Prints all the information available
-#'            about the errors and halts execution.
-#'            \item \code{error_append} - Attaches the errors to a special
-#'            attribute of \code{data} and returns the data. This is chiefly
-#'            to allow assertr errors to be accumulated in a pipeline so that
-#'            all assertions can have a chance to be checked and so that all
-#'            the errors can be displayed at the end of the chain.
-#'            \item \code{error_logical} - returns FALSE
-#'          }
+#' @details For examples of possible choices for the \code{success_fun} and
+#' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
 #'
 #' @return By default, the \code{data} is returned if predicate assertion
 #'         is TRUE and and error is thrown if not. If a non-default
@@ -309,7 +257,7 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
   loc.violations <- which(!log.vec)
 
   error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
-                                          name.of.predicate.generator,
+                                          name.of.predicate,
                                           num.violations,
                                           loc.violations)
   error_fun(list(error), data=data)
@@ -342,34 +290,8 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
 #'
-#' @details The behavior of this function when the assertion passes or fails
-#'          is configurable via the \code{success_fun} and \code{error_fun}
-#'          parameters, respectively.
-#'          The \code{success_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{success_continue} - just returns the data that was
-#'                  passed into the assertion function
-#'            \item \code{success_logical} - returns TRUE
-#'          }
-#'          The \code{error_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own error handler function, but there are a few
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{error_stop} - Prints a summary of the errors and
-#'            halts execution.
-#'            \item \code{error_report} - Prints all the information available
-#'            about the errors and halts execution.
-#'            \item \code{error_append} - Attaches the errors to a special
-#'            attribute of \code{data} and returns the data. This is chiefly
-#'            to allow assertr errors to be accumulated in a pipeline so that
-#'            all assertions can have a chance to be checked and so that all
-#'            the errors can be displayed at the end of the chain.
-#'            \item \code{error_logical} - returns FALSE
-#'          }
+#' @details For examples of possible choices for the \code{success_fun} and
+#' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
 #'
 #' @return By default, the \code{data} is returned if dynamically created
 #'         predicate assertion is TRUE and and error is thrown if not. If a
@@ -504,34 +426,8 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
 #'
-#' @details The behavior of this function when the assertion passes or fails
-#'          is configurable via the \code{success_fun} and \code{error_fun}
-#'          parameters, respectively.
-#'          The \code{success_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{success_continue} - just returns the data that was
-#'                  passed into the assertion function
-#'            \item \code{success_logical} - returns TRUE
-#'          }
-#'          The \code{error_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own error handler function, but there are a few
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{error_stop} - Prints a summary of the errors and
-#'            halts execution.
-#'            \item \code{error_report} - Prints all the information available
-#'            about the errors and halts execution.
-#'            \item \code{error_append} - Attaches the errors to a special
-#'            attribute of \code{data} and returns the data. This is chiefly
-#'            to allow assertr errors to be accumulated in a pipeline so that
-#'            all assertions can have a chance to be checked and so that all
-#'            the errors can be displayed at the end of the chain.
-#'            \item \code{error_logical} - returns FALSE
-#'          }
+#' @details For examples of possible choices for the \code{success_fun} and
+#' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
 #'
 #' @return By default, the \code{data} is returned if dynamically created
 #'         predicate assertion is TRUE and and error is thrown if not. If a
@@ -650,34 +546,8 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
 #'
-#' @details The behavior of this function when the assertion passes or fails
-#'          is configurable via the \code{success_fun} and \code{error_fun}
-#'          parameters, respectively.
-#'          The \code{success_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own success handler function, but there are two
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{success_continue} - just returns the data that was
-#'                  passed into the assertion function
-#'            \item \code{success_logical} - returns TRUE
-#'          }
-#'          The \code{error_fun} parameter takes a function that takes
-#'          the data passed to the assertion function as a parameter. You can
-#'          write your own error handler function, but there are a few
-#'          provided by this package:
-#'          \itemize{
-#'            \item \code{error_stop} - Prints a summary of the errors and
-#'            halts execution.
-#'            \item \code{error_report} - Prints all the information available
-#'            about the errors and halts execution.
-#'            \item \code{error_append} - Attaches the errors to a special
-#'            attribute of \code{data} and returns the data. This is chiefly
-#'            to allow assertr errors to be accumulated in a pipeline so that
-#'            all assertions can have a chance to be checked and so that all
-#'            the errors can be displayed at the end of the chain.
-#'            \item \code{error_logical} - returns FALSE
-#'          }
+#' @details For examples of possible choices for the \code{success_fun} and
+#' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
 #'
 #' @return By default, the \code{data} is returned if predicate assertion
 #'         is TRUE and and error is thrown if not. If a non-default
