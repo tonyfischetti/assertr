@@ -1,3 +1,15 @@
+# assertr 2.0.0
+
+* redesigned error and error handling mechanism
+
+* assertr errors are now an S3 class and have some methods defined for them
+
+* created some useful 'success' and 'error' functions
+
+* added `chain_start` and `chain_end` that directs assertr to check all
+  assertions (powering through failed ones instead of halting) and
+  accumulating all the errors
+
 # assertr 1.0.0
 
 * added row reduction functions like mahalanobis distnace

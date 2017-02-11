@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2017-02-05" />
+<meta name="date" content="2017-02-11" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2017-02-05</em></h4>
+<h4 class="date"><em>2017-02-11</em></h4>
 
 
 
@@ -237,7 +237,7 @@ dat %&gt;%
 ## 1    18  32.4
 ## 2    20  33.9</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
-<p>Execution of the pipeline was halted. But now we know exactly which data point (and column) violated the predicate that <code>within_n_sds(3)(mtcars$mpg)</code> returned.</p>
+<p>Execution of the pipeline was halted. But now we know exactly which data point violated the predicate that <code>within_n_sds(2)(mtcars$mpg)</code> returned.</p>
 <p>Now that’s an efficient car!</p>
 <p>After the predicate generator, <code>insist</code> takes an arbitrary number of columns just like <code>assert</code> using the syntax of <code>dplyr</code>’s <code>select</code> function. If you wanted to check that everything in mtcars is within 10 standard deviations of the mean (of each column vector), you can do so like this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
@@ -308,12 +308,12 @@ dat %&gt;%
 <p>Well, <code>maha_dist</code> will typically be used with the <code>insist_rows</code> function. <code>insist_rows</code> takes a data frame, a row reduction function, a predicate-generating function, and an arbitrary number of columns to apply the predicate function to. The row reduction function (<code>maha_dist</code> in this case) is applied to the data frame, and returns a value for each row. The predicate-generating function is then applied to the vector returned from the row reduction function and the resultant predicate is applied to each element of that vector. It will raise an error if it finds any violations.</p>
 <p>As always, this undoubtedly sounds far more confusing than it really is. Here’s an example of it in use</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example.data %&gt;%
-<span class="st">  </span><span class="kw">insist_rows</span>(maha_dist, <span class="kw">within_n_mads</span>(<span class="dv">3</span>), <span class="kw">everything</span>())</code></pre></div>
+<span class="st">  </span><span class="kw">insist_rows</span>(maha_dist, <span class="kw">within_n_mads</span>(<span class="dv">3</span>), dplyr::<span class="kw">everything</span>())</code></pre></div>
 <pre><code>## Data frame row reduction 'maha_dist' violates predicate 'within_n_mads(3)' 1 time
 ##   rownumber
 ## 1         5</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
-<p>Check that out! To be clear, this function is running the supplied data frame through the <code>maha_dist</code> function which returns a value for each row corresponding to its mahalanobis distance. (The whole data frame is used because we used the <code>everything()</code> selection function.) Then, <code>within_n_mads(3)</code> computes on that vector and returns a bounds checking predicate. The bounds checking predicate checks to see that all mahalanobis distances are within 3 median absolute deviations of each other. They are not, and the pipeline errors out.</p>
+<p>Check that out! To be clear, this function is running the supplied data frame through the <code>maha_dist</code> function which returns a value for each row corresponding to its mahalanobis distance. (The whole data frame is used because we used the <code>everything()</code> selection function from the <code>dplyr</code> package.) Then, <code>within_n_mads(3)</code> computes on that vector and returns a bounds checking predicate. The bounds checking predicate checks to see that all mahalanobis distances are within 3 median absolute deviations of each other. They are not, and the pipeline errors out.</p>
 <p>This is probably the most powerful construct in <code>assertr</code>–it can find a whole lot of nasty errors that would be very difficult to check for by hand.</p>
 <p>Part of what makes it so powerful is how flexible <code>maha_dist</code> is. We only used it, so far, on a data frame of numerics, but it can handle all sorts of data frames. To really see it shine, let’s use it on the iris data set, that contains a categorical variable in its right-most column…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(iris)</code></pre></div>
@@ -338,7 +338,7 @@ mistake %&gt;%<span class="st"> </span>maha_dist %&gt;%<span class="st"> </span>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mistake %&gt;%<span class="st"> </span>maha_dist %&gt;%<span class="st"> </span>which.max</code></pre></div>
 <pre><code>## [1] 149</code></pre>
 <p>Look at that! This mistake can easily be picked up by any reasonable bounds checker…</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mistake %&gt;%<span class="st"> </span><span class="kw">insist_rows</span>(maha_dist, <span class="kw">within_n_mads</span>(<span class="dv">7</span>), <span class="kw">everything</span>())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mistake %&gt;%<span class="st"> </span><span class="kw">insist_rows</span>(maha_dist, <span class="kw">within_n_mads</span>(<span class="dv">7</span>), dplyr::<span class="kw">everything</span>())</code></pre></div>
 <pre><code>## Data frame row reduction 'maha_dist' violates predicate 'within_n_mads(7)' 1 time
 ##   rownumber
 ## 1       149</code></pre>
@@ -348,9 +348,27 @@ mistake %&gt;%<span class="st"> </span>maha_dist %&gt;%<span class="st"> </span>
 <p><code>assert_rows</code> works the same as <code>insist_rows</code>, except that instead of using a predicate generator on the row-reduced data frame, it uses a regular-old predicate.</p>
 <p>For an example of a <code>assert_rows</code> use case, let’s say that we got a data set (<code>another-dataset.csv</code>) from the web and we don’t want to continue processing the data set if any row contains more than two missing values (NAs). You can use the row reduction function <code>num_row_NAs</code> to reduce all the rows into the number of NAs they contain. Then, a simple bounds checker will suffice for ensuring that no element is higher than 2…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">read.csv</span>(<span class="st">&quot;another-dataset.csv&quot;</span>) %&gt;%
-<span class="st">  </span><span class="kw">assert_rows</span>(num_row_NAs, <span class="kw">within_bounds</span>(<span class="dv">0</span>,<span class="dv">2</span>), <span class="kw">everything</span>()) %&gt;%
+<span class="st">  </span><span class="kw">assert_rows</span>(num_row_NAs, <span class="kw">within_bounds</span>(<span class="dv">0</span>,<span class="dv">2</span>), dplyr::<span class="kw">everything</span>()) %&gt;%
 <span class="st">  </span>...</code></pre></div>
 <p><code>assert_rows</code> can be used for anomaly detection as well. A future version of <code>assertr</code> may contain a cosine distance row reduction function. Since all cosine distances are contrained from -1 to 1, it is easy to use a non-dynamic predicate to disallow certain values.</p>
+</div>
+<div id="success-and-error-functions" class="section level3">
+<h3>success and error functions</h3>
+<p>The behavior of functions like <code>assert</code>, <code>assert_rows</code>, <code>insist</code>, <code>insist_rows</code>, <code>verify</code> when the assertion passes or fails is configurable via the <code>success_fun</code> and <code>error_fun</code> parameters, respectively.</p>
+<p>The <code>success_fun</code> parameter takes a function that takes the data passed to the assertion function as a parameter. You can write your own success handler function, but there are two provided by this package:</p>
+<ul>
+<li><p><code>success_continue</code> - just returns the data that was passed into the assertion function (this is default)</p></li>
+<li><p><code>success_logical</code> - returns TRUE</p></li>
+</ul>
+<p>The <code>error_fun</code> parameter takes a function that takes the data passed to the assertion function as a parameter. You can write your own error handler function, but there are a few provided by this package:</p>
+<ul>
+<li><p><code>error_stop</code> - Prints a summary of the errors and halts execution (default)</p></li>
+<li><p><code>error_report</code> - Prints <em>all</em> the information available about the errors and halts execution.</p></li>
+<li><p><code>error_append</code> - Attaches the errors to a special attribute of <code>data</code> and returns the data. This is chiefly to allow assertr errors to be accumulated in a pipeline so that all assertions can have a chance to be checked and so that all the errors can be displayed at the end of the chain.</p></li>
+<li><p><code>error_logical</code> - returns FALSE</p></li>
+<li><p><code>just_warn</code> - Prints a summary of the errors but does not halt execution, it just issues a warning.</p></li>
+<li><p><code>warn_report</code> - Prints all the information available about the errors but does not halt execution, it just issues a warning.</p></li>
+</ul>
 </div>
 <div id="combining-chains-of-assertions" class="section level3">
 <h3>combining chains of assertions</h3>
@@ -375,15 +393,16 @@ mistake %&gt;%<span class="st"> </span>maha_dist %&gt;%<span class="st"> </span>
 ## 1     4 26.66364
 ## 2     6 19.74286
 ## 3     8 15.10000</code></pre>
-<p>Ew, there are four lines of assertions before the real fun starts. We can make look much better by abstracting out all the assertions:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">check_me &lt;-<span class="st"> </span>. %&gt;%
+<p>In an assertr chain with default options, <code>assert</code>, <code>assert_rows</code>, <code>insist</code>, <code>insist_rows</code>, and <code>verify</code> will stop at the first assertion that yields an error and not go on to process the assertions further down in the chain. For some needs, this is sensible behavior. There are times, however, when we might like to get a report of all assertion violations. For example, one might want to write an R program to download some dataset from the internet and get a detailed report of all deviations from expectation.</p>
+<p>The best thing to do for this use case, is to use the <code>chain_start</code>, and <code>chain_end</code> functions at the beginning and end of a chain of assertr assertions. When <code>chain_start</code> gets called with data, the data gets a special tag that tells the assertr assertions that follow to override their <code>success_fun</code> and <code>error_fun</code> values and replace them with <code>success_continue</code> (which passes the data along if the test passes) and <code>error_append</code> (which we’ve just discussed). After all relevant verifications, <code>chain_end</code> will receive the data (possibly with accumulated error messages attached) and, by default, print a report of all the errors that have been found since the start of the chain.</p>
+<p>Let’s see it in action!</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span>chain_start %&gt;%
 <span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(mtcars) &gt;<span class="st"> </span><span class="dv">10</span>) %&gt;%
 <span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>) %&gt;%
 <span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg) %&gt;%
-<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs)
-
-mtcars %&gt;%
-<span class="st">  </span>check_me %&gt;%
+<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs) %&gt;%
+<span class="st">  </span>chain_end %&gt;%
 <span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre></div>
 <pre><code>## # A tibble: 3 × 2
@@ -392,32 +411,71 @@ mtcars %&gt;%
 ## 1     4 26.66364
 ## 2     6 19.74286
 ## 3     8 15.10000</code></pre>
+<p>Now <em>all</em> assertions will be checked and reported.</p>
+<p>Tip: we can make this whole thing look a lot better by abstracting out all the assertions:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">check_me &lt;-<span class="st"> </span>. %&gt;%
+<span class="st">  </span>chain_start %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(mtcars) &gt;<span class="st"> </span><span class="dv">10</span>) %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>) %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg) %&gt;%
+<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs)
+  chain_end 
+
+mtcars %&gt;%
+<span class="st">  </span>check_me %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(cyl) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre></div>
 <p>Awesome! Now we can add an arbitrary number of assertions, as the need arises, without touching the real logic.</p>
 </div>
 <div id="advanced-send-email-reports-using-custom-error-functions" class="section level3">
 <h3>advanced: send email reports using custom error functions</h3>
 <p>One particularly cool application of <code>assertr</code> is to use it as a data integrity checker for frequently updated data sources. A script can download new data as it becomes available, and then run <code>assertr</code> checks on it. This makes <code>assertr</code> into a sort of “continuous integration” tool (but for data, not code.)</p>
 <p>In an unsupervised “continuous integration” environment, you need a way to discover that the assertions failed. In CI-as-a-service in the software world, failed automated checks often send an email of reporting the maintainer of a botched build; why not bring that functionality to <code>assertr</code>?!</p>
-<p>All assertion verbs in <code>assertr</code> support a custom error function. By default, the error function is R’s built-in <code>stop</code> function, which displays a message and halts execution. You can specify your own to hijack this behavior and redirect flow-of-control wherever you want.</p>
-<p>All custom error functions take one argument: the actual error message that <code>assertr</code> assembles based on which assertions fail. In this case, we will build a function that takes that message and emails it to someone before halting execution. We will use the <code>mailR</code> package to send the mail.</p>
+<p>As we learned in the last sections, all assertion verbs in <code>assertr</code> support a custom error function. <code>chain_end</code> similarly supports custom error functions. By default, this is <code>error_stop</code> (or <code>error_report</code> in the case of <code>chain_end</code>) which prints a summary of the errors and halts execution.</p>
+<p>You can specify your own, though, to hijack this behavior and redirect flow-of-control wherever you want.</p>
+<p>Your custom error function must take, as its first argument, a list of <code>assertr_error</code> S3 objects. The second argument must be the <code>data.frame</code> that the verb is computing on. Every error function must take this because there may be some other errors that are attached to the <code>data.frame</code>’s <code>assertr_errors</code> attribute leftover from other previous assertions.</p>
+<p>Below we are going to build a function that takes a list of <code>assertr_errors</code>, gets a string representation of the errors and emails it to someone before halting execution. We will use the <code>mailR</code> package to send the mail.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mailR)
 
-email_me &lt;-<span class="st"> </span>function(err_str){
+email_me &lt;-<span class="st"> </span>function(list_of_errors, <span class="dt">data=</span><span class="ot">NULL</span>, ...){
+  <span class="co"># we are checking to see if there are any errors that</span>
+  <span class="co"># are still attached to the data.frame</span>
+  if(!<span class="kw">is.null</span>(data) &amp;&amp;<span class="st"> </span>!<span class="kw">is.null</span>(<span class="kw">attr</span>(data, <span class="st">&quot;assertr_errors&quot;</span>)))
+    errors &lt;-<span class="st"> </span><span class="kw">append</span>(<span class="kw">attr</span>(data, <span class="st">&quot;assertr_errors&quot;</span>), errors)
+
+  num.of.errors &lt;-<span class="st"> </span><span class="kw">length</span>(list_of_errors)
+
+  preface &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;There %s %d error%s:</span><span class="ch">\n</span><span class="st">&quot;</span>,
+                     <span class="kw">ifelse</span>(num.of.errors==<span class="dv">1</span>,<span class="st">&quot;is&quot;</span>, <span class="st">&quot;are&quot;</span>),
+                     num.of.errors,
+                     <span class="kw">ifelse</span>(num.of.errors==<span class="dv">1</span>,<span class="st">&quot;&quot;</span>, <span class="st">&quot;s&quot;</span>))
+
+  <span class="co"># all `assertr_error` S3 objects have `print` and `summary` methods</span>
+  <span class="co"># here, we will call `print` on all of the errors since `print`</span>
+  <span class="co"># will give us the complete/unabridged error report</span>
+  error_string &lt;-<span class="st"> </span><span class="kw">capture.output</span>(tmp &lt;-<span class="st"> </span><span class="kw">lapply</span>(list_of_errors,
+                                               function(x){
+                                                 <span class="kw">cat</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">- &quot;</span>);
+                                                 <span class="kw">print</span>(x);
+                                                 <span class="kw">return</span>();}))
+  error_string &lt;-<span class="st"> </span><span class="kw">c</span>(preface, error_string)
+  error_string &lt;-<span class="st"> </span>error_string %&gt;%<span class="st"> </span><span class="kw">paste0</span>(<span class="dt">collapse=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
+
   <span class="kw">send.mail</span>(<span class="dt">from=</span><span class="st">&quot;assertr@gmail.com&quot;</span>, <span class="dt">to=</span><span class="st">&quot;YOU@gmail.com&quot;</span>,
-            <span class="dt">subject=</span><span class="st">&quot;error from assertr&quot;</span>, <span class="dt">body=</span>err_str,
+            <span class="dt">subject=</span><span class="st">&quot;error from assertr&quot;</span>, <span class="dt">body=</span>error_string,
             <span class="dt">smtp =</span> <span class="kw">list</span>(<span class="dt">host.name=</span><span class="st">&quot;aspmx.l.google.com&quot;</span>, <span class="dt">port=</span><span class="dv">25</span>),
             <span class="dt">authenticate =</span> <span class="ot">FALSE</span>, <span class="dt">send=</span><span class="ot">TRUE</span>)
-  <span class="kw">stop</span>(err_str, <span class="dt">call.=</span><span class="ot">FALSE</span>)
+  <span class="kw">stop</span>(<span class="st">&quot;assertr stopped execution&quot;</span>, <span class="dt">call.=</span><span class="ot">FALSE</span>)
 }
 
 questionable_mtcars %&gt;%
-<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(.) &gt;<span class="st"> </span><span class="dv">10</span>, <span class="dt">error_fun=</span>email_me) %&gt;%
-<span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>, <span class="dt">error_fun=</span>email_me) %&gt;%
-<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg, <span class="dt">error_fun=</span>email_me) %&gt;%
-<span class="st">  </span><span class="kw">assert</span>(<span class="kw">in_set</span>(<span class="dv">0</span>,<span class="dv">1</span>), am, vs, <span class="dt">error_fun=</span>email_me)
-  <span class="co"># ...</span></code></pre></div>
-<p>(this particular <code>send.mail</code> formulation will only for gmail receptients; see the <code>mailR</code> documentation for more information)</p>
-<p>Now you’ll get notified of any failed assertions via email. Groovy!</p>
+<span class="st">  </span>chain_start %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(.) &gt;<span class="st"> </span><span class="dv">10</span>) %&gt;%
+<span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg) %&gt;%
+<span class="st">  </span><span class="co"># ...</span>
+<span class="st">  </span><span class="kw">chain_end</span>(<span class="dt">error_fun=</span>email.me)</code></pre></div>
+<p>(this particular <code>send.mail</code> formulation will only work for gmail receptients; see the <code>mailR</code> documentation for more information)</p>
+<p>Now you’ll get notified of <s>any</s> all failed assertions via email. Groovy!</p>
 </div>
 <div id="advanced-creating-your-own-predicate-generators-for-insist" class="section level3">
 <h3>advanced: creating your own predicate generators for <code>insist</code></h3>
