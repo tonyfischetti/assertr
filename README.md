@@ -3,7 +3,7 @@ assertr
 
 ![assertr logo](http://statethatiamin.onlythisrose.com/assertrlogo.png)
 
-[![Build Status](https://travis-ci.org/ropenscilabs/assertr.svg?branch=master)](https://travis-ci.org/ropenscilabs/assertr)
+[![Build Status](https://travis-ci.org/ropensci/assertr.svg?branch=master)](https://travis-ci.org/ropensci/assertr)
 [![](http://www.r-pkg.org/badges/version/assertr)](https://cran.r-project.org/package=assertr)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/assertr)](https://cran.r-project.org/package=assertr)
 
@@ -24,7 +24,7 @@ You can install the latest version on CRAN like this
 or you can install the bleeding-edge development version like this:
 ```{r}
     install.packages("devtools")
-    devtools::install_github("ropenscilabs/assertr")
+    devtools::install_github("ropensci/assertr")
 ```
 ### What does it look like?
 This package offers five assertion functions, `assert`, `verify`,
