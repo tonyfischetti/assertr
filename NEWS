@@ -10,6 +10,8 @@
   assertions (powering through failed ones instead of halting) and
   accumulating all the errors
 
+* added 'is_uniq' predicate
+
 # assertr 1.0.0
 
 * added row reduction functions like mahalanobis distnace

@@ -264,3 +264,37 @@ test_that("predicate appropriately assigns the 'call' attribute", {
 })
 
 ######################################
+
+
+############### is_uniq ###############
+
+test_that("is_uniq works correctly", {
+  expect_equal(is_uniq(c("tree", "arbol")), c(TRUE, TRUE))
+  expect_equal(is_uniq(c("tree", "arbol", "tree")), c(FALSE, TRUE, FALSE))
+  expect_equal(is_uniq(c("tree", "árbol", NA, "δέντρο")),
+               c(TRUE, TRUE, NA, TRUE))
+  expect_equal(is_uniq(c("tree", "árbol", NA, "δέντρο", "δέντρο")),
+               c(TRUE, TRUE, NA, FALSE, FALSE))
+  expect_equal(is_uniq(c("tree", "árbol", NA, "δέντρο"), allow.na=TRUE),
+               c(TRUE, TRUE, TRUE, TRUE))
+  expect_equal(is_uniq(c("tree", "árbol", NA, "δέντρο", "δέντρο"), allow.na=TRUE),
+               c(TRUE, TRUE, TRUE, FALSE, FALSE))
+  expect_equal(is_uniq(c("tree", "árbol", NA, "δέντρο", NA, "δέντρο"), allow.na=TRUE),
+               c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE))
+})
+
+test_that("is_uniq errors out when appropriate", {
+  expect_error(is_uniq(c()),
+               "is_uniq must be called on non-null object")
+  expect_error(is_uniq(),
+               ".x. is missing")
+})
+
+test_that("predicate is tagged for assert function to vectorize", {
+  expect_true(attr(is_uniq, "assertr_vectorized"))
+})
+
+test_that("predicate appropriately assigns the 'call' attribute", {
+  expect_equal(attr(is_uniq, "call"), "is_uniq")
+})
+######################################

@@ -115,7 +115,7 @@ Internally, the `assert_rows` function uses `dplyr`'s`select` function to
 extract the columns to test the predicate function on.
 
 
-`assertr` also offers three (so far) predicate functions designed to be used
+`assertr` also offers four (so far) predicate functions designed to be used
 with the `assert` and `assert_rows` functions:
 
 - `not_na` - that checks if an element is not NA
@@ -123,6 +123,7 @@ with the `assert` and `assert_rows` functions:
 value falls within the bounds supplied, and
 - `in_set` - that returns a predicate function that checks if an element is
 a member of the set supplied.
+- `is_uniq` - that checks to see if each element appears only once
 
 and predicate generators designed to be used with the `insist` and `insist_rows`
 functions:

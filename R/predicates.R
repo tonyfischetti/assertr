@@ -316,3 +316,52 @@ within_n_mads <- function(n, ...){
 }
 
 
+#' Returns TRUE where no elements appear more than once
+#'
+#' This function is meant to take only a vector. It relies heavily on
+#' the \code{\link{duplicated}} function where it can be thought of as
+#' the inverse. Where this function differs, though--besides being only
+#' meant for one vector or column--is that it marks the first occurrence
+#' of a duplicated value as "non unique", as well.
+#'
+#' @param x A vector to check for unique elements in
+#' @param allow.na A logical indicating whether NAs should be preserved
+#'                 as missing values in the return value (FALSE) or
+#'                 if they should be treated just like any other value
+#'                 (TRUE) (default is FALSE)
+#'
+#' @return A vector of the same length where the corresponding element
+#'         is TRUE if the element only appears once in the vector and
+#'         FALSE otherwise
+#' @seealso \code{\link{duplicated}}
+#' @examples
+#'
+#' is_uniq(1:10)
+#'
+#' \dontrun{
+#' # returns FALSE where a "5" appears
+#' is_uniq(c(1:10, 5))
+#' }
+#'
+#' library(magrittr)
+#'
+#' \dontrun{
+#' # this fails 4 times
+#' mtcars %>% assert(is_uniq, qsec)
+#' }
+#'
+#' @export
+is_uniq <- function(x, allow.na=FALSE){
+  if(is.null(x))    stop("is_uniq must be called on non-null object")
+  raw_result <- !duplicated(x)
+  repeats <- x[!raw_result]
+  raw_result[x %in% repeats] <- FALSE
+  if(!allow.na){
+    these_are_NAs <- which(is.na(x))
+    raw_result[these_are_NAs] <- NA
+  }
+  return(raw_result)
+}
+attr(is_uniq, "call") <- "is_uniq"
+attr(is_uniq, "assertr_vectorized") <- TRUE
+

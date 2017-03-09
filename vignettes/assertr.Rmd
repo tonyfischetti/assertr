@@ -146,13 +146,14 @@ advantage of its own that we heretofore ignored.
 ### assertr's predicates
 
 `assertr`'s predicates, both built-in and custom, make `assert` very powerful.
-The three predicates that are built in to `assertr` are
+The predicates that are built in to `assertr` are
 
 - `not_na` - that checks if an element is not NA
 - `within_bounds` - that returns a predicate function that checks if a numeric
 value falls within the bounds supplied, and
 - `in_set` - that returns a predicate function that checks if an element is
 a member of the set supplied.
+- `is_uniq` - that checks to see if each element appears only once
 
 We've already seen `within_bounds` in action... let's use the `in_set` function
 to make sure that there are only 0s and 1s (automatic and manual, respectively)

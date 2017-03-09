@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2017-02-11" />
+<meta name="date" content="2017-03-09" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2017-02-11</em></h4>
+<h4 class="date"><em>2017-03-09</em></h4>
 
 
 
@@ -174,11 +174,12 @@ dat %&gt;%
 </div>
 <div id="assertrs-predicates" class="section level3">
 <h3>assertr’s predicates</h3>
-<p><code>assertr</code>’s predicates, both built-in and custom, make <code>assert</code> very powerful. The three predicates that are built in to <code>assertr</code> are</p>
+<p><code>assertr</code>’s predicates, both built-in and custom, make <code>assert</code> very powerful. The predicates that are built in to <code>assertr</code> are</p>
 <ul>
 <li><code>not_na</code> - that checks if an element is not NA</li>
 <li><code>within_bounds</code> - that returns a predicate function that checks if a numeric value falls within the bounds supplied, and</li>
 <li><code>in_set</code> - that returns a predicate function that checks if an element is a member of the set supplied.</li>
+<li><code>is_uniq</code> - that checks to see if each element appears only once</li>
 </ul>
 <p>We’ve already seen <code>within_bounds</code> in action… let’s use the <code>in_set</code> function to make sure that there are only 0s and 1s (automatic and manual, respectively) values in the <code>am</code> column…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">our.data %&gt;%
