@@ -4,7 +4,7 @@
 \alias{maha_dist}
 \title{Computes mahalanobis distance for each row of data frame}
 \usage{
-maha_dist(data, keep.NA = TRUE, robust = FALSE)
+maha_dist(data, keep.NA = TRUE, robust = FALSE, stringsAsFactors = FALSE)
 }
 \arguments{
 \item{data}{A data frame}
@@ -14,6 +14,9 @@ the output? TRUE by default.}
 
 \item{robust}{Attempt to compute mahalanobis distance based on
 robust covariance matrix? FALSE by default}
+
+\item{stringsAsFactors}{Convert non-factor string columns into factors?
+FALSE by default}
 }
 \value{
 A vector of observation-wise mahalanobis distances.
@@ -29,7 +32,8 @@ This is useful for finding anomalous observations, row-wise.
 It will convert any categorical variables in the data frame into numerics
 as long as they are factors. For example, in order for a character
 column to be used as a component in the distance calculations, it must
-either be a factor, or converted to a factor.
+either be a factor, or converted to a factor by using the
+\code{stringsAsFactors} parameter.
 }
 \examples{
 

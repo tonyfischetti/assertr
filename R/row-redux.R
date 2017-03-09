@@ -14,13 +14,16 @@
 #' It will convert any categorical variables in the data frame into numerics
 #' as long as they are factors. For example, in order for a character
 #' column to be used as a component in the distance calculations, it must
-#' either be a factor, or converted to a factor.
+#' either be a factor, or converted to a factor by using the
+#' \code{stringsAsFactors} parameter.
 #'
 #' @param data A data frame
 #' @param keep.NA Ensure that every row with missing data remains NA in
 #'                 the output? TRUE by default.
 #' @param robust Attempt to compute mahalanobis distance based on
 #'         robust covariance matrix? FALSE by default
+#' @param stringsAsFactors Convert non-factor string columns into factors?
+#'                         FALSE by default
 #'
 #' @return A vector of observation-wise mahalanobis distances.
 #' @seealso \code{\link{insist_rows}}
@@ -42,11 +45,18 @@
 #'   ## anything here will run
 #'
 #' @export
-maha_dist <- function(data, keep.NA=TRUE, robust=FALSE){
+maha_dist <- function(data, keep.NA=TRUE, robust=FALSE, stringsAsFactors=FALSE){
   # this implementation is heavily inspired by the implementation
   # in the "psych" package written by William Revelle
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
+  ## check
+  if(stringsAsFactors){
+    char_cols <- unlist(lapply(data, class))=="character"
+    for(i in which(char_cols)){
+      data[,i] <- factor(data[,i])
+    }
+  }
   a.matrix <- data.matrix(data)
   if(ncol(a.matrix)<2)
     stop("\"data\" needs to have at least two columns", call.=FALSE)
@@ -106,4 +116,3 @@ num_row_NAs <- function(data, allow.NaN=FALSE){
   return(ret.vec)
 }
 attr(num_row_NAs, "call") <- "num_row_NAs"
-
