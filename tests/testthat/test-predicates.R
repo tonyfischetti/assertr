@@ -238,15 +238,23 @@ test_that("returned predicate works appropriately", {
   expect_equal(in_set(1:10, allow.na = FALSE)(NA), FALSE)
   expect_equal(in_set(1, "tree")("tree"), TRUE)
   expect_equal(in_set(1, "tree")("leaf"), FALSE)
+  # a vector now
+  expect_equal(in_set(3, 4)(c(4,pi)), c(TRUE, FALSE))
+  expect_equal(in_set(3, 4)(c(4,3)), c(TRUE, TRUE))
+  expect_equal(in_set(1:10)(1:11), c(rep(TRUE, 10), FALSE))
+  expect_equal(in_set(1:10, allow.na = TRUE)(c(1:10, NA)), rep(TRUE, 11))
+  expect_equal(in_set(1:10, allow.na = FALSE)(c(1:10, NA)), c(rep(TRUE, 10), FALSE))
 })
 
 test_that("returned predicate fails appropriately", {
   expect_error(in_set(0,1)(),
                ".x. is missing")
-  expect_error(in_set(0,1)(c(1,2)),
-               "bounds must be checked on a single element")
   expect_error(in_set(0,1)(c()),
-               "bounds must be checked on a single element")
+               "nothing to check set membership to")
+})
+
+test_that("returned predicate is tagged for assert function to vectorize", {
+  expect_true(attr(in_set(1,2), "assertr_vectorized"))
 })
 
 test_that("predicate appropriately assigns the 'call' attribute", {
@@ -254,4 +262,5 @@ test_that("predicate appropriately assigns the 'call' attribute", {
   expect_equal(attr(in_set("ένα", "δύο", "τρία", "δέκατέσσερα"), "call"),
                "in_set(\"ένα\", \"δύο\", \"τρία\", \"δέκατέσσερα\")")
 })
+
 ######################################

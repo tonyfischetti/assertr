@@ -158,16 +158,17 @@ in_set <- function(..., allow.na=TRUE){
   the_call <- deparse(sys.call())
   set <- c(...)
   if(!length(set)) stop("can not test for membership in empty set")
-  fun<- function(x){
-    if(length(x)>1)      stop("bounds must be checked on a single element")
-    if(is.null(x))       stop("bounds must be checked on a single element")
-    if(x %in% set)
-      return(TRUE)
-    if(is.na(x))
-      if(allow.na)
-        return(TRUE)
-    return(FALSE)
+  fun <- function(x){
+    if(is.null(x))       stop("nothing to check set membership to")
+
+    raw_result <- x %in% set
+    if(allow.na){
+      these_are_NAs <- which(is.na(x))
+      raw_result[these_are_NAs] <- TRUE
+    }
+    return(raw_result)
   }
+  attr(fun, "assertr_vectorized") <- TRUE
   attr(fun, "call") <- the_call
   return(fun)
 }
