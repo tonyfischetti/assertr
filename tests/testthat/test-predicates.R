@@ -207,9 +207,14 @@ test_that("second inner function fails appropriately", {
   expect_error(within_n_mads(1)(),
                "argument .a.vector. is missing")
   expect_error(within_n_mads(1)(1),
-               "lower bound must be strictly lower than upper bound")
+               "MAD of vector is 0")
   expect_error(within_n_mads(1)(c("johnny", "marr")),
                "argument must be a numeric vector")
+})
+
+test_that("weird edge cases", {
+  expect_error(within_n_mads(2)(mtcars$vs),
+               "MAD of vector is 0")
 })
 
 test_that("predicate appropriately assigns the 'call' attribute", {

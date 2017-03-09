@@ -308,6 +308,7 @@ within_n_mads <- function(n, ...){
     dmad <- stats::mad(a.vector, na.rm=TRUE)
     dmed <- stats::median(a.vector, na.rm=TRUE)
     if(is.na(dmad)) stop("MAD of vector is NA")
+    if(dmad==0) stop("MAD of vector is 0")
     if(is.na(dmed)) stop("median of vector is NA")
     within_bounds((dmed-(n*dmad)), (dmed+(n*dmad)), ...)
   }
