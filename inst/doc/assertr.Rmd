@@ -512,6 +512,7 @@ Let's say that as part of an automated pipeline that grabs mtcars from an
 untrusted source and finds the average miles per gallon for each number of
 engine cylinders, we want to perform the following checks...
 
+- that it has the columns "mpg", "vs", and "am"
 - that the dataset contains more than 10 observations
 - that the column for 'miles per gallon' (mpg) is a positive number
 - that the column for 'miles per gallon' (mpg) does not contain a
@@ -523,6 +524,7 @@ This could be written thusly:
 
 ```{r purl = FALSE}
 mtcars %>%
+  verify(has_all_names("mpg", "vs", "am")) %>%
   verify(nrow(mtcars) > 10) %>%
   verify(mpg > 0) %>%
   insist(within_n_sds(4), mpg) %>%

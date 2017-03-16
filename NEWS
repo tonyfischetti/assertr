@@ -12,6 +12,8 @@
 
 * added 'is_uniq' predicate
 
+* added 'has_all_names' utility function
+
 # assertr 1.0.0
 
 * added row reduction functions like mahalanobis distnace

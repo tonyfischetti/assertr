@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2017-03-09" />
+<meta name="date" content="2017-03-16" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2017-03-09</em></h4>
+<h4 class="date"><em>2017-03-16</em></h4>
 
 
 
@@ -375,6 +375,7 @@ mistake %&gt;%<span class="st"> </span>maha_dist %&gt;%<span class="st"> </span>
 <h3>combining chains of assertions</h3>
 <p>Let’s say that as part of an automated pipeline that grabs mtcars from an untrusted source and finds the average miles per gallon for each number of engine cylinders, we want to perform the following checks…</p>
 <ul>
+<li>that it has the columns “mpg”, “vs”, and “am”</li>
 <li>that the dataset contains more than 10 observations</li>
 <li>that the column for ‘miles per gallon’ (mpg) is a positive number</li>
 <li>that the column for ‘miles per gallon’ (mpg) does not contain a datum that is outside 4 standard deviations from its mean, and</li>
@@ -382,6 +383,7 @@ mistake %&gt;%<span class="st"> </span>maha_dist %&gt;%<span class="st"> </span>
 </ul>
 <p>This could be written thusly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars %&gt;%
+<span class="st">  </span><span class="kw">verify</span>(<span class="kw">has_all_names</span>(<span class="st">&quot;mpg&quot;</span>, <span class="st">&quot;vs&quot;</span>, <span class="st">&quot;am&quot;</span>)) %&gt;%
 <span class="st">  </span><span class="kw">verify</span>(<span class="kw">nrow</span>(mtcars) &gt;<span class="st"> </span><span class="dv">10</span>) %&gt;%
 <span class="st">  </span><span class="kw">verify</span>(mpg &gt;<span class="st"> </span><span class="dv">0</span>) %&gt;%
 <span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">4</span>), mpg) %&gt;%

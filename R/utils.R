@@ -41,3 +41,43 @@ apply.predicate.to.vector <- function(a.column, predicate){
   return(res)
 }
 
+
+#' Returns TRUE if data.frame or list has specified names
+#'
+#' This function checks parent frame environment for existence of names.
+#' This is meant to be used with `assertr`'s `verify` function to check
+#' for the existence of specific column names in a `data.frame` that is
+#' piped to `verify`. It can also work on a non-`data.frame` list.
+#'
+#' @param ... A arbitrary amount of quoted names to check for
+#' @return TRUE is all names exist, FALSE if not
+#' @seealso \code{\link{exists}}
+#' @examples
+#'
+#' verify(mtcars, has_all_names("mpg", "wt", "qsec"))
+#'
+#' library(magrittr)   # for pipe operator
+#'
+#' \dontrun{
+#' mtcars %>%
+#'   verify(has_all_names("mpgg"))  # fails
+#' }
+#'
+#' mpgg <- "something"
+#'
+#' mtcars %>%
+#'   verify(exists("mpgg"))   # passes but big mistake
+#'
+#' \dontrun{
+#' mtcars %>%
+#'   verify(has_all_names("mpgg")) # correctly fails
+#' }
+#'
+#' @export
+has_all_names <- function(...){
+  check_this <- list(...)
+  parent <- parent.frame()
+  all(unlist(lapply(check_this, function(x){
+    exists(x, where=parent, inherits=FALSE)
+  })))
+}

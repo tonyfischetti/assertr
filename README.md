@@ -36,6 +36,7 @@ built-in but rather procured from an external source that was known for making
 errors in data entry or coding. Pretend we wanted to find the average
 miles per gallon for each number of engine cylinders. We might want to first,
 confirm
+- that it has the columns "mpg", "vs", and "am"
 - that the dataset contains more than 10 observations
 - that the column for 'miles per gallon' (mpg) is a positive number
 - that the column for ‘miles per gallon’ (mpg) does not contain a datum
@@ -51,6 +52,7 @@ This could be written (in order) using `assertr` like this:
 
 ```{r}
     mtcars %>%
+      verify(has_all_names("mpg", "vs", "am")) %>%
       verify(nrow(.) > 10) %>%
       verify(mpg > 0) %>%
       insist(within_n_sds(4), mpg) %>%
