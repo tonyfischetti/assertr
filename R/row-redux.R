@@ -116,3 +116,44 @@ num_row_NAs <- function(data, allow.NaN=FALSE){
   return(ret.vec)
 }
 attr(num_row_NAs, "call") <- "num_row_NAs"
+
+
+
+#' Concatenate all columns of each row in data frame into a string
+#'
+#' This function will return a vector, with the same length as the number
+#' of rows of the provided data frame. Each element of the vector will be
+#' it's corresponding row with all of its values (one for each column)
+#' "pasted" together in a string.
+#'
+#' @param data A data frame
+#' @param sep A string to separate the columns with (default: "")
+#' @return A vector of rows concatenated into strings
+#' @seealso \code{\link{paste}}
+#' @examples
+#'
+#' col_concat(mtcars)
+#'
+#' library(magrittr)            # for piping operator
+#'
+#' # you can use "assert_rows", "is_uniq", and this function to
+#' # check if joint duplicates (across different columns) appear
+#' # in a data frame
+#' \dontrun{
+#' mtcars %>%
+#'   assert_rows(col_concat, is_uniq, mpg, hp)
+#'   # fails because the first two rows are jointly duplicates
+#'   # on these two columns
+#' }
+#'
+#' mtcars %>%
+#'   assert_rows(col_concat, is_uniq, mpg, hp, wt) # ok
+#'
+#' @export
+col_concat <- function(data, sep=""){
+  if(!(any(class(data) %in% c("matrix", "data.frame"))))
+    stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
+
+  apply(data, 1, paste, sep="", collapse=sep)
+}
+attr(col_concat, "call") <- "col_concat"

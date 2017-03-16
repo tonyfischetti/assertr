@@ -44,6 +44,7 @@ that is outside 4 standard deviations from its mean, and
 - that the am and vs columns (automatic/manual and v/straight engine,
 respectively) contain 0s and 1s only
 - each row contains at most 2 NAs
+- each row is unique *jointly* between the "mpg", "am", and "wt" columns
 - each row's mahalanobis distance is within 10 median absolute deviations of
 all the distances (for outlier detection)
 
@@ -51,13 +52,17 @@ all the distances (for outlier detection)
 This could be written (in order) using `assertr` like this:
 
 ```{r}
+    library(dplyr)
+    library(assertr)
+
     mtcars %>%
-      verify(has_all_names("mpg", "vs", "am")) %>%
+      verify(has_all_names("mpg", "vs", "am", "wt")) %>%
       verify(nrow(.) > 10) %>%
       verify(mpg > 0) %>%
       insist(within_n_sds(4), mpg) %>%
       assert(in_set(0,1), am, vs) %>%
       assert_rows(num_row_NAs, within_bounds(0,2), everything()) %>%
+      assert_rows(col_concat, is_uniq, mpg, am, wt) %>%
       insist_rows(maha_dist, within_n_mads(10), everything()) %>%
       group_by(cyl) %>%
       summarise(avg.mpg=mean(mpg))
@@ -141,6 +146,7 @@ and `insist_rows`:
 - `num_row_NAs` - counts number of missing values in each row
 - `maha_dist` - computes the mahalanobis distance of each row (for outlier
 detection). It will coerce categorical variables into numerics if it needs to.
+- `col_concat` - concatenates all rows into strings
 
 Finally, each assertion function has a counterpart that using standard
 evaluation. The counterpart functions are postfixed by "_" (an underscore).
