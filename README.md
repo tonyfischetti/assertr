@@ -157,6 +157,6 @@ For more info, check out the `assertr` vignette
 ```{r}
     > vignette("assertr")
 ```
-Or [read it here](http://cran.r-project.org/web/packages/assertr/vignettes/assertr.html)
+Or [read it here](https://CRAN.R-project.org/package=assertr/vignettes/assertr.html)
 
 [![ropensci\_footer](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
