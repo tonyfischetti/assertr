@@ -253,7 +253,10 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 
   num.violations <- sum(!log.vec)
   if(num.violations==0)
-    return("")
+    # There are errors, just no new ones, so calling success
+    # is inappropriate, so we must call the error function.
+    # NOT calling either function would break the pipeline.
+    return(error_fun(list(), data=data))
   loc.violations <- which(!log.vec)
 
   error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
@@ -517,7 +520,10 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
 
   num.violations <- sum(!log.vec)
   if(num.violations==0)
-    return("")
+    # There are errors, just no new ones, so calling success
+    # is inappropriate, so we must call the error function.
+    # NOT calling either function would break the pipeline.
+    return(error_fun(list(), data=data))
   loc.violations <- which(!log.vec)
 
   error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
