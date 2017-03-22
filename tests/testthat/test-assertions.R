@@ -24,6 +24,7 @@ mnexmpl.data[12,1] <- NA
 nanmnexmpl.data <- mnexmpl.data
 nanmnexmpl.data[10,1] <- 0/0
 
+test.df <- data.frame(x = c(0,1,2))
 
 # custom error (or success) messages
 yell <- function(message){
@@ -560,3 +561,38 @@ test_that("insist_rows breaks appropriately (using se)", {
 ###########################################
 
 
+########## chaining works ############
+
+# A special error function for these tests, produces the error but no
+# standard output.
+error_no_output <- function (list_of_errors, data=NULL, ...) {
+  stop("assertr stopped execution", call.=FALSE)
+}
+
+test_that("assert_rows works with chaining", {
+  code_to_test <- function () {
+    test.df %>%
+      chain_start %>%
+      # This gives one error.
+      assert(within_bounds(1, Inf), x) %>%
+      # This gives no errors.
+      assert_rows(col_concat, is_uniq, x) %>%
+      assert_rows(col_concat, is_uniq, x) %>%
+      chain_end(error_fun = error_no_output)
+  }
+  expect_error(code_to_test(),
+               "assertr stopped execution")
+})
+
+test_that("insist_rows works with chaining", {
+  code_to_test <- function () {
+    test.df %>%
+      chain_start %>%
+      assert(within_bounds(1, Inf), x) %>%
+      insist_rows(col_concat, function (a_vector) {function (xx) TRUE}, x) %>%
+      insist_rows(col_concat, function (a_vector) {function (xx) TRUE}, x) %>%
+      chain_end(error_fun = error_no_output)
+  }
+  expect_error(code_to_test(),
+               "assertr stopped execution")
+})
