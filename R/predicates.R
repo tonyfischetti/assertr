@@ -236,6 +236,7 @@ within_n_sds <- function(n, ...){
     stdev <- stats::sd(a.vector, na.rm=TRUE)
     if(is.na(mu)) stop("mean of vector is NA")
     if(is.na(stdev)) stop("standard deviations of vector is NA")
+    if(stdev==0) stop("standard deviation of vector is 0")
     within_bounds((mu-(n*stdev)), (mu+(n*stdev)), ...)
   }
   attr(fun, "call") <- the_call
