@@ -24,19 +24,22 @@ mnexmpl.data[12,1] <- NA
 nanmnexmpl.data <- mnexmpl.data
 nanmnexmpl.data[10,1] <- 0/0
 
-test.df <- data.frame(x = c(0,1,2))
+test.df <- data.frame(x = c(0, 1, 2))
+test.df2 <- data.frame(x = c(0, 1, 2),
+                       y = c(2, 1.5, 1),
+                       z = c(0,NA, -1))
 
 # custom error (or success) messages
-yell <- function(message){
-  stop(toupper(message), call.=FALSE)
-}
-
-not.helpful <- function(message){
+not.helpful <- function(message, ...){
   stop("unspecified error", call.=FALSE)
 }
 
 give.validation <- function(data){
   return("great job!")
+}
+
+just.show.error <- function(err, ...){
+  lapply(err, summary)
 }
 
 
@@ -87,20 +90,36 @@ test_that("verify performs custom success function if verification passes", {
 })
 
 test_that("verify raises error if verification fails", {
-  error <- verify(mtcars, drat > 3, error_fun=error_return)
-  #print(error)
-#   expect_error(verify(mtcars, drat > 3), "verification failed! \\(4 failures)")
-#   expect_error(verify(mtcars, nrow(mtcars) > 34), "verification failed! \\(1 failure)")
-#   expect_error(verify(mtcars, am %in% c(1,2)), "verification failed! \\(19 failures)")
-#   # looks to parent frame scope?
-#   expect_error(verify(mtcars, a < 0), "verification failed! \\(1 failure)")
-#   # respects scoping rules?
-#   expect_error(verify(alist, length(a) == 1), "verification failed! \\(1 failure)")
-#   expect_error(verify(alist, length(a) > 4), "verification failed! \\(1 failure)")
-#   expect_error(verify(alist, length(a) > 2 && length(b) > 3),
-#                "verification failed! \\(1 failure)")
-#   expect_error(verify(alist, a >= 2 | b > 4), "verification failed! \\(1 failure)")
-#   expect_error(verify(alist, 2 > 4), "verification failed! \\(1 failure)")
+  expect_equal(verify(mtcars, drat > 3, error_fun = error_logical), FALSE)
+  expect_output(verify(mtcars, drat > 3, error_fun = just.show.error),
+                "verification \\[drat > 3\\] failed! \\(4 failures\\)")
+
+  expect_equal(verify(mtcars, nrow(mtcars) > 34, error_fun = error_logical), FALSE)
+  expect_output(verify(mtcars, nrow(mtcars) > 34, error_fun = just.show.error),
+                "verification \\[nrow\\(mtcars\\) > 34\\] failed! \\(1 failure\\)")
+
+  expect_equal(verify(mtcars, am %in% c(1,2), error_fun = error_logical), FALSE)
+  expect_output(verify(mtcars, am %in% c(1,2), error_fun = just.show.error),
+                "verification \\[am %in% c\\(1, 2\\)\\] failed! \\(19 failures\\)")
+
+  # looks to parent frame scope?
+  expect_equal(verify(mtcars, a < 0, error_fun = error_logical), FALSE)
+  expect_output(verify(mtcars, a < 0, error_fun = just.show.error),
+                "verification \\[a < 0\\] failed! \\(1 failure\\)")
+
+  # respects scoping rules?
+  expect_equal(verify(alist, length(a) == 1, error_fun = error_logical), FALSE)
+  expect_output(verify(alist, length(a) == 1, error_fun = just.show.error),
+                "verification \\[length\\(a\\) == 1\\] failed! \\(1 failure\\)")
+  expect_equal(verify(alist, length(a) > 4, error_fun = error_logical), FALSE)
+  expect_output(verify(alist, length(a) > 4, error_fun = just.show.error),
+                "verification \\[length\\(a\\) > 4\\] failed! \\(1 failure\\)")
+  expect_output(verify(alist, length(a) > 2 && length(b) > 3, error_fun = just.show.error),
+                "verification \\[length\\(a\\) > 2 && length\\(b\\) > 3\\] failed! \\(1 failure\\)")
+  expect_output(verify(alist, a >= 2 | b > 4, error_fun = just.show.error),
+                "verification \\[a >= 2 | b > 4\\] failed! \\(1 failure\\)")
+  expect_output(verify(alist, 2 > 4, error_fun = just.show.error),
+                "verification \\[2 > 4\\] failed! \\(1 failure\\)")
 })
 
 test_that("verify breaks appropriately", {
@@ -112,7 +131,7 @@ test_that("verify breaks appropriately", {
                  "coercing argument of type 'double' to logical")
   expect_error(suppressWarnings(verify(mtcars, "1")),
                "missing value where TRUE/FALSE needed")
-  expect_error(verify(mtcars, 1 > 0, "tree"), "could not find function \"success_fun\"") #############
+  expect_error(verify(mtcars, 1 > 0, "tree"), "could not find function \"success_fun\"")
   expect_error(verify(mtcars, d > 1), "object 'd' not found")
 })
 ######################################
@@ -167,49 +186,43 @@ test_that("assert performs custom success function if verification passes", {
 
 })
 
-# test_that("assert raises error if verification fails", {
-#   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear),
-#                "Vector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
-#   expect_error(assert(mtcars, within_bounds(3,5), gear, carb),
-#                "Vector 'carb' violates assertion 'within_bounds' 19 times \\(e.g. \\[1\\] at index 3\\)")
-#   expect_error(assert(mtcars, within_bounds(3.5, 4.5), carb, gear),
-#                "Vector 'carb' violates assertion 'within_bounds' 22 times \\(e.g. \\[1\\] at index 3\\)\nVector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
-# })
-#
-# test_that("assert raises error if verification fails (using se)", {
-#   expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear"),
-#                "Vector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
-#   expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb"),
-#                "Vector 'carb' violates assertion 'within_bounds' 19 times \\(e.g. \\[1\\] at index 3\\)")
-#   expect_error(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear"),
-#                "Vector 'carb' violates assertion 'within_bounds' 22 times \\(e.g. \\[1\\] at index 3\\)\nVector 'gear' violates assertion 'within_bounds' 20 times \\(e.g. \\[3\\] at index 4\\)")
-# })
-#
-# test_that("assert raises *custom error* if verification fails", {
-#   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun=yell),
-#                "VECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
-#   expect_error(assert(mtcars, within_bounds(3,5), gear, carb, error_fun=yell),
-#                "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 19 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)")
-#   expect_error(assert(mtcars, within_bounds(3.5, 4.5), carb, gear, error_fun=yell),
-#                "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 22 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)\nVECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
-#   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun=not.helpful),
-#                "unspecified error")
-#   expect_error(assert(mtcars, within_bounds(3,5), gear, carb, error_fun=not.helpful),
-#                "unspecified error")
-# })
-#
-# test_that("assert raises *custom error* if verification fails (using se)", {
-#   expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun=yell),
-#                "VECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
-#   expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun=yell),
-#                "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 19 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)")
-#   expect_error(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear", error_fun=yell),
-#                "VECTOR 'CARB' VIOLATES ASSERTION 'WITHIN_BOUNDS' 22 TIMES \\(E.G. \\[1\\] AT INDEX 3\\)\nVECTOR 'GEAR' VIOLATES ASSERTION 'WITHIN_BOUNDS' 20 TIMES \\(E.G. \\[3\\] AT INDEX 4\\)")
-#   expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun=not.helpful),
-#                "unspecified error")
-#   expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun=not.helpful),
-#                "unspecified error")
-# })
+test_that("assert raises error if verification fails", {
+  expect_equal(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun = error_logical), FALSE)
+  expect_output(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun = just.show.error),
+               "Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times.*")
+  expect_equal(assert(mtcars, within_bounds(3,5), gear, carb, error_fun = error_logical), FALSE)
+  expect_output(assert(mtcars, within_bounds(3,5), gear, carb, error_fun = just.show.error),
+                 "Column 'carb' violates assertion 'within_bounds\\(3, 5\\)' 19 times")
+  expect_equal(assert(mtcars, within_bounds(3.5, 4.5), carb, gear, error_fun = error_logical), FALSE)
+  expect_output(assert(mtcars, within_bounds(3.5, 4.5), carb, gear, error_fun = just.show.error),
+               "Column 'carb' violates assertion 'within_bounds\\(3.5, 4.5\\)' 22 times.+Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times")
+})
+
+test_that("assert raises error if verification fails (using se)", {
+  expect_equal(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun = error_logical), FALSE)
+  expect_output(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun = just.show.error),
+               "Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times.*")
+  expect_equal(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun = error_logical), FALSE)
+  expect_output(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun = just.show.error),
+                 "Column 'carb' violates assertion 'within_bounds\\(3, 5\\)' 19 times")
+  expect_equal(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear", error_fun = error_logical), FALSE)
+  expect_output(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear", error_fun = just.show.error),
+               "Column 'carb' violates assertion 'within_bounds\\(3.5, 4.5\\)' 22 times.+Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times")
+})
+
+test_that("assert raises *custom error* if verification fails", {
+  expect_error(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun=not.helpful),
+               "unspecified error")
+  expect_error(assert(mtcars, within_bounds(3,5), gear, carb, error_fun=not.helpful),
+               "unspecified error")
+})
+
+test_that("assert raises *custom error* if verification fails (using se)", {
+  expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun=not.helpful),
+               "unspecified error")
+  expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun=not.helpful),
+               "unspecified error")
+})
 
 test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
@@ -248,8 +261,6 @@ test_that("assert_rows returns data if verification passes", {
                mtcars)
   expect_equal(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,2),
                            dplyr::everything()), mnexmpl.data)
-  # newest version of R broke this
-  # expect_equal(assert_rows(mtcars, `|`, in_set(0,1), vs, am), mtcars)
   expect_equal(assert_rows(nexmpl.data, num_row_NAs, function(x) x < 2,
                            dplyr::everything()), nexmpl.data)
   expect_equal(assert_rows(mtcars, rowSums, function(x) if(x>16) return(FALSE), carb, cyl),
@@ -261,8 +272,6 @@ test_that("assert_rows returns data if verification passes (using se)", {
   expect_equal(assert_rows_(mtcars, rowSums, within_bounds(0,2), "vs:am"), mtcars)
   expect_equal(assert_rows_(mtcars, rowSums, within_bounds(5,16), "cyl", "carb"),
                mtcars)
-  # newest version of R broke this
-  # expect_equal(assert_rows_(mtcars, `|`, in_set(0,1), "vs", "am"), mtcars)
   expect_equal(assert_rows_(mtcars, rowSums, function(x) if(x>16) return(FALSE), "carb", "cyl"),
                mtcars)
 })
@@ -273,8 +282,6 @@ test_that("assert_rows returns TRUE if verification passes (w/ `success_logical`
   expect_true(assert_rows(mtcars, rowSums, within_bounds(5,16), cyl, carb, success_fun=success_logical))
   expect_true(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,2),
                            dplyr::everything(), success_fun=success_logical))
-  # newest version of R broke this
-  # expect_true(assert_rows(mtcars, `|`, in_set(0,1), vs, am), mtcars)
   expect_true(assert_rows(nexmpl.data, num_row_NAs, function(x) x < 2,
                            dplyr::everything(), success_fun=success_logical))
   expect_true(assert_rows(mtcars, rowSums, function(x) if(x>16) return(FALSE), carb, cyl, success_fun=success_logical))
@@ -286,45 +293,35 @@ test_that("assert_rows performs custom success function if verification passes",
 
 })
 
-# test_that("assert_rows raises error if verification fails", {
-#   expect_error(assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am),
-#                "Data frame row reduction violates predicate 'within_bounds' 12 times \\(e.g. at row number 5\\)")
-#   expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything()),
-#                "Data frame row reduction violates predicate 'within_bounds' 32 times \\(e.g. at row number 1\\)")
-#   expect_error(assert_rows(mtcars, rowSums, function(x) if(x==10) return(FALSE), carb, cyl),
-#                "Data frame row reduction violates predicate 'function' 8 times \\(e.g. at row number 1\\)")
-#   expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything()),
-#                "Data frame row reduction violates predicate 'within_bounds' 1 time \\(at row number 12\\)")
-# })
-#
-# test_that("assert_rows raises error if verification fails (using se)", {
-#   expect_error(assert_rows_(mtcars, rowSums, within_bounds(1,2), "vs", "am"),
-#                "Data frame row reduction violates predicate 'within_bounds' 12 times \\(e.g. at row number 5\\)")
-#   expect_error(assert_rows_(mtcars, rowSums, function(x) if(x==10) return(FALSE), "carb", "cyl"),
-#                "Data frame row reduction violates predicate 'function' 8 times \\(e.g. at row number 1\\)")
-#   expect_error(assert_rows_(mnexmpl.data, num_row_NAs, within_bounds(0,1), "x", "y"),
-#                "Data frame row reduction violates predicate 'within_bounds' 1 time \\(at row number 12\\)")
-# })
+test_that("assert_rows raises error if verification fails", {
+  expect_output(assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am, error_fun = just.show.error),
+               "Data frame row reduction 'rowSums' violates predicate 'within_bounds\\(1, 2\\)' 12 times")
+  expect_output(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun = just.show.error),
+                "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(1, 2\\)' 32 times")
+  expect_output(assert_rows(mtcars, rowSums, function(x) if(x==10) return(FALSE), carb, cyl, error_fun = just.show.error),
+                "Data frame row reduction 'rowSums' violates predicate 'function\\(x\\) if \\(x == 10\\) return\\(FALSE\\)' 8 times")
+  expect_output(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything(), error_fun = just.show.error),
+                "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(0, 1\\)' 1 time")
+})
 
-# test_that("assert_rows raises *custom error* if verification fails", {
-#   expect_error(assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am, error_fun=yell),
-#                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'WITHIN_BOUNDS' 12 TIMES \\(E.G. AT ROW NUMBER 5\\)")
-#   expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun=yell),
-#                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'WITHIN_BOUNDS' 32 TIMES \\(E.G. AT ROW NUMBER 1\\)")
-#   expect_error(assert_rows(mtcars, rowSums, function(x) if(x==10) return(FALSE), carb, cyl, error_fun=yell),
-#                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'FUNCTION' 8 TIMES \\(E.G. AT ROW NUMBER 1\\)")
-#   expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything(), error_fun=not.helpful),
-#                "unspecified error")
-# })
-#
-# test_that("assert_rows raises *custom error* if verification fails (using se)", {
-#   expect_error(assert_rows_(mtcars, rowSums, within_bounds(1,2), "vs", "am", error_fun=yell),
-#                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'WITHIN_BOUNDS' 12 TIMES \\(E.G. AT ROW NUMBER 5\\)")
-#   expect_error(assert_rows_(mtcars, rowSums, function(x) if(x==10) return(FALSE), "carb", "cyl", error_fun=yell),
-#                "DATA FRAME ROW REDUCTION VIOLATES PREDICATE 'FUNCTION' 8 TIMES \\(E.G. AT ROW NUMBER 1\\)")
-#   expect_error(assert_rows_(mnexmpl.data, num_row_NAs, within_bounds(0,1), "x", "y", error_fun=not.helpful),
-#                "unspecified error")
-# })
+test_that("assert_rows raises error if verification fails (using se)", {
+  expect_output(assert_rows_(mtcars, rowSums, within_bounds(1,2), "vs", "am", error_fun = just.show.error),
+               "Data frame row reduction 'rowSums' violates predicate 'within_bounds\\(1, 2\\)' 12 times")
+  expect_output(assert_rows_(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun = just.show.error),
+                "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(1, 2\\)' 32 times")
+  expect_output(assert_rows_(mtcars, rowSums, function(x) if(x==10) return(FALSE), "carb", "cyl", error_fun = just.show.error),
+                "Data frame row reduction 'rowSums' violates predicate 'function\\(x\\) if \\(x == 10\\) return\\(FALSE\\)' 8 times")
+})
+
+test_that("assert_rows raises *custom error* if verification fails", {
+  expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything(), error_fun=not.helpful),
+               "unspecified error")
+})
+
+test_that("assert_rows raises *custom error* if verification fails (using se)", {
+  expect_error(assert_rows_(mnexmpl.data, num_row_NAs, within_bounds(0,1), "x", "y", error_fun=not.helpful),
+               "unspecified error")
+})
 
 test_that("assert_rows breaks appropriately", {
   expect_error(assert_rows(in_set(0,1), mtcars$vs),
@@ -380,57 +377,41 @@ test_that("insist performs custom success function if verification passes", {
   expect_equal(insist(our.iris.3, within_n_sds(2), Sepal.Length, success_fun=function(x){return("noice!")}), "noice!")
 })
 
-# test_that("insist raises error if verification fails", {
-#   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length),
-#                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)")
-#   expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length),
-#                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)")
-#   expect_error(insist(our.iris, within_n_sds(3), Sepal.Length:Petal.Width),
-#                "Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)")
-#   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length:Petal.Width),
-#                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)")
-# })
-#
-# test_that("insist raises error if verification fails (using se)", {
-#   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length"),
-#                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)")
-#   expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length"),
-#                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)")
-#   expect_error(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width"),
-#                "Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)")
-#   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width"),
-#                "Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)")
-# })
-#
-# test_that("insist raises *custom error* if verification fails", {
-#   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun=yell),
-#                toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)"))
-#   expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun=yell),
-#                toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)"))
-#   expect_error(insist(our.iris, within_n_sds(3), Sepal.Length:Petal.Width, error_fun=yell),
-#                toupper("Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)"))
-#   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length:Petal.Width, error_fun=yell),
-#                toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)"))
-#   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
-#                "unspecified error")
-#   expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
-#                "unspecified error")
-# })
-#
-# test_that("insist raises *custom error* if verification fails (using se)", {
-#   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun=yell),
-#                toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)"))
-#   expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun=yell),
-#                toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 5 times \\(e.g. \\[7.7\\] at index 118\\)"))
-#   expect_error(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width", error_fun=yell),
-#                toupper("Vector 'Sepal.Width' violates assertion 'within_n_sds' 1 time \\(value \\[4.4\\] at index 16\\)"))
-#   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width", error_fun=yell),
-#                toupper("Vector 'Sepal.Length' violates assertion 'within_n_sds' 6 times \\(e.g. \\[7.6\\] at index 106\\)\nVector 'Sepal.Width' violates assertion 'within_n_sds' 5 times \\(e.g. \\[4\\] at index 15\\)"))
-#   expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
-#                "unspecified error")
-#   expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
-#                "unspecified error")
-# })
+test_that("insist raises error if verification fails", {
+  expect_output(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun = just.show.error),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times")
+  expect_output(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun = just.show.error),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 5 times")
+  expect_output(insist(our.iris, within_n_sds(3), Sepal.Length:Petal.Width, error_fun = just.show.error),
+                "Column 'Sepal.Width' violates assertion 'within_n_sds\\(3\\)' 1 time")
+  expect_output(insist(our.iris, within_n_sds(2), Sepal.Length:Petal.Width, error_fun = just.show.error),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times.*Column 'Sepal.Width' violates assertion 'within_n_sds\\(2\\)' 5 times")
+})
+
+test_that("insist raises error if verification fails (using se)", {
+  expect_output(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun = just.show.error),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times")
+  expect_output(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun = just.show.error),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 5 times")
+  expect_output(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width", error_fun = just.show.error),
+                "Column 'Sepal.Width' violates assertion 'within_n_sds\\(3\\)' 1 time")
+  expect_output(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width", error_fun = just.show.error),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times.*Column 'Sepal.Width' violates assertion 'within_n_sds\\(2\\)' 5 times")
+})
+
+test_that("insist raises *custom error* if verification fails", {
+  expect_error(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
+               "unspecified error")
+  expect_error(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
+               "unspecified error")
+})
+
+test_that("insist raises *custom error* if verification fails (using se)", {
+  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
+               "unspecified error")
+  expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
+               "unspecified error")
+})
 
 test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
@@ -473,50 +454,37 @@ test_that("insist_rows returns data if verification passes (using se)", {
                our.iris)
 })
 
-# test_that("insist_rows raises error if verification fails", {
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_sds(4), dplyr::everything()),
-#                "Data frame row reduction violates predicate 'within_n_sds' 1 time \\(at row number 135\\)")
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_sds(2), dplyr::everything()),
-#                "Data frame row reduction violates predicate 'within_n_sds' 8 times \\(e.g. at row number 42\\)")
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Species),
-#                "Data frame row reduction violates predicate 'within_n_mads' 1 time \\(at row number 135\\)")
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Petal.Width),
-#                "Data frame row reduction violates predicate 'within_n_mads' 4 times \\(e.g. at row number 118\\)")
-# })
-#
-# test_that("insist_rows raises error if verification fails (using se)", {
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_sds(4), "Sepal.Length:Species"),
-#                "Data frame row reduction violates predicate 'within_n_sds' 1 time \\(at row number 135\\)")
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_sds(2), "Sepal.Length:Species"),
-#                "Data frame row reduction violates predicate 'within_n_sds' 8 times \\(e.g. at row number 42\\)")
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Species"),
-#                "Data frame row reduction violates predicate 'within_n_mads' 1 time \\(at row number 135\\)")
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Petal.Width"),
-#                "Data frame row reduction violates predicate 'within_n_mads' 4 times \\(e.g. at row number 118\\)")
-# })
-#
-#
-# test_that("insist_rows raises *custom error* if verification fails", {
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_sds(4), dplyr::everything(), error_fun = yell),
-#                toupper("Data frame row reduction violates predicate 'within_n_sds' 1 time \\(at row number 135\\)"))
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_sds(2), dplyr::everything(), error_fun = yell),
-#                toupper("Data frame row reduction violates predicate 'within_n_sds' 8 times \\(e.g. at row number 42\\)"))
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Species, error_fun = yell),
-#                toupper("Data frame row reduction violates predicate 'within_n_mads' 1 time \\(at row number 135\\)"))
-#   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Petal.Width, error_fun = not.helpful),
-#                "unspecified error")
-# })
-#
-# test_that("insist_rows raises *custom error* if verification fails (using se)", {
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_sds(4), "Sepal.Length:Species", error_fun = yell),
-#                toupper("Data frame row reduction violates predicate 'within_n_sds' 1 time \\(at row number 135\\)"))
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_sds(2), "Sepal.Length:Species", error_fun = yell),
-#                toupper("Data frame row reduction violates predicate 'within_n_sds' 8 times \\(e.g. at row number 42\\)"))
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Species", error_fun = yell),
-#                toupper("Data frame row reduction violates predicate 'within_n_mads' 1 time \\(at row number 135\\)"))
-#   expect_error(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Petal.Width", error_fun = not.helpful),
-#                "unspecified")
-# })
+test_that("insist_rows raises error if verification fails", {
+  expect_output(insist_rows(our.iris, maha_dist, within_n_sds(4), dplyr::everything(), error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(4\\)' 1 time")
+  expect_output(insist_rows(our.iris, maha_dist, within_n_sds(2), dplyr::everything(), error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(2\\)' 8 times")
+  expect_output(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Species, error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 1 time")
+  expect_output(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Petal.Width, error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 4 times")
+})
+
+test_that("insist_rows raises error if verification fails (using se)", {
+  expect_output(insist_rows_(our.iris, maha_dist, within_n_sds(4), "Sepal.Length:Species", error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(4\\)' 1 time")
+  expect_output(insist_rows_(our.iris, maha_dist, within_n_sds(2), "Sepal.Length:Species", error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(2\\)' 8 times")
+  expect_output(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Species", error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 1 time")
+  expect_output(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Petal.Width", error_fun = just.show.error),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 4 times")
+})
+
+test_that("insist_rows raises *custom error* if verification fails", {
+  expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Petal.Width, error_fun = not.helpful),
+               "unspecified error")
+})
+
+test_that("insist_rows raises *custom error* if verification fails (using se)", {
+  expect_error(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Petal.Width", error_fun = not.helpful),
+               "unspecified")
+})
 
 
 test_that("insist_rows breaks appropriately", {
@@ -569,30 +537,339 @@ error_no_output <- function (list_of_errors, data=NULL, ...) {
   stop("assertr stopped execution", call.=FALSE)
 }
 
-test_that("assert_rows works with chaining", {
-  code_to_test <- function () {
+strip_attributes <- function(d){
+  attr(d, "assertr_in_chain_error_fun_override") <- NULL
+  attr(d, "assertr_in_chain_success_fun_override") <- NULL
+  d
+}
+
+ret_num_off_errors <- function(errors, data=NULL, warn=FALSE, ...){
+  if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
+    errors <- append(attr(data, "assertr_errors"), errors)
+  num.of.errors <- length(errors)
+  cat(sprintf("There %s %d error%s:\n",
+              ifelse(num.of.errors==1,"is", "are"),
+              num.of.errors,
+              ifelse(num.of.errors==1,"", "s")))
+}
+
+##### !!! chaining: assert
+test_that("assert works with chaining", {
+
+  # only assert with no error
+  code_to_test <- function() {
     test.df %>%
       chain_start %>%
-      # This gives one error.
-      assert(within_bounds(1, Inf), x) %>%
-      # This gives no errors.
-      assert_rows(col_concat, is_uniq, x) %>%
-      assert_rows(col_concat, is_uniq, x) %>%
-      chain_end(error_fun = error_no_output)
+      assert(in_set(0,1,2), x) %>%
+      chain_end %>% strip_attributes
   }
-  expect_error(code_to_test(),
-               "assertr stopped execution")
+  expect_equal(code_to_test(), test.df)
+
+  # only assert with error
+  code_to_test <- function() {
+    test.df %>%
+      chain_start %>%
+      assert(in_set(0,1), x) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two asserts with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert(in_set(0,1,2), x) %>%
+      assert(within_bounds(1,2),y) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # only assert with error (1st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert(in_set(0,1), x) %>%
+      assert(within_bounds(1,2),y) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # only assert with error (2st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert(within_bounds(1,2),y) %>%
+      assert(in_set(0,1), x) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # only assert with two errors
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert(within_bounds(1,1.5),y) %>%
+      assert(in_set(0,1), x) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 2 errors")
 })
 
-test_that("insist_rows works with chaining", {
-  code_to_test <- function () {
-    test.df %>%
+
+##### !!! chaining: assert_rows
+test_that("assert_rows works with chaining", {
+
+  # only assert_rows with no error
+  code_to_test <- function() {
+    test.df2 %>%
       chain_start %>%
-      assert(within_bounds(1, Inf), x) %>%
-      insist_rows(col_concat, function (a_vector) {function (xx) TRUE}, x) %>%
-      insist_rows(col_concat, function (a_vector) {function (xx) TRUE}, x) %>%
-      chain_end(error_fun = error_no_output)
+      assert_rows(col_concat, is_uniq, x, y) %>%
+      chain_end %>% strip_attributes
   }
-  expect_error(code_to_test(),
-               "assertr stopped execution")
+  expect_equal(code_to_test(), test.df2)
+
+  # only assert_row with error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(rowSums, not_na, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two asserts_row with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(rowSums, is.numeric, x, y, z) %>%
+      assert_rows(col_concat, is.character, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # only assert_rows with error (1st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(rowSums, is.character, x, y, z) %>%
+      assert_rows(col_concat, is.character, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # only assert_rows with error (2st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(col_concat, is.character, x, y, z) %>%
+      assert_rows(rowSums, is.character, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # only assert_rows with two error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(col_concat, is.numeric, x, y, z) %>%
+      assert_rows(rowSums, is.character, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 2 errors")
 })
+
+
+
+
+##### !!! chaining: insist
+test_that("insist works with chaining", {
+
+  # only insist with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(5), x, y, z) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # only insist with error (3 of them, though)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(.4), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 3 errors")
+
+  # two insists with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(5), x, y, z) %>%
+      insist(within_n_sds(5), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # two insists with error (1st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(.4), x, y, z) %>%
+      insist(within_n_sds(5), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 3 errors")
+
+  # two insists with error (2st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_sds(5), x, y, z) %>%
+      insist(within_n_mads(.4), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 3 errors")
+
+  # two insists with two error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_sds(.4), x, y, z) %>%
+      insist(within_n_mads(.4), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 6 errors")
+})
+
+
+
+
+##### !!! chaining: insist_rows
+test_that("insist_rows works with chaining", {
+
+  # only insist_rows with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) TRUE}, x, y, z) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # only insist_rows with error (3 of them, though)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two insists_rows with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) TRUE}, x, y, z) %>%
+      insist_rows(col_concat, function(x){function(...) TRUE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # two insists_rows with error (1st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z) %>%
+      insist_rows(col_concat, function(x){function(...) TRUE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two insists with error (2st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(col_concat, function(x){function(...) TRUE}, x, y, z) %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two insists_rows with two errors
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(col_concat, function(x){function(...) FALSE}, x, y, z) %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 2 errors")
+})
+
+
+
+##### !!! chaining: verify
+test_that("verify works with chaining", {
+
+  # only verify with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x >= 0) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # only verify with error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two verify with no error
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x >= 0) %>%
+      verify(y > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_equal(code_to_test(), test.df2)
+
+  # two verify with error (1st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x > 0) %>%
+      verify(y > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two verify with error (2st)
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(y > 0) %>%
+      verify(x > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There is 1 error")
+
+  # two verify with two errors
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(y > 2) %>%
+      verify(x > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(code_to_test(), "There are 2 errors")
+})
+
+
