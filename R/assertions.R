@@ -76,14 +76,9 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
                       error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
-  }
-  else {
-    name.of.predicate <- deparse(substitute(predicate))
-    if(length(name.of.predicate)>1)
-      name.of.predicate <- gsub("\\s{2,}", " ",
-                                paste0(name.of.predicate, collapse=""))
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
@@ -209,24 +204,15 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
                          success_fun=success_continue,
                          error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
+  name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
-  }
-  else {
-    name.of.row.redux.fn <- deparse(substitute(row_reduction_fn))
-    if(length(name.of.row.redux.fn)>1)
-      name.of.row.redux.fn <- gsub("\\s{2,}", " ",
-                                   paste0(name.of.row.redux.fn, collapse=""))
   }
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
   }
-  else {
-    name.of.predicate <- deparse(substitute(predicate))
-    if(length(name.of.predicate)>1)
-      name.of.predicate <- gsub("\\s{2,}", " ",
-                                paste0(name.of.predicate, collapse=""))
-  }
+
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
   if(!is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
@@ -339,16 +325,11 @@ insist_ <- function(data, predicate_generator, ..., .dots,
                     success_fun=success_continue,
                     error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
   }
-  else {
-    name.of.predicate.generator <- deparse(substitute(predicate_generator))
-    if(length(name.of.predicate.generator)>1)
-      name.of.predicate.generator <- gsub("\\s{2,}", " ",
-                                          paste0(name.of.predicate.generator,
-                                                 collapse=""))
-  }
+
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
   if(!is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
@@ -476,25 +457,17 @@ insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
                          .dots, success_fun=success_continue,
                          error_fun=error_stop){
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+
+
+  name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
+  name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
-  }
-  else {
-    name.of.row.redux.fn <- deparse(substitute(row_reduction_fn))
-    if(length(name.of.row.redux.fn)>1)
-      name.of.row.redux.fn <- gsub("\\s{2,}", " ",
-                                   paste0(name.of.row.redux.fn, collapse=""))
   }
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
   }
-  else {
-    name.of.predicate.generator <- deparse(substitute(predicate_generator))
-    if(length(name.of.predicate.generator)>1)
-      name.of.predicate.generator <- gsub("\\s{2,}", " ",
-                                          paste0(name.of.predicate.generator,
-                                                 collapse=""))
-  }
+
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
   if(!is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
@@ -616,6 +589,7 @@ verify <- function(data, expr, success_fun=success_continue,
   if(all(logical.results) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
   num.violations <- sum(!logical.results)
+  if(num.violations==0) return(error_fun(list(), data=data))
   error <- make.assertr.verify.error(num.violations, deparse(expr))
   error_fun(list(error), data=data)
 }
