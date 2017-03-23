@@ -109,3 +109,29 @@ test_that("num_row_NAs breaks correctly", {
 
 })
 ###########################################
+
+this <- c("882")
+names(this)[1] <- "1"
+
+unname <- function(this){
+  names(this) <- NULL
+  this
+}
+
+############### col_concat ###############
+# test NaN
+test_that("col_concat works correctly", {
+
+  expect_equal(unname(col_concat(exmpl.data[1,])), "882")
+  expect_equal(unname(col_concat(head(exmpl.data))), c("882", "991", "661", "549", "940", "549"))
+  expect_equal(unname(col_concat(head(exmpl.data), sep="<>")), c("8<>82", "9<>91", "6<>61", "5<>49", "9<>40", "5<>49"))
+  expect_equal(unname(col_concat(tail(nexmpl.data))), c("990", "661", "5NA", "551", "662", "768"))
+  expect_equal(unname(col_concat(head(iris, n=2))), c("5.13.51.40.2setosa", "4.93.01.40.2setosa"))
+})
+
+test_that("col_concat breaks correctly", {
+  expect_error(col_concat(), "argument \"data\" is missing, with no default")
+  expect_error(col_concat(exmpl.data[1,1]),
+               "\"data\" must be a data.frame \\(or matrix\\)")
+})
+###########################################
