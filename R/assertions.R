@@ -591,5 +591,6 @@ verify <- function(data, expr, success_fun=success_continue,
   num.violations <- sum(!logical.results)
   if(num.violations==0) return(error_fun(list(), data=data))
   error <- make.assertr.verify.error(num.violations, deparse(expr))
+  error$error_df <- data.frame( index = (1:nrow(data))[!logical.results] )
   error_fun(list(error), data=data)
 }
