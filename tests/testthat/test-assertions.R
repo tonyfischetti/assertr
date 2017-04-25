@@ -230,7 +230,7 @@ test_that("assert breaks appropriately", {
   expect_error(assert(mtcars, in_set(0,1), vs, tree),
                "object 'tree' not found")
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"),
-               "All select\\(\\) inputs must resolve to integer column positions")
+               "All select\\(\\) inputs must resolve to integer column positions|\"tree\": must resolve to integer column positions, not string")
   expect_error(assert("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
 })
@@ -307,8 +307,9 @@ test_that("assert_rows raises error if verification fails", {
 test_that("assert_rows raises error if verification fails (using se)", {
   expect_output(assert_rows_(mtcars, rowSums, within_bounds(1,2), "vs", "am", error_fun = just.show.error),
                "Data frame row reduction 'rowSums' violates predicate 'within_bounds\\(1, 2\\)' 12 times")
-  expect_output(assert_rows_(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun = just.show.error),
-                "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(1, 2\\)' 32 times")
+  # you can no longer use dplyr::everything with the dplyr 6 (pues, '0.5.0.9004') in underscore functions
+  # expect_output(assert_rows_(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun = just.show.error),
+  #               "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(1, 2\\)' 32 times")
   expect_output(assert_rows_(mtcars, rowSums, function(x) if(x==10) return(FALSE), "carb", "cyl", error_fun = just.show.error),
                 "Data frame row reduction 'rowSums' violates predicate 'function\\(x\\) if \\(x == 10\\) return\\(FALSE\\)' 8 times")
 })
@@ -331,7 +332,7 @@ test_that("assert_rows breaks appropriately", {
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
                "object 'tree' not found")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"),
-               "All select\\(\\) inputs must resolve to integer column positions")
+               "All select\\(\\) inputs must resolve to integer column positions|\"tree\": must resolve to integer column positions, not string")
   expect_error(assert_rows("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
 })
@@ -417,7 +418,7 @@ test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(insist(mtcars, within_n_sds(5), "vs"),
-               "All select\\(\\) inputs must resolve to integer column positions")
+               "All select\\(\\) inputs must resolve to integer column positions|\"vs\": must resolve to integer column positions, not string")
   expect_error(insist(mtcars, within_n_sds(5), tree),
                "object 'tree' not found")
   expect_error(insist("tree"),
