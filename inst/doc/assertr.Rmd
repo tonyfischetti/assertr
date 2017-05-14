@@ -257,7 +257,7 @@ mtcars %>%
   summarise(avg.mpg=mean(mpg))
 ```
 
-Notice what happens when we drop that z-score to 2 stardard deviations
+Notice what happens when we drop that z-score to 2 standard deviations
 from the mean
 
 ```{r error=TRUE,  purl = FALSE}
@@ -318,7 +318,7 @@ Tubular!
 
 ### row-wise assertions and row reduction functions
 
-As cool as it's been so far, this still isn't enough to consitute a complete
+As cool as it's been so far, this still isn't enough to constitute a complete
 grammar of data integrity checking. To see why, check out the following
 small example data set:
 
@@ -411,7 +411,7 @@ head(iris)
 iris %>% maha_dist %>% hist(main="", xlab="")
 ```
 
-Looks ok, but what happens when we accidently enter a row as a different
+Looks ok, but what happens when we accidentally enter a row as a different
 species...
 
 ```{r purl=FALSE}
@@ -458,7 +458,7 @@ read.csv("another-dataset.csv") %>%
 
 `assert_rows` can be used for anomaly detection as well. A future version of
 `assertr` may contain a cosine distance row reduction function. Since all
-cosine distances are contrained from -1 to 1, it is easy to use a non-dynamic
+cosine distances are constained from -1 to 1, it is easy to use a non-dynamic
 predicate to disallow certain values.
 
 
@@ -669,7 +669,7 @@ questionable_mtcars %>%
 ```
 
 (this particular `send.mail` formulation will only work for gmail
-receptients; see the `mailR` documentation for more information)
+recipients; see the `mailR` documentation for more information)
 
 Now you'll get notified of <s>any</s> all failed assertions via email. Groovy!
 
