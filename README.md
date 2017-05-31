@@ -159,4 +159,4 @@ For more info, check out the `assertr` vignette
 ```
 Or [read it here](https://CRAN.R-project.org/package=assertr/vignettes/assertr.html)
 
-[![ropensci\_footer](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
+# [![ropensci\_footer](https://ropensci.org/public_images/github_footer.png)](http://ropensci.org)

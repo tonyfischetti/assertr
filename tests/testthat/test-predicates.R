@@ -264,8 +264,8 @@ test_that("returned predicate is tagged for assert function to vectorize", {
 
 test_that("predicate appropriately assigns the 'call' attribute", {
   expect_equal(attr(in_set(0,  1), "call"), "in_set(0, 1)")
-  expect_equal(attr(in_set("ένα", "δύο", "τρία", "δέκατέσσερα"), "call"),
-               "in_set(\"ένα\", \"δύο\", \"τρία\", \"δέκατέσσερα\")")
+  # expect_equal(attr(in_set("ένα", "δύο", "τρία", "δέκατέσσερα"), "call"),
+  #              "in_set(\"ένα\", \"δύο\", \"τρία\", \"δέκατέσσερα\")")
 })
 
 ######################################
