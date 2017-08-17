@@ -20,8 +20,8 @@ make.assertr.assert.error <- function(name.of.predicate,
 
   this_error <- list()
 
-  this_error$error_df <- data.frame(index=index.of.violations,
-                                    value=offending.elements)
+  this_error$error_df <- data.frame(index=unname(index.of.violations),
+                                    value=unname(offending.elements))
   this_error$message <- msg
   this_error$num.violations <- num.violations
   this_error$call <- name.of.predicate
