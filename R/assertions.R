@@ -73,9 +73,10 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 
 #' @export
 #' @rdname assert
-assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
+assert_ <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -200,10 +201,11 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
 #' @export
 #' @rdname assert_rows
-assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
+assert_rows_ <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
   name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(row_reduction_fn, "call"))){
@@ -321,10 +323,11 @@ insist <- function(data, predicate_generator, ...,
 
 #' @export
 #' @rdname insist
-insist_ <- function(data, predicate_generator, ..., .dots,
+insist_ <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
                     error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
@@ -454,11 +457,10 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #' @export
 #' @rdname insist_rows
 insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
-                         .dots, success_fun=success_continue,
+                         success_fun=success_continue,
                          error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-
-
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
   name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
   if(!is.null(attr(row_reduction_fn, "call"))){
