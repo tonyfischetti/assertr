@@ -2,14 +2,10 @@
 % Please edit documentation in R/assertions.R
 \name{insist_rows}
 \alias{insist_rows}
-\alias{insist_rows_}
 \title{Raises error if dynamically created predicate is FALSE for any row
 after applying row reduction function}
 \usage{
 insist_rows(data, row_reduction_fn, predicate_generator, ...,
-  success_fun = success_continue, error_fun = error_stop)
-
-insist_rows_(data, row_reduction_fn, predicate_generator, ..., .dots,
   success_fun = success_continue, error_fun = error_stop)
 }
 \arguments{
@@ -33,8 +29,6 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
-
-\item{.dots}{Use insist_rows_() to select columns using standard evaluation.}
 }
 \value{
 By default, the \code{data} is returned if dynamically created

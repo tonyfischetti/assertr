@@ -64,15 +64,6 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
-                   error_fun=error_stop){
-  assert_(data, predicate,
-          success_fun=success_fun,
-          error_fun = error_fun)
-}
-
-#' @export
-#' @rdname assert
-assert_ <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
@@ -189,16 +180,6 @@ assert_ <- function(data, predicate, ..., success_fun=success_continue,
 #' @export
 #'
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
-                        success_fun=success_continue,
-                        error_fun=error_stop){
-  assert_rows_(data, row_reduction_fn, predicate,
-               success_fun = success_fun,
-               error_fun = error_fun)
-}
-
-#' @export
-#' @rdname assert_rows
-assert_rows_ <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
@@ -310,16 +291,6 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ...,
 #'
 #' @export
 insist <- function(data, predicate_generator, ...,
-                   success_fun=success_continue,
-                   error_fun=error_stop){
-  insist_(data, predicate_generator,
-          success_fun=success_fun,
-          error_fun = error_fun)
-}
-
-#' @export
-#' @rdname insist
-insist_ <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
                     error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
@@ -442,15 +413,6 @@ insist_ <- function(data, predicate_generator, ...,
 #' @export
 #'
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
-                        success_fun=success_continue,
-                        error_fun=error_stop){
-  insist_rows_(data, row_reduction_fn, predicate_generator,
-               success_fun=success_fun, error_fun = error_fun)
-}
-
-#' @export
-#' @rdname insist_rows
-insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)

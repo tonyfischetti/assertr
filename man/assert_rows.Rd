@@ -2,14 +2,10 @@
 % Please edit documentation in R/assertions.R
 \name{assert_rows}
 \alias{assert_rows}
-\alias{assert_rows_}
 \title{Raises error if predicate is FALSE for any row after applying
 row reduction function}
 \usage{
 assert_rows(data, row_reduction_fn, predicate, ...,
-  success_fun = success_continue, error_fun = error_stop)
-
-assert_rows_(data, row_reduction_fn, predicate, ..., .dots,
   success_fun = success_continue, error_fun = error_stop)
 }
 \arguments{
@@ -29,8 +25,6 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
-
-\item{.dots}{Use assert_rows_() to select columns using standard evaluation.}
 }
 \value{
 By default, the \code{data} is returned if predicate assertion

@@ -2,13 +2,9 @@
 % Please edit documentation in R/assertions.R
 \name{insist}
 \alias{insist}
-\alias{insist_}
 \title{Raises error if dynamically created predicate is FALSE in any columns selected}
 \usage{
 insist(data, predicate_generator, ..., success_fun = success_continue,
-  error_fun = error_stop)
-
-insist_(data, predicate_generator, ..., .dots, success_fun = success_continue,
   error_fun = error_stop)
 }
 \arguments{
@@ -28,8 +24,6 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
-
-\item{.dots}{Use insist_() to select columns using standard evaluation.}
 }
 \value{
 By default, the \code{data} is returned if dynamically created
