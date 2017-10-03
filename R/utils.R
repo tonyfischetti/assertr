@@ -11,9 +11,7 @@
 # TRUE (and not NULL) if not FALSE
 make.predicate.proper <- function(improper.predicate){
   ret.fun <- function(x){
-    if(length(improper.predicate(x))==0)    return(TRUE)
-    if(!improper.predicate(x))              return(FALSE)
-    return(TRUE)
+    return(length(improper.predicate(x))==0 || improper.predicate(x))
   }
   if(is.vectorized.predicate(improper.predicate)){
     attr(ret.fun, "assertr_vectorized") <- TRUE
@@ -26,7 +24,7 @@ make.predicate.proper <- function(improper.predicate){
 
 is.vectorized.predicate <- function(predicate){
   if(!is.null(attr(predicate, "assertr_vectorized")) &&
-     attr(predicate, "assertr_vectorized")==TRUE)
+     attr(predicate, "assertr_vectorized"))
     return(TRUE)
   return(FALSE)
 }
@@ -77,7 +75,5 @@ apply.predicate.to.vector <- function(a.column, predicate){
 has_all_names <- function(...){
   check_this <- list(...)
   parent <- parent.frame()
-  all(unlist(lapply(check_this, function(x){
-    exists(x, where=parent, inherits=FALSE)
-  })))
+  all(vapply(check_this, function(x) exists(x, where=parent, inherits=FALSE), logical(1)))
 }
