@@ -18,7 +18,6 @@
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use assert_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -66,7 +65,7 @@
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
                    error_fun=error_stop){
-  assert_(data, predicate, .dots = lazyeval::lazy_dots(...),
+  assert_(data, predicate,
           success_fun=success_fun,
           error_fun = error_fun)
 }
@@ -150,7 +149,6 @@ assert_ <- function(data, predicate, ..., success_fun=success_continue,
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use assert_rows_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -194,7 +192,6 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                         success_fun=success_continue,
                         error_fun=error_stop){
   assert_rows_(data, row_reduction_fn, predicate,
-               .dots = lazyeval::lazy_dots(...),
                success_fun = success_fun,
                error_fun = error_fun)
 }
@@ -275,7 +272,6 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ...,
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use insist_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -316,7 +312,7 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ...,
 insist <- function(data, predicate_generator, ...,
                    success_fun=success_continue,
                    error_fun=error_stop){
-  insist_(data, predicate_generator, .dots = lazyeval::lazy_dots(...),
+  insist_(data, predicate_generator,
           success_fun=success_fun,
           error_fun = error_fun)
 }
@@ -407,7 +403,6 @@ insist_ <- function(data, predicate_generator, ...,
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use insist_rows_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -450,7 +445,6 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                         success_fun=success_continue,
                         error_fun=error_stop){
   insist_rows_(data, row_reduction_fn, predicate_generator,
-               .dots = lazyeval::lazy_dots(...),
                success_fun=success_fun, error_fun = error_fun)
 }
 
