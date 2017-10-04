@@ -48,17 +48,8 @@ See \code{vignette("assertr")} for how to use this in context
 # returns mtcars
 assert(mtcars, not_na, vs)
 
-# equivalent statements using standard evaluation
-assert_(mtcars, not_na, "vs")
-var <- "vs"
-assert_(mtcars, not_na, var)
-
 # return mtcars
 assert(mtcars, not_na, mpg:carb)
-
-# equivalent using standard evaluation
-assert_(mtcars, not_na, "mpg:carb")
-
 
 library(magrittr)                    # for piping operator
 

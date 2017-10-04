@@ -196,7 +196,7 @@ test_that("assert breaks appropriately", {
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(assert(mtcars, in_set(0,1), vs, tree),
                "object 'tree' not found")
-  expect_error(assert(mtcars, in_set(0,1), vs, tree),
+  expect_error(assert(mtcars, in_set(0,1), vs, "tree"),
                "All select\\(\\) inputs must resolve to integer column positions|\"tree\": must resolve to integer column positions, not string")
   expect_error(assert("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
@@ -263,7 +263,7 @@ test_that("assert_rows breaks appropriately", {
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
                "object 'tree' not found")
-  expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
+  expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"),
                "All select\\(\\) inputs must resolve to integer column positions|\"tree\": must resolve to integer column positions, not string")
   expect_error(assert_rows("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
@@ -312,7 +312,7 @@ test_that("insist raises *custom error* if verification fails", {
 test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(insist(mtcars, within_n_sds(5), vs),
+  expect_error(insist(mtcars, within_n_sds(5), "vs"),
                "All select\\(\\) inputs must resolve to integer column positions|\"vs\": must resolve to integer column positions, not string")
   expect_error(insist(mtcars, within_n_sds(5), tree),
                "object 'tree' not found")
