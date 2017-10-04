@@ -152,10 +152,6 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 #' # returns mtcars
 #' assert_rows(mtcars, num_row_NAs, within_bounds(0,2), mpg:carb)
 #'
-#' # equivalent using standard evaluation
-#' assert_rows_(mtcars, num_row_NAs, within_bounds(0,2), "mpg:carb")
-#'
-#'
 #' library(magrittr)                    # for piping operator
 #'
 #' mtcars %>%
@@ -262,9 +258,6 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 #' @examples
 #'
 #' insist(iris, within_n_sds(3), Sepal.Length)   # returns iris
-#'
-#' # equivalent using standard evaluation
-#' insist_(iris, within_n_sds(3), "Sepal.Length")
 #'
 #' library(magrittr)
 #'
@@ -384,10 +377,6 @@ insist <- function(data, predicate_generator, ...,
 #'
 #' # returns mtcars
 #' insist_rows(mtcars, maha_dist, within_n_mads(30), mpg:carb)
-#'
-#' # equivalent using standard evaluation
-#' insist_rows_(mtcars, maha_dist, within_n_mads(30), "mpg:carb")
-#'
 #'
 #' library(magrittr)                    # for piping operator
 #'
