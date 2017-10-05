@@ -51,9 +51,6 @@ See \code{vignette("assertr")} for how to use this in context
 
 insist(iris, within_n_sds(3), Sepal.Length)   # returns iris
 
-# equivalent using standard evaluation
-insist_(iris, within_n_sds(3), "Sepal.Length")
-
 library(magrittr)
 
 iris \%>\%

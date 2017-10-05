@@ -58,10 +58,6 @@ See \code{vignette("assertr")} for how to use this in context
 # returns mtcars
 insist_rows(mtcars, maha_dist, within_n_mads(30), mpg:carb)
 
-# equivalent using standard evaluation
-insist_rows_(mtcars, maha_dist, within_n_mads(30), "mpg:carb")
-
-
 library(magrittr)                    # for piping operator
 
 mtcars \%>\%

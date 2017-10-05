@@ -53,10 +53,6 @@ See \code{vignette("assertr")} for how to use this in context
 # returns mtcars
 assert_rows(mtcars, num_row_NAs, within_bounds(0,2), mpg:carb)
 
-# equivalent using standard evaluation
-assert_rows_(mtcars, num_row_NAs, within_bounds(0,2), "mpg:carb")
-
-
 library(magrittr)                    # for piping operator
 
 mtcars \%>\%
