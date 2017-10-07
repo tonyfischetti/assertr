@@ -148,9 +148,6 @@ and `insist_rows`:
 detection). It will coerce categorical variables into numerics if it needs to.
 - `col_concat` - concatenates all rows into strings
 
-Finally, each assertion function has a counterpart that using standard
-evaluation. The counterpart functions are postfixed by "_" (an underscore).
-
 ### More info
 
 For more info, check out the `assertr` vignette
