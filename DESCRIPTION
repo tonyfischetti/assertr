@@ -15,11 +15,12 @@ BugReports: https://github.com/ropensci/assertr/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
-    dplyr,
+    dplyr (>= 0.7.0),
     MASS,
     lazyeval,
     stats,
-    utils
+    utils,
+    rlang (>= 0.1.2)
 Suggests:
     knitr,
     testthat,

@@ -52,10 +52,8 @@ maha_dist <- function(data, keep.NA=TRUE, robust=FALSE, stringsAsFactors=FALSE){
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
   ## check
   if(stringsAsFactors){
-    char_cols <- unlist(lapply(data, class))=="character"
-    for(i in which(char_cols)){
-      data[,i] <- factor(data[,i])
-    }
+    char_cols <- vapply(data, is.character, logical(1))
+    data[char_cols] <- lapply(data[char_cols], as.factor)
   }
   a.matrix <- data.matrix(data)
   if(ncol(a.matrix)<2)
@@ -63,7 +61,7 @@ maha_dist <- function(data, keep.NA=TRUE, robust=FALSE, stringsAsFactors=FALSE){
   row.names(a.matrix) <- NULL
   a.matrix <- scale(a.matrix, scale=FALSE)
   if(robust){
-    if(sum(is.na(a.matrix)))
+    if(anyNA(a.matrix))
       stop("cannot use robust maha_dist with missing values", call.=FALSE)
     dcov <- MASS::cov.mcd(a.matrix)$cov
   } else{
@@ -108,10 +106,11 @@ attr(maha_dist, "call") <- "maha_dist"
 num_row_NAs <- function(data, allow.NaN=FALSE){
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
-  pred <- function(x){ sum((is.na(x)&(!(is.nan(x))))) }
-  if(allow.NaN){
-    pred <- function(x){ sum((is.na(x) | is.nan(x))) }
-  }
+  pred <- if(allow.NaN){
+            function(x){ sum((is.na(x) | is.nan(x))) }
+          } else {
+            function(x){ sum((is.na(x)&(!(is.nan(x))))) }
+          }
   ret.vec <- apply(data, 1, pred)
   return(ret.vec)
 }
@@ -154,6 +153,6 @@ col_concat <- function(data, sep=""){
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
 
-  apply(data, 1, paste, sep="", collapse=sep)
+  apply(data, 1, paste0, collapse=sep)
 }
 attr(col_concat, "call") <- "col_concat"

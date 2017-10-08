@@ -14,17 +14,15 @@ make.assertr.assert.error <- function(name.of.predicate,
                                       num.violations,
                                       index.of.violations,
                                       offending.elements){
-  time.or.times <- ifelse(num.violations==1, "time", "times")
+  time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Column '", column, "' violates assertion '",
                 name.of.predicate,"' ", num.violations, " ", time.or.times)
 
-  this_error <- list()
-
-  this_error$error_df <- data.frame(index=index.of.violations,
-                                    value=offending.elements)
-  this_error$message <- msg
-  this_error$num.violations <- num.violations
-  this_error$call <- name.of.predicate
+  this_error <- list(error_df = data.frame(index=index.of.violations,
+                                           value=offending.elements),
+                     message = msg,
+                     num.violations = num.violations,
+                     call = name.of.predicate)
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")
@@ -36,17 +34,14 @@ make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
                                            name.of.predicate,
                                            num.violations,
                                            loc.violations){
-  time.or.times <- ifelse(num.violations==1, "time", "times")
+  time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
                 "' violates predicate '", name.of.predicate,
                 "' ", num.violations, " ", time.or.times)
-  this_error <- list()
-
-  this_error$error_df <- data.frame(rownumber=loc.violations)
-
-  this_error$message <- msg
-  this_error$num.violations <- num.violations
-  this_error$call <- name.of.predicate
+  this_error <- list(error_df = data.frame(rownumber=loc.violations),
+                     message = msg,
+                     num.violations = num.violations,
+                     call = name.of.predicate)
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")
@@ -90,7 +85,7 @@ summary.assertr_assert_error <- function(object, ...){
   numrows <- nrow(object$error_df)
   print(utils::head(object$error_df, n=5))
   if(numrows > 5)
-    cat(paste0("  [omitted ", numrows-5, " rows]\n\n"))
+    cat("  [omitted ", numrows-5, " rows]\n\n", sep = "")
 }
 
 
@@ -100,12 +95,11 @@ summary.assertr_assert_error <- function(object, ...){
 # used by "verify"
 
 make.assertr.verify.error <- function(num.violations, the_call){
-  sing.plur <- ifelse(num.violations==1, " failure)", " failures)")
+  sing.plur <- if (num.violations==1) " failure)" else " failures)"
   msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
-  this_error <- list()
-  this_error$message <- msg
-  this_error$num.violations <- num.violations
-  this_error$call <- the_call
+  this_error <- list(message = msg,
+                     num.violations = num.violations,
+                     call = the_call)
   class(this_error) <- c("assertr_verify_error", "assertr_error",
                          "error", "condition")
   return(this_error)
@@ -227,9 +221,9 @@ error_report <- function(errors, data=NULL, warn=FALSE, ...){
     errors <- append(attr(data, "assertr_errors"), errors)
   num.of.errors <- length(errors)
   cat(sprintf("There %s %d error%s:\n",
-              ifelse(num.of.errors==1,"is", "are"),
+              if (num.of.errors==1) "is" else "are",
               num.of.errors,
-              ifelse(num.of.errors==1,"", "s")))
+              if (num.of.errors==1) "" else "s"))
   lapply(errors, function(x){cat("\n- "); print(x)})
   if(!warn)
     stop("assertr stopped execution", call.=FALSE)

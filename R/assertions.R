@@ -18,7 +18,6 @@
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use assert_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -39,17 +38,8 @@
 #' # returns mtcars
 #' assert(mtcars, not_na, vs)
 #'
-#' # equivalent statements using standard evaluation
-#' assert_(mtcars, not_na, "vs")
-#' var <- "vs"
-#' assert_(mtcars, not_na, var)
-#'
 #' # return mtcars
 #' assert(mtcars, not_na, mpg:carb)
-#'
-#' # equivalent using standard evaluation
-#' assert_(mtcars, not_na, "mpg:carb")
-#'
 #'
 #' library(magrittr)                    # for piping operator
 #'
@@ -65,17 +55,9 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
-                   error_fun=error_stop){
-  assert_(data, predicate, .dots = lazyeval::lazy_dots(...),
-          success_fun=success_fun,
-          error_fun = error_fun)
-}
-
-#' @export
-#' @rdname assert
-assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
                       error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -149,7 +131,6 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use assert_rows_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -171,10 +152,6 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
 #' # returns mtcars
 #' assert_rows(mtcars, num_row_NAs, within_bounds(0,2), mpg:carb)
 #'
-#' # equivalent using standard evaluation
-#' assert_rows_(mtcars, num_row_NAs, within_bounds(0,2), "mpg:carb")
-#'
-#'
 #' library(magrittr)                    # for piping operator
 #'
 #' mtcars %>%
@@ -190,20 +167,10 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
 #' @export
 #'
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
-                        success_fun=success_continue,
-                        error_fun=error_stop){
-  assert_rows_(data, row_reduction_fn, predicate,
-               .dots = lazyeval::lazy_dots(...),
-               success_fun = success_fun,
-               error_fun = error_fun)
-}
-
-#' @export
-#' @rdname assert_rows
-assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
                          success_fun=success_continue,
                          error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
   name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(row_reduction_fn, "call"))){
@@ -273,7 +240,6 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use insist_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -293,9 +259,6 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #'
 #' insist(iris, within_n_sds(3), Sepal.Length)   # returns iris
 #'
-#' # equivalent using standard evaluation
-#' insist_(iris, within_n_sds(3), "Sepal.Length")
-#'
 #' library(magrittr)
 #'
 #' iris %>%
@@ -312,19 +275,10 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 #'
 #' @export
 insist <- function(data, predicate_generator, ...,
-                   success_fun=success_continue,
-                   error_fun=error_stop){
-  insist_(data, predicate_generator, .dots = lazyeval::lazy_dots(...),
-          success_fun=success_fun,
-          error_fun = error_fun)
-}
-
-#' @export
-#' @rdname insist
-insist_ <- function(data, predicate_generator, ..., .dots,
                     success_fun=success_continue,
                     error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
@@ -404,7 +358,6 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #' @param ... Comma separated list of unquoted expressions.
 #'            Uses dplyr's \code{select} to select
 #'            columns from data.
-#' @param .dots Use insist_rows_() to select columns using standard evaluation.
 #' @param success_fun Function to call if assertion passes. Defaults to
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
@@ -425,10 +378,6 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #' # returns mtcars
 #' insist_rows(mtcars, maha_dist, within_n_mads(30), mpg:carb)
 #'
-#' # equivalent using standard evaluation
-#' insist_rows_(mtcars, maha_dist, within_n_mads(30), "mpg:carb")
-#'
-#'
 #' library(magrittr)                    # for piping operator
 #'
 #' mtcars %>%
@@ -444,21 +393,10 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 #' @export
 #'
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
-                        success_fun=success_continue,
-                        error_fun=error_stop){
-  insist_rows_(data, row_reduction_fn, predicate_generator,
-               .dots = lazyeval::lazy_dots(...),
-               success_fun=success_fun, error_fun = error_fun)
-}
-
-#' @export
-#' @rdname insist_rows
-insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
-                         .dots, success_fun=success_continue,
+                         success_fun=success_continue,
                          error_fun=error_stop){
-  sub.frame <- dplyr::select_(data, ..., .dots = .dots)
-
-
+  keeper.vars <- dplyr::quos(...)
+  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
   name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
   if(!is.null(attr(row_reduction_fn, "call"))){
