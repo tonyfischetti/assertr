@@ -1,0 +1,151 @@
+{
+  "@context": [
+    "https://doi.org/doi:10.5063/schema/codemeta-2.0",
+    "http://schema.org"
+  ],
+  "@type": "SoftwareSourceCode",
+  "identifier": "assertr",
+  "description":
+    "Provides functionality to assert conditions\n    that have to be met so that errors in data used in\n    analysis pipelines can fail quickly. Similar to\n    'stopifnot()' but more powerful, friendly, and easier\n    for use in pipelines.",
+  "name": "assertr: Assertive Programming for R Analysis Pipelines",
+  "codeRepository": "https://github.com/ropensci/assertr.git",
+  "issueTracker": "https://github.com/ropensci/assertr/issues",
+  "license": "https://spdx.org/licenses/MIT",
+  "version": "2.0.2.1",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "version": "3.4.2",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 3.4.2 (2017-09-28)",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Central R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Tony",
+      "familyName": "Fischetti",
+      "email": "tony.fischetti@gmail.com"
+    }
+  ],
+  "maintainer": {
+    "@type": "Person",
+    "givenName": "Tony",
+    "familyName": "Fischetti",
+    "email": "tony.fischetti@gmail.com"
+  },
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "magrittr",
+      "name": "magrittr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    }
+  ],
+  "softwareRequirements": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "dplyr",
+      "name": "dplyr",
+      "version": "0.7.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "MASS",
+      "name": "MASS",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "lazyeval",
+      "name": "lazyeval",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "utils",
+      "name": "utils"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rlang",
+      "name": "rlang",
+      "version": "0.1.2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Central R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      }
+    }
+  ],
+  "applicationCategory": "ComputingInfrastructure",
+  "isPartOf": "https://ropensci.org",
+  "keywords": [
+    "ropensci",
+    "defensive",
+    "audit",
+    "assert",
+    "assertions",
+    "sanitization",
+    "workflow",
+    "checking"
+  ],
+  "contIntegration": "https://travis-ci.org/ropensci/assertr",
+  "releaseNotes": "https://github.com/ropensci/assertr.git/blob/master/NEWS",
+  "readme": "https://github.com/ropensci/assertr.git/blob/master/README.md",
+  "fileSize": "95.466KB"
+}
