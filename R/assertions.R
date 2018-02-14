@@ -55,9 +55,10 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
-                      error_fun=error_stop){
+                      error_fun=error_stop, title = NULL){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  validation_id <- paste0(sample(c(LETTERS, letters, 0:9), 20, TRUE), collapse = "")
   name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -76,6 +77,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
     error_fun <- error_fun_override
   }
 
+  if(!is.null(title) && is.null(attr(data, "assertr_results")))
+    attr(data, "assertr_results") <- list()
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
@@ -87,9 +90,17 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
+  if (!is.null(title)) {
+    result <- all(log.mat)
+    attr(data, "assertr_results") <- append(
+      attr(data, "assertr_results"),
+      list(data.frame(title = title, result = result, validation_id, stringsAsFactors = FALSE)))
+  }
+
   # if all checks pass *and* there are no leftover errors
   if(all(log.mat) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
+
 
   errors <- lapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
@@ -102,7 +113,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          validation_id)
     return(an_error)
   })
 

@@ -13,7 +13,7 @@ make.assertr.assert.error <- function(name.of.predicate,
                                       column,
                                       num.violations,
                                       index.of.violations,
-                                      offending.elements){
+                                      offending.elements, validation_id){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Column '", column, "' violates assertion '",
                 name.of.predicate,"' ", num.violations, " ", time.or.times)
@@ -22,7 +22,8 @@ make.assertr.assert.error <- function(name.of.predicate,
                                            value=offending.elements),
                      message = msg,
                      num.violations = num.violations,
-                     call = name.of.predicate)
+                     call = name.of.predicate,
+                     validation_id = validation_id)
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")

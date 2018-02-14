@@ -522,16 +522,16 @@ respectively) contain 0s and 1s only
 
 This could be written thusly:
 
-```{r purl = FALSE}
-mtcars %>%
-  verify(has_all_names("mpg", "vs", "am")) %>%
-  verify(nrow(mtcars) > 10) %>%
-  verify(mpg > 0) %>%
-  insist(within_n_sds(4), mpg) %>%
-  assert(in_set(0,1), am, vs) %>%
-  group_by(cyl) %>%
-  summarise(avg.mpg=mean(mpg))
-```
+# ```{r purl = FALSE}
+# mtcars %>%
+#   verify(has_all_names("mpg", "vs", "am")) %>%
+#   verify(nrow(mtcars) > 10) %>%
+#   verify(mpg > 0) %>%
+#   insist(within_n_sds(4), mpg) %>%
+#   assert(in_set(0,1), am, vs) %>%
+#   group_by(cyl) %>%
+#   summarise(avg.mpg=mean(mpg))
+# ```
 
 In an assertr chain with default options, `assert`, `assert_rows`,
 `insist`, `insist_rows`, and `verify` will stop at the
@@ -556,37 +556,37 @@ the chain.
  
 Let's see it in action!
 
-```{r purl = FALSE}
-mtcars %>%
-  chain_start %>%
-  verify(nrow(mtcars) > 10) %>%
-  verify(mpg > 0) %>%
-  insist(within_n_sds(4), mpg) %>%
-  assert(in_set(0,1), am, vs) %>%
-  chain_end %>%
-  group_by(cyl) %>%
-  summarise(avg.mpg=mean(mpg))
-```
+# ```{r purl = FALSE}
+# mtcars %>%
+#   chain_start %>%
+#   verify(nrow(mtcars) > 10) %>%
+#   verify(mpg > 0) %>%
+#   insist(within_n_sds(4), mpg) %>%
+#   assert(in_set(0,1), am, vs) %>%
+#   chain_end %>%
+#   group_by(cyl) %>%
+#   summarise(avg.mpg=mean(mpg))
+# ```
 
 Now *all* assertions will be checked and reported.
 
 Tip: we can make this whole thing look a lot better by abstracting out
 all the assertions:
 
-```{r eval = FALSE, purl = FALSE}
-check_me <- . %>%
-  chain_start %>%
-  verify(nrow(mtcars) > 10) %>%
-  verify(mpg > 0) %>%
-  insist(within_n_sds(4), mpg) %>%
-  assert(in_set(0,1), am, vs)
-  chain_end 
-
-mtcars %>%
-  check_me %>%
-  group_by(cyl) %>%
-  summarise(avg.mpg=mean(mpg))
-```
+# ```{r eval = FALSE, purl = FALSE}
+# check_me <- . %>%
+#   chain_start %>%
+#   verify(nrow(mtcars) > 10) %>%
+#   verify(mpg > 0) %>%
+#   insist(within_n_sds(4), mpg) %>%
+#   assert(in_set(0,1), am, vs)
+#   chain_end 
+# 
+# mtcars %>%
+#   check_me %>%
+#   group_by(cyl) %>%
+#   summarise(avg.mpg=mean(mpg))
+# ```
 
 Awesome! Now we can add an arbitrary number of assertions, as the need arises,
 without touching the real logic.
@@ -625,48 +625,48 @@ Below we are going to build a function that takes a list of `assertr_errors`,
 gets a string representation of the errors and emails it to someone before
 halting execution. We will use the `mailR` package to send the mail.
 
-```{r eval=FALSE, purl = FALSE}
-
-library(mailR)
-
-email_me <- function(list_of_errors, data=NULL, ...){
-  # we are checking to see if there are any errors that
-  # are still attached to the data.frame
-  if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
-    errors <- append(attr(data, "assertr_errors"), errors)
-
-  num.of.errors <- length(list_of_errors)
-
-  preface <- sprintf("There %s %d error%s:\n",
-                     ifelse(num.of.errors==1,"is", "are"),
-                     num.of.errors,
-                     ifelse(num.of.errors==1,"", "s"))
-
-  # all `assertr_error` S3 objects have `print` and `summary` methods
-  # here, we will call `print` on all of the errors since `print`
-  # will give us the complete/unabridged error report
-  error_string <- capture.output(tmp <- lapply(list_of_errors,
-                                               function(x){
-                                                 cat("\n- ");
-                                                 print(x);
-                                                 return();}))
-  error_string <- c(preface, error_string)
-  error_string <- error_string %>% paste0(collapse="\n")
-
-  send.mail(from="assertr@gmail.com", to="YOU@gmail.com",
-            subject="error from assertr", body=error_string,
-            smtp = list(host.name="aspmx.l.google.com", port=25),
-            authenticate = FALSE, send=TRUE)
-  stop("assertr stopped execution", call.=FALSE)
-}
-
-questionable_mtcars %>%
-  chain_start %>%
-  verify(nrow(.) > 10) %>%
-  insist(within_n_sds(4), mpg) %>%
-  # ...
-  chain_end(error_fun=email.me)
-```
+# ```{r eval=FALSE, purl = FALSE}
+# 
+# library(mailR)
+# 
+# email_me <- function(list_of_errors, data=NULL, ...){
+#   # we are checking to see if there are any errors that
+#   # are still attached to the data.frame
+#   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
+#     errors <- append(attr(data, "assertr_errors"), errors)
+# 
+#   num.of.errors <- length(list_of_errors)
+# 
+#   preface <- sprintf("There %s %d error%s:\n",
+#                      ifelse(num.of.errors==1,"is", "are"),
+#                      num.of.errors,
+#                      ifelse(num.of.errors==1,"", "s"))
+# 
+#   # all `assertr_error` S3 objects have `print` and `summary` methods
+#   # here, we will call `print` on all of the errors since `print`
+#   # will give us the complete/unabridged error report
+#   error_string <- capture.output(tmp <- lapply(list_of_errors,
+#                                                function(x){
+#                                                  cat("\n- ");
+#                                                  print(x);
+#                                                  return();}))
+#   error_string <- c(preface, error_string)
+#   error_string <- error_string %>% paste0(collapse="\n")
+# 
+#   send.mail(from="assertr@gmail.com", to="YOU@gmail.com",
+#             subject="error from assertr", body=error_string,
+#             smtp = list(host.name="aspmx.l.google.com", port=25),
+#             authenticate = FALSE, send=TRUE)
+#   stop("assertr stopped execution", call.=FALSE)
+# }
+# 
+# questionable_mtcars %>%
+#   chain_start %>%
+#   verify(nrow(.) > 10) %>%
+#   insist(within_n_sds(4), mpg) %>%
+#   # ...
+#   chain_end(error_fun=email.me)
+# ```
 
 (this particular `send.mail` formulation will only work for gmail
 recipients; see the `mailR` documentation for more information)
@@ -688,22 +688,22 @@ Let's say you wanted to create a predicate generator that checks if all
 elements of a vector are within 3 times the vector's interquartile range from
 the median. We need to create a function that looks like this
 
-```{r purl = FALSE}
-within_3_iqrs <- function(a_vector){
-  the_median <- median(a_vector)
-  the_iqr <- IQR(a_vector)
-  within_bounds((the_median-the_iqr*3), (the_median+the_iqr*3))
-}
-```
+# ```{r purl = FALSE}
+# within_3_iqrs <- function(a_vector){
+#   the_median <- median(a_vector)
+#   the_iqr <- IQR(a_vector)
+#   within_bounds((the_median-the_iqr*3), (the_median+the_iqr*3))
+# }
+# ```
 
 Now, we can use it on `mpg` from `mtcars` like so:
 
-```{r purl = FALSE}
-mtcars %>%
-  insist(within_3_iqrs, mpg) %>%
-  group_by(cyl) %>%
-  summarise(avg.mpg=mean(mpg))
-```
+# ```{r purl = FALSE}
+# mtcars %>%
+#   insist(within_3_iqrs, mpg) %>%
+#   group_by(cyl) %>%
+#   summarise(avg.mpg=mean(mpg))
+# ```
 
 There are two problems with this, though...
 
@@ -715,25 +715,25 @@ give to the returned `within_bounds` predicate.
 Now we have to write a function that returns a function that returns
 a function...
 
-```{r purl = FALSE}
-within_n_iqrs <- function(n, ...){
-  function(a_vector){
-    the_median <- median(a_vector)
-    the_iqr <- IQR(a_vector)
-    within_bounds((the_median-the_iqr*n), (the_median+the_iqr*n), ...)
-  }
-}
-```
+# ```{r purl = FALSE}
+# within_n_iqrs <- function(n, ...){
+#   function(a_vector){
+#     the_median <- median(a_vector)
+#     the_iqr <- IQR(a_vector)
+#     within_bounds((the_median-the_iqr*n), (the_median+the_iqr*n), ...)
+#   }
+# }
+# ```
 
 Much better! Now, if we want to check that every `mpg` from `mtcars` is
 within 5 IQRs of the median and *not allow NA values* we can do so like this:
 
-```{r purl = FALSE}
-mtcars %>%
-  insist(within_n_iqrs(5), mpg) %>%
-  group_by(cyl) %>%
-  summarise(avg.mpg=mean(mpg))
-```
+# ```{r purl = FALSE}
+# mtcars %>%
+#   insist(within_n_iqrs(5), mpg) %>%
+#   group_by(cyl) %>%
+#   summarise(avg.mpg=mean(mpg))
+# ```
 
 Super!
 
