@@ -77,3 +77,7 @@ has_all_names <- function(...){
   parent <- parent.frame()
   all(vapply(check_this, function(x) exists(x, where=parent, inherits=FALSE), logical(1)))
 }
+
+generate_id <- function() {
+  paste0(sample(c(LETTERS, letters, 0:9), 20, TRUE), collapse = "")
+}

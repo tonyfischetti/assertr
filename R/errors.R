@@ -34,7 +34,8 @@ make.assertr.assert.error <- function(name.of.predicate,
 make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
                                            name.of.predicate,
                                            num.violations,
-                                           loc.violations){
+                                           loc.violations,
+                                           valdiation_id){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
                 "' violates predicate '", name.of.predicate,
@@ -42,7 +43,8 @@ make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
   this_error <- list(error_df = data.frame(rownumber=loc.violations),
                      message = msg,
                      num.violations = num.violations,
-                     call = name.of.predicate)
+                     call = name.of.predicate,
+                     validation_id = validation_id)
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")
@@ -95,12 +97,13 @@ summary.assertr_assert_error <- function(object, ...){
 #####################
 # used by "verify"
 
-make.assertr.verify.error <- function(num.violations, the_call){
+make.assertr.verify.error <- function(num.violations, the_call, validation_id){
   sing.plur <- if (num.violations==1) " failure)" else " failures)"
   msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
   this_error <- list(message = msg,
                      num.violations = num.violations,
-                     call = the_call)
+                     call = the_call,
+                     validation_id = validation_id)
   class(this_error) <- c("assertr_verify_error", "assertr_error",
                          "error", "condition")
   return(this_error)
