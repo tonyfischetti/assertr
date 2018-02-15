@@ -1,16 +1,16 @@
 ---
-  title: "Assertive R Programming with assertr"
+title: "Assertive R Programming with assertr"
 author: "Tony Fischetti"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Assertive R Programming with assertr}
-%\VignetteEngine{knitr::rmarkdown}
-\usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
-  
-  
-  In data analysis workflows that depend on un-sanitized data sets from external
+
+
+In data analysis workflows that depend on un-sanitized data sets from external
 sources, it’s very common that errors in data bring an analysis to a
 screeching halt. Oftentimes, these errors occur late in the analysis and
 provide no clear indication of which datum caused the error.
@@ -41,19 +41,19 @@ head(mtcars)
 ```
 
 But let's pretend that the data we got accidentally negated the 5th mpg value:
-  
-  ```{r}
+
+```{r}
 our.data <- mtcars
 our.data$mpg[5] <- our.data$mpg[5] * -1
 our.data[4:6,]
 ```
 
 Whoops!
-  
-  If we wanted to find the average miles per gallon for each number of engine
+
+If we wanted to find the average miles per gallon for each number of engine
 cylinders, we might do so like this:
-  
-  ```{r message=FALSE}
+
+```{r message=FALSE}
 library(dplyr)
 
 our.data %>%
@@ -76,9 +76,9 @@ that `mpg` is a positive number:
 library(assertr)
 
 our.data %>%
-verify(mpg >= 0) %>%
-group_by(cyl) %>%
-summarise(avg.mpg=mean(mpg))
+  verify(mpg >= 0) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
 ```
 
 If we had done this, we would have caught this data error.
@@ -93,9 +93,9 @@ We could have also written this assertion using `assertr`'s `assert` function...
 
 ```{r error=TRUE, purl = FALSE}
 our.data %>%
-assert(within_bounds(0,Inf), mpg) %>%
-group_by(cyl) %>%
-summarise(avg.mpg=mean(mpg))
+  assert(within_bounds(0,Inf), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
 ```
 
 The `assert` function takes a data frame, a predicate function, and an arbitrary
@@ -113,9 +113,9 @@ are *greater* than zero (except `mpg`):
 library(assertr)
 
 our.data %>%
-assert(within_bounds(0,Inf, include.lower=FALSE), -mpg) %>%
-group_by(cyl) %>%
-summarise(avg.mpg=mean(mpg))
+  assert(within_bounds(0,Inf, include.lower=FALSE), -mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
 ```
 
 ### verify vs. assert
@@ -136,8 +136,8 @@ of that assumption like this:
 ```{r eval=FALSE, purl = FALSE}
 dat <- read.csv("a-data-file.csv")
 dat %>%
-verify(nrow(.) > 100) %>%
-....
+  verify(nrow(.) > 100) %>%
+  ....
 ```
 
 This is a powerful advantage over `assert`... but `assert` has one more
@@ -162,8 +162,8 @@ values in the `am` column...
 
 ```{r, eval=FALSE, purl = FALSE}
 our.data %>%
-assert(in_set(0,1), am) %>%
-...
+  assert(in_set(0,1), am) %>%
+  ...
 ```
 
 If we were reading a dataset that contained a column representing boroughs of
@@ -174,8 +174,8 @@ or otherwise unexpected boroughs like so...
 boroughs <- c("Bronx", "Manhattan", "Queens", "Brooklyn", "Staten Island")
 
 read.csv("a-dataset.csv") %>%
-assert(in_set(boroughs), BORO) %>%
-...
+  assert(in_set(boroughs), BORO) %>%
+  ...
 ```
 
 Rad!
@@ -189,14 +189,14 @@ In order to make a custom predicate, you only have to specify cases where the
 predicate should return FALSE. Let's say that a dataset has an ID column
 (named `ID`) that we want to check is not an empty string. We can create a
 predicate like this:
-  
-  ```{r}
+
+```{r}
 not.empty.p <- function(x) if(x=="") return(FALSE)
 ```
 
 and apply it like this:
-  
-  ```{r, eval=FALSE, purl = FALSE}
+
+```{r, eval=FALSE, purl = FALSE}
 read.csv("another-dataset.csv") %>%
   assert(not.empty.p, ID) %>%
   ...
@@ -215,8 +215,8 @@ predicates that are only used once). The check above might be better written as
 
 ```{r, eval=FALSE, purl = FALSE}
 read.csv("another-dataset.csv") %>%
-assert(function(x) nchar(x)==7, ID) %>%
-...
+  assert(function(x) nchar(x)==7, ID) %>%
+  ...
 ```
 
 Neat-o!
@@ -252,9 +252,9 @@ like this:
 ```{r purl = FALSE}
 
 mtcars %>%
-insist(within_n_sds(3), mpg) %>%
-group_by(cyl) %>%
-summarise(avg.mpg=mean(mpg))
+  insist(within_n_sds(3), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
 ```
 
 Notice what happens when we drop that z-score to 2 standard deviations
@@ -262,9 +262,9 @@ from the mean
 
 ```{r error=TRUE,  purl = FALSE}
 mtcars %>%
-insist(within_n_sds(2), mpg) %>%
-group_by(cyl) %>%
-summarise(avg.mpg=mean(mpg))
+  insist(within_n_sds(2), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
 ```
 
 Execution of the pipeline was halted. But now we know exactly which data point
@@ -272,17 +272,17 @@ violated the predicate that `within_n_sds(2)(mtcars$mpg)`
 returned.
 
 Now that's an efficient car!
-  
-  After the predicate generator, `insist` takes an arbitrary number of columns
+
+After the predicate generator, `insist` takes an arbitrary number of columns
 just like `assert` using the syntax of `dplyr`'s `select` function. If you
 wanted to check that everything in mtcars is within 10 standard deviations
 of the mean (of each column vector), you can do so like this:
 
 ```{r purl = FALSE}
 mtcars %>%
-insist(within_n_sds(10), mpg:carb) %>%
-group_by(cyl) %>%
-summarise(avg.mpg=mean(mpg))
+  insist(within_n_sds(10), mpg:carb) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
 ```
 
 Aces!
@@ -324,9 +324,9 @@ small example data set:
 
 ```{r perl=FALSE}
 example.data <- data.frame(x=c(8, 9, 6, 5, 9, 5, 6, 7,
-8, 9, 6, 5, 5, 6, 7),
-y=c(82, 91, 61, 49, 40, 49, 57,
-74, 78, 90, 61, 49, 51, 62, 68))
+                             8, 9, 6, 5, 5, 6, 7),
+                         y=c(82, 91, 61, 49, 40, 49, 57,
+                             74, 78, 90, 61, 49, 51, 62, 68))
 (example.data)
 ```
 
@@ -357,7 +357,7 @@ reduce each row into a single value. We'll call them *row reduction functions*.
 
 The first one we'll look at is called `maha_dist`. It computes the average
 mahalanobis distance (kind of like multivariate z-scoring for outlier
-                      detection) of each row from the whole data set. The big idea is that in the
+detection) of each row from the whole data set. The big idea is that in the
 resultant vector, big/distant values are potential anomalous entries. Let's
 look at the distribution of mahalanobis distances for this data set...
 
@@ -387,11 +387,11 @@ example.data %>%
   insist_rows(maha_dist, within_n_mads(3), dplyr::everything())
 
 ```
-
+ 
 Check that out! To be clear, this function is running the supplied data frame
 through the `maha_dist` function which returns a value for each row
 corresponding to its mahalanobis distance. (The whole data frame is used because
-                                            we used the `everything()` selection function from the `dplyr` package.)
+we used the `everything()` selection function from the `dplyr` package.)
 Then, `within_n_mads(3)` computes on that vector and returns a bounds
 checking predicate. The bounds checking predicate checks to see that all
 mahalanobis distances are within 3 median absolute deviations
@@ -473,36 +473,36 @@ The `success_fun` parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
 write your own success handler function, but there are two
 provided by this package:
-  
+
   * `success_continue` - just returns the data that was passed into the
-assertion function (this is default)
-  
+    assertion function (this is default)
+
   * `success_logical` - returns TRUE
 
 The `error_fun` parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
 write your own error handler function, but there are a few
 provided by this package:
-  
+
   * `error_stop` - Prints a summary of the errors and
-halts execution (default)
+                            halts execution (default)
 
-* `error_report` - Prints *all* the information available
-about the errors and halts execution.
+  * `error_report` - Prints *all* the information available
+                              about the errors and halts execution.
 
-* `error_append` - Attaches the errors to a special
-attribute of `data` and returns the data. This is chiefly
-to allow assertr errors to be accumulated in a pipeline so that
-all assertions can have a chance to be checked and so that all
-the errors can be displayed at the end of the chain.
+  * `error_append` - Attaches the errors to a special
+   attribute of `data` and returns the data. This is chiefly
+   to allow assertr errors to be accumulated in a pipeline so that
+   all assertions can have a chance to be checked and so that all
+   the errors can be displayed at the end of the chain.
 
-* `error_logical` - returns FALSE
+  * `error_logical` - returns FALSE
 
-* `just_warn` - Prints a summary of the errors but does
-not halt execution, it just issues a warning.
+  * `just_warn` - Prints a summary of the errors but does
+   not halt execution, it just issues a warning.
 
-* `warn_report` - Prints all the information available
-about the errors but does not halt execution, it just issues a warning.
+  * `warn_report` - Prints all the information available
+  about the errors but does not halt execution, it just issues a warning.
 
 
 
@@ -553,7 +553,7 @@ After all relevant verifications, `chain_end` will receive the
 data (possibly with accumulated error messages attached) and, by default,
 print a report of all the errors that have been found since the start of
 the chain.
-
+ 
 Let's see it in action!
 
 ```{r purl = FALSE}
@@ -580,7 +580,7 @@ check_me <- . %>%
   verify(mpg > 0) %>%
   insist(within_n_sds(4), mpg) %>%
   assert(in_set(0,1), am, vs)
-  chain_end
+  chain_end 
 
 mtcars %>%
   check_me %>%
@@ -669,7 +669,7 @@ questionable_mtcars %>%
 ```
 
 (this particular `send.mail` formulation will only work for gmail
-  recipients; see the `mailR` documentation for more information)
+recipients; see the `mailR` documentation for more information)
 
 Now you'll get notified of <s>any</s> all failed assertions via email. Groovy!
 
@@ -683,8 +683,8 @@ generators.
 
 Okay... so its, perhaps, not _easy_ because predicate generators by nature
 are functions that return functions. But it's possible!
-  
-  Let's say you wanted to create a predicate generator that checks if all
+
+Let's say you wanted to create a predicate generator that checks if all
 elements of a vector are within 3 times the vector's interquartile range from
 the median. We need to create a function that looks like this
 
@@ -697,15 +697,15 @@ within_3_iqrs <- function(a_vector){
 ```
 
 Now, we can use it on `mpg` from `mtcars` like so:
-  
-  ```{r purl = FALSE}
-  mtcars %>%
-    insist(within_3_iqrs, mpg) %>%
-    group_by(cyl) %>%
-    summarise(avg.mpg=mean(mpg))
-  ```
-  
-  There are two problems with this, though...
+
+```{r purl = FALSE}
+mtcars %>%
+  insist(within_3_iqrs, mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+There are two problems with this, though...
 
 1. We may want to abstract this so that we can supply an arbitrary number
 of IQRs to create the bounds with
@@ -727,20 +727,20 @@ within_n_iqrs <- function(n, ...){
 
 Much better! Now, if we want to check that every `mpg` from `mtcars` is
 within 5 IQRs of the median and *not allow NA values* we can do so like this:
-  
-  ```{r purl = FALSE}
-  mtcars %>%
-    insist(within_n_iqrs(5), mpg) %>%
-    group_by(cyl) %>%
-    summarise(avg.mpg=mean(mpg))
-  ```
-  
-  Super!
-  
-  
-  ### advanced: programming with assertion functions
-  
-  These assertion functions use the [tidyeval](https://rpubs.com/hadley/dplyr-programming) framework.  In the past,
+
+```{r purl = FALSE}
+mtcars %>%
+  insist(within_n_iqrs(5), mpg) %>%
+  group_by(cyl) %>%
+  summarise(avg.mpg=mean(mpg))
+```
+
+Super!
+
+
+### advanced: programming with assertion functions
+
+These assertion functions use the [tidyeval](https://rpubs.com/hadley/dplyr-programming) framework.  In the past,
 programming in a tidyverse-like setting was accomplished through
 standard evaluation versions of verbs, which used functions postfixed
 with an underscore: `insist_` instead of `insist`, for example.  However,
