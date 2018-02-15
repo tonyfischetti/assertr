@@ -320,4 +320,14 @@ chain_end <- function(data, success_fun=success_continue,
   error_fun(list_of_errors, data=data)
 }
 
-
+#' Clear errors and results attributes
+#'
+#' It removes assertr_results and assertr_errors attributes.
+#'
+#' @param data A data frame
+#' @export
+clear_results <- function(data) {
+  attr(data, "assertr_results") <- NULL
+  attr(data, "assertr_errors") <- NULL
+  return(data)
+}
