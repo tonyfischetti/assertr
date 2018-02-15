@@ -55,9 +55,10 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
-                      error_fun=error_stop){
+                      error_fun=error_stop, title = NULL){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  validation_id <- generate_id()
   name.of.predicate <- lazyeval::expr_text(predicate)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -76,6 +77,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
     error_fun <- error_fun_override
   }
 
+  if(!is.null(title) && is.null(attr(data, "assertr_results")))
+    attr(data, "assertr_results") <- list()
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
@@ -87,9 +90,17 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
+  if (!is.null(title)) {
+    result <- all(log.mat)
+    attr(data, "assertr_results") <- append(
+      attr(data, "assertr_results"),
+      list(data.frame(title = title, result = result, validation_id = validation_id, stringsAsFactors = FALSE)))
+  }
+
   # if all checks pass *and* there are no leftover errors
   if(all(log.mat) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
+
 
   errors <- lapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
@@ -102,7 +113,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          validation_id)
     return(an_error)
   })
 
@@ -168,11 +180,12 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 #'
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
-                         error_fun=error_stop){
+                         error_fun=error_stop, title = NULL){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
   name.of.predicate <- lazyeval::expr_text(predicate)
+  validation_id <- generate_id()
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
   }
@@ -193,12 +206,22 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
     error_fun <- error_fun_override
   }
 
+  if(!is.null(title) && is.null(attr(data, "assertr_results")))
+    attr(data, "assertr_results") <- list()
+
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
 
   redux <- row_reduction_fn(sub.frame)
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
+
+  if (!is.null(title)) {
+    result <- all(log.vec)
+    attr(data, "assertr_results") <- append(
+      attr(data, "assertr_results"),
+      list(data.frame(title = title, result = result, validation_id = validation_id, stringsAsFactors = FALSE)))
+  }
 
   # if all checks pass *and* there are no leftover errors
   if(all(log.vec) && is.null(attr(data, "assertr_errors")))
@@ -215,7 +238,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
   error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
                                           name.of.predicate,
                                           num.violations,
-                                          loc.violations)
+                                          loc.violations,
+                                          validation_id)
   error_fun(list(error), data=data)
 
 }
@@ -276,10 +300,11 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 #' @export
 insist <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
-                    error_fun=error_stop){
+                    error_fun=error_stop, title = NULL){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
+  validation_id <- generate_id()
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
   }
@@ -297,6 +322,9 @@ insist <- function(data, predicate_generator, ...,
     error_fun <- error_fun_override
   }
 
+  if(!is.null(title) && is.null(attr(data, "assertr_results")))
+    attr(data, "assertr_results") <- list()
+
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),
                             function(column){predicate_generator(sub.frame[[column]])})
@@ -307,6 +335,13 @@ insist <- function(data, predicate_generator, ...,
                       predicate <- true.predicates[[column]]
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
+
+  if (!is.null(title)) {
+    result <- all(log.mat)
+    attr(data, "assertr_results") <- append(
+      attr(data, "assertr_results"),
+      list(data.frame(title = title, result = result, validation_id = validation_id, stringsAsFactors = FALSE)))
+  }
 
   # if all checks pass *and* there are no leftover errors
   if(all(log.mat) && is.null(attr(data, "assertr_errors")))
@@ -323,7 +358,8 @@ insist <- function(data, predicate_generator, ...,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          validation_id)
     return(an_error)
   })
 
@@ -394,11 +430,12 @@ insist <- function(data, predicate_generator, ...,
 #'
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          success_fun=success_continue,
-                         error_fun=error_stop){
+                         error_fun=error_stop, title = NULL){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
   name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
   name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
+  validation_id <- generate_id()
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
   }
@@ -419,11 +456,21 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
     error_fun <- error_fun_override
   }
 
+  if(!is.null(title) && is.null(attr(data, "assertr_results")))
+    attr(data, "assertr_results") <- list()
+
   redux <- row_reduction_fn(sub.frame)
 
   predicate <- predicate_generator(redux)
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
+
+  if (!is.null(title)) {
+    result <- all(log.vec)
+    attr(data, "assertr_results") <- append(
+      attr(data, "assertr_results"),
+      list(data.frame(title = title, result = result, validation_id = validation_id, stringsAsFactors = FALSE)))
+  }
 
   # if all checks pass *and* there are no leftover errors
   if(all(log.vec) && is.null(attr(data, "assertr_errors")))
@@ -503,12 +550,13 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #'
 #' @export
 verify <- function(data, expr, success_fun=success_continue,
-                   error_fun=error_stop){
+                   error_fun=error_stop, title = NULL){
   expr <- substitute(expr)
   # conform to terminology from subset
   envir <- data
   enclos <- parent.frame()
   logical.results <- eval(expr, envir, enclos)
+  validation_id <- generate_id()
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
   if(!is.null(success_fun_override)){
@@ -523,11 +571,21 @@ verify <- function(data, expr, success_fun=success_continue,
     error_fun <- error_fun_override
   }
 
+  if(!is.null(title) && is.null(attr(data, "assertr_results")))
+    attr(data, "assertr_results") <- list()
+
+  if (!is.null(title)) {
+    result <- all(logical.results)
+    attr(data, "assertr_results") <- append(
+      attr(data, "assertr_results"),
+      list(data.frame(title = title, result = result, validation_id = validation_id, stringsAsFactors = FALSE)))
+  }
+
   # if all checks pass *and* there are no leftover errors
   if(all(logical.results) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
   num.violations <- sum(!logical.results)
   if(num.violations==0) return(error_fun(list(), data=data))
-  error <- make.assertr.verify.error(num.violations, deparse(expr))
+  error <- make.assertr.verify.error(num.violations, deparse(expr), validation_id)
   error_fun(list(error), data=data)
 }
