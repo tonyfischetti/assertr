@@ -18,11 +18,14 @@ make.assertr.assert.error <- function(name.of.predicate,
   msg <- paste0("Column '", column, "' violates assertion '",
                 name.of.predicate,"' ", num.violations, " ", time.or.times)
 
-  this_error <- list(error_df = data.frame(index=index.of.violations,
-                                           value=offending.elements),
-                     message = msg,
-                     num.violations = num.violations,
-                     call = name.of.predicate)
+  this_error <- list()
+
+  this_error$error_df <- data.frame(index=unname(index.of.violations),
+                                    value=unname(offending.elements))
+  this_error$message <- msg
+  this_error$num.violations <- num.violations
+  this_error$call <- name.of.predicate
+
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")
