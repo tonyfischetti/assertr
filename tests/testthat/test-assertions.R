@@ -120,6 +120,9 @@ test_that("verify raises error if verification fails", {
                 "verification \\[a >= 2 | b > 4\\] failed! \\(1 failure\\)")
   expect_output(verify(alist, 2 > 4, error_fun = just.show.error),
                 "verification \\[2 > 4\\] failed! \\(1 failure\\)")
+  # NA values don't compare TRUE
+  expect_output(verify(test.df2, z > -2, , error_fun = just.show.error),
+                "verification \\[z > -2\\] failed! \\(1 failure\\)")
 })
 
 test_that("verify breaks appropriately", {
@@ -148,20 +151,6 @@ test_that("assert returns data if verification passes", {
   expect_equal(assert(mtcars, function(x) x%%1==0, cyl, vs, am, gear, carb), mtcars)
   expect_equal(assert(mtcars, function(x) if(x%%1!=0) return(FALSE), gear), mtcars)
   expect_equal(assert(iris, function(x) nchar(as.character(x)) > 5, Species),
-               iris)
-})
-
-test_that("assert returns data if verification passes (using se)", {
-  expect_equal(assert_(mtcars, in_set(0,1), "vs", "am"), mtcars)
-  expect_equal(assert_(mtcars, within_bounds(3,5), "gear"), mtcars)
-  expect_equal(assert_(mtcars, is.numeric, "mpg:carb"), mtcars)
-  expect_equal(assert_(mtcars, not_na, "vs"), mtcars)
-  expect_equal(assert_(mtcars, not_na, "mpg:carb"), mtcars)
-  # lambdas
-  expect_equal(assert_(mtcars, function(x) x%%1==0, "cyl", "vs", "am",
-                       "gear", "carb"), mtcars)
-  expect_equal(assert_(mtcars, function(x) if(x%%1!=0) return(FALSE), "gear"), mtcars)
-  expect_equal(assert_(iris, function(x) nchar(as.character(x)) > 5, "Species"),
                iris)
 })
 
@@ -198,29 +187,10 @@ test_that("assert raises error if verification fails", {
                "Column 'carb' violates assertion 'within_bounds\\(3.5, 4.5\\)' 22 times.+Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times")
 })
 
-test_that("assert raises error if verification fails (using se)", {
-  expect_equal(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun = error_logical), FALSE)
-  expect_output(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun = just.show.error),
-               "Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times.*")
-  expect_equal(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun = error_logical), FALSE)
-  expect_output(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun = just.show.error),
-                 "Column 'carb' violates assertion 'within_bounds\\(3, 5\\)' 19 times")
-  expect_equal(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear", error_fun = error_logical), FALSE)
-  expect_output(assert_(mtcars, within_bounds(3.5, 4.5), "carb", "gear", error_fun = just.show.error),
-               "Column 'carb' violates assertion 'within_bounds\\(3.5, 4.5\\)' 22 times.+Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times")
-})
-
 test_that("assert raises *custom error* if verification fails", {
   expect_error(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun=not.helpful),
                "unspecified error")
   expect_error(assert(mtcars, within_bounds(3,5), gear, carb, error_fun=not.helpful),
-               "unspecified error")
-})
-
-test_that("assert raises *custom error* if verification fails (using se)", {
-  expect_error(assert_(mtcars, within_bounds(3.5,4.5), "gear", error_fun=not.helpful),
-               "unspecified error")
-  expect_error(assert_(mtcars, within_bounds(3,5), "gear", "carb", error_fun=not.helpful),
                "unspecified error")
 })
 
@@ -230,19 +200,8 @@ test_that("assert breaks appropriately", {
   expect_error(assert(mtcars, in_set(0,1), vs, tree),
                "object 'tree' not found")
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"),
-               "All select\\(\\) inputs must resolve to integer column positions|\"tree\": must resolve to integer column positions, not string")
+               "Strings must match column names. Unknown columns: tree")
   expect_error(assert("tree"),
-               "no applicable method for 'select.?' applied to an object of class \"character\"")
-})
-
-test_that("assert breaks appropriately (using se)", {
-  expect_error(assert_(in_set(0,1), mtcars$vs),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(assert_(mtcars, in_set(0,1), vs),
-               "object 'vs' not found")
-  expect_error(assert_(mtcars, in_set(0,1), "vs", "tree"),
-               "object 'tree' not found")
-  expect_error(assert_("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
 })
 
@@ -264,15 +223,6 @@ test_that("assert_rows returns data if verification passes", {
   expect_equal(assert_rows(nexmpl.data, num_row_NAs, function(x) x < 2,
                            dplyr::everything()), nexmpl.data)
   expect_equal(assert_rows(mtcars, rowSums, function(x) if(x>16) return(FALSE), carb, cyl),
-               mtcars)
-})
-
-test_that("assert_rows returns data if verification passes (using se)", {
-  expect_equal(assert_rows_(mtcars, rowSums, within_bounds(0,2), "vs", "am"), mtcars)
-  expect_equal(assert_rows_(mtcars, rowSums, within_bounds(0,2), "vs:am"), mtcars)
-  expect_equal(assert_rows_(mtcars, rowSums, within_bounds(5,16), "cyl", "carb"),
-               mtcars)
-  expect_equal(assert_rows_(mtcars, rowSums, function(x) if(x>16) return(FALSE), "carb", "cyl"),
                mtcars)
 })
 
@@ -304,23 +254,8 @@ test_that("assert_rows raises error if verification fails", {
                 "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(0, 1\\)' 1 time")
 })
 
-test_that("assert_rows raises error if verification fails (using se)", {
-  expect_output(assert_rows_(mtcars, rowSums, within_bounds(1,2), "vs", "am", error_fun = just.show.error),
-               "Data frame row reduction 'rowSums' violates predicate 'within_bounds\\(1, 2\\)' 12 times")
-  # you can no longer use dplyr::everything with the dplyr 6 (pues, '0.5.0.9004') in underscore functions
-  # expect_output(assert_rows_(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun = just.show.error),
-  #               "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(1, 2\\)' 32 times")
-  expect_output(assert_rows_(mtcars, rowSums, function(x) if(x==10) return(FALSE), "carb", "cyl", error_fun = just.show.error),
-                "Data frame row reduction 'rowSums' violates predicate 'function\\(x\\) if \\(x == 10\\) return\\(FALSE\\)' 8 times")
-})
-
 test_that("assert_rows raises *custom error* if verification fails", {
   expect_error(assert_rows(mnexmpl.data, num_row_NAs, within_bounds(0,1), dplyr::everything(), error_fun=not.helpful),
-               "unspecified error")
-})
-
-test_that("assert_rows raises *custom error* if verification fails (using se)", {
-  expect_error(assert_rows_(mnexmpl.data, num_row_NAs, within_bounds(0,1), "x", "y", error_fun=not.helpful),
                "unspecified error")
 })
 
@@ -332,23 +267,11 @@ test_that("assert_rows breaks appropriately", {
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
                "object 'tree' not found")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"),
-               "All select\\(\\) inputs must resolve to integer column positions|\"tree\": must resolve to integer column positions, not string")
+               "Strings must match column names. Unknown columns: tree")
   expect_error(assert_rows("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
 })
 
-test_that("assert_rows breaks appropriately (using se)", {
-  expect_error(assert_rows_(in_set(0,1), "mtcars$vs"),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(assert_rows_(rowSums, in_set(0,1), "mtcars$vs"),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(assert_rows_(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
-               "object 'vs' not found")
-  expect_error(assert_rows_(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"),
-               "object 'vs' not found")
-  expect_error(assert_rows_("tree"),
-               "no applicable method for 'select.?' applied to an object of class \"character\"")
-})
 ######################################
 
 
@@ -357,13 +280,6 @@ test_that("insist returns data if verification passes", {
   expect_equal(insist(our.iris, within_n_sds(3), Sepal.Length), our.iris)
   expect_equal(insist(our.iris.3, within_n_sds(2), Sepal.Length), our.iris.3)
   expect_equal(insist(our.iris, within_n_sds(4), Sepal.Length:Petal.Width),
-               our.iris)
-})
-
-test_that("insist returns data if verification passes (using se)", {
-  expect_equal(insist_(our.iris, within_n_sds(3), "Sepal.Length"), our.iris)
-  expect_equal(insist_(our.iris.3, within_n_sds(2), "Sepal.Length"), our.iris.3)
-  expect_equal(insist_(our.iris, within_n_sds(4), "Sepal.Length:Petal.Width"),
                our.iris)
 })
 
@@ -389,17 +305,6 @@ test_that("insist raises error if verification fails", {
                 "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times.*Column 'Sepal.Width' violates assertion 'within_n_sds\\(2\\)' 5 times")
 })
 
-test_that("insist raises error if verification fails (using se)", {
-  expect_output(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun = just.show.error),
-                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times")
-  expect_output(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun = just.show.error),
-                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 5 times")
-  expect_output(insist_(our.iris, within_n_sds(3), "Sepal.Length:Petal.Width", error_fun = just.show.error),
-                "Column 'Sepal.Width' violates assertion 'within_n_sds\\(3\\)' 1 time")
-  expect_output(insist_(our.iris, within_n_sds(2), "Sepal.Length:Petal.Width", error_fun = just.show.error),
-                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times.*Column 'Sepal.Width' violates assertion 'within_n_sds\\(2\\)' 5 times")
-})
-
 test_that("insist raises *custom error* if verification fails", {
   expect_error(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun=not.helpful),
                "unspecified error")
@@ -407,18 +312,11 @@ test_that("insist raises *custom error* if verification fails", {
                "unspecified error")
 })
 
-test_that("insist raises *custom error* if verification fails (using se)", {
-  expect_error(insist_(our.iris, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
-               "unspecified error")
-  expect_error(insist_(our.iris.2, within_n_sds(2), "Sepal.Length", error_fun=not.helpful),
-               "unspecified error")
-})
-
 test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(insist(mtcars, within_n_sds(5), "vs"),
-               "All select\\(\\) inputs must resolve to integer column positions|\"vs\": must resolve to integer column positions, not string")
+  expect_error(insist(mtcars, within_n_sds(5), "vs:am"),
+               "Strings must match column names. Unknown columns: vs:am")
   expect_error(insist(mtcars, within_n_sds(5), tree),
                "object 'tree' not found")
   expect_error(insist("tree"),
@@ -427,16 +325,6 @@ test_that("insist breaks appropriately", {
                "argument must be a numeric vector")
 })
 
-test_that("insist breaks appropriately (using se)", {
-  expect_error(insist_(within_n_sds(5), "mtcars$vs"),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(insist_(mtcars, within_n_sds(5), tree),
-               "object 'tree' not found")
-  expect_error(insist_("tree"),
-               "no applicable method for 'select.?' applied to an object of class \"character\"")
-  expect_error(insist_(iris, within_n_sds(5), "Petal.Width:Species"),
-               "argument must be a numeric vector")
-})
 ######################################
 
 
@@ -445,13 +333,6 @@ test_that("insist_rows returns data if verification passes", {
   expect_equal(insist_rows(our.iris, maha_dist, within_n_sds(6), dplyr::everything()), our.iris)
   expect_equal(insist_rows(our.iris, maha_dist, within_n_mads(10), Sepal.Length:Species), our.iris)
   expect_equal(insist_rows(our.iris, maha_dist, within_n_mads(11), Sepal.Length:Petal.Width),
-               our.iris)
-})
-
-test_that("insist_rows returns data if verification passes (using se)", {
-  expect_equal(insist_rows_(our.iris, maha_dist, within_n_sds(6), "Sepal.Length:Species"), our.iris)
-  expect_equal(insist_rows_(our.iris, maha_dist, within_n_mads(10), "Sepal.Length:Species"), our.iris)
-  expect_equal(insist_rows_(our.iris, maha_dist, within_n_mads(11), "Sepal.Length:Petal.Width"),
                our.iris)
 })
 
@@ -466,27 +347,10 @@ test_that("insist_rows raises error if verification fails", {
                 "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 4 times")
 })
 
-test_that("insist_rows raises error if verification fails (using se)", {
-  expect_output(insist_rows_(our.iris, maha_dist, within_n_sds(4), "Sepal.Length:Species", error_fun = just.show.error),
-                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(4\\)' 1 time")
-  expect_output(insist_rows_(our.iris, maha_dist, within_n_sds(2), "Sepal.Length:Species", error_fun = just.show.error),
-                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(2\\)' 8 times")
-  expect_output(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Species", error_fun = just.show.error),
-                "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 1 time")
-  expect_output(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Petal.Width", error_fun = just.show.error),
-                "Data frame row reduction 'maha_dist' violates predicate 'within_n_mads\\(5\\)' 4 times")
-})
-
 test_that("insist_rows raises *custom error* if verification fails", {
   expect_error(insist_rows(our.iris, maha_dist, within_n_mads(5), Sepal.Length:Petal.Width, error_fun = not.helpful),
                "unspecified error")
 })
-
-test_that("insist_rows raises *custom error* if verification fails (using se)", {
-  expect_error(insist_rows_(our.iris, maha_dist, within_n_mads(5), "Sepal.Length:Petal.Width", error_fun = not.helpful),
-               "unspecified")
-})
-
 
 test_that("insist_rows breaks appropriately", {
   expect_error(insist_rows(within_n_sds(5), mtcars$vs),
@@ -508,25 +372,6 @@ test_that("insist_rows breaks appropriately", {
                "no applicable method for 'select.?' applied to an object of class \"lm\"")
 })
 
-test_that("insist_rows breaks appropriately (using se)", {
-  expect_error(insist_rows_(within_n_sds(5), "mtcars$vs"),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(insist_rows_(mtcars, within_n_sds(10), "vs"),
-               "argument must be a numeric vector")
-  expect_error(insist_rows_(mtcars, maha_dist, within_n_sds(10), "vs"),
-               "\"data\" needs to have at least two columns")
-  expect_error(insist_rows_(mtcars, maha_dist, within_bound(0, 10), "vs", "am"),
-               "could not find function \"within_bound\"")
-  expect_error(insist_rows_(), "argument \"data\" is missing, with no default")
-  expect_error(insist_rows_(mtcars), "argument \"row_reduction_fn\" is missing, with no default")
-  expect_error(insist_rows_(mtcars, maha_dist, "am", "vs"),
-               "\"data\" needs to have at least two columns")
-  expect_error(insist_rows_(mtcars, maha_dist, "am", "vs", "carb"),
-               "could not find function \"predicate_generator\"")
-
-  expect_error(insist_rows_(lm(Petal.Length ~ Petal.Width, data=iris)),
-               "no applicable method for 'select.?' applied to an object of class \"lm\"")
-})
 ###########################################
 
 
@@ -872,5 +717,3 @@ test_that("verify works with chaining", {
   }
   expect_output(code_to_test(), "There are 2 errors")
 })
-
-

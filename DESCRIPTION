@@ -2,9 +2,9 @@ Package: assertr
 Type: Package
 Title: Assertive Programming for R Analysis Pipelines
 Version: 2.0.2.1
-Authors@R: person("Tony", "Fischetti", email="tony.fischetti@gmail.com",
-  role = c("aut", "cre"))
-Maintainer: Tony Fischetti <tony.fischetti@gmail.com>
+Authors@R: person("Tony", "Fischetti",
+              email="tony.fischetti@gmail.com",
+              role = c("aut", "cre"))
 Description: Provides functionality to assert conditions
     that have to be met so that errors in data used in
     analysis pipelines can fail quickly. Similar to
@@ -15,14 +15,18 @@ BugReports: https://github.com/ropensci/assertr/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 Imports:
-    dplyr,
+    dplyr (>= 0.7.0),
     MASS,
     lazyeval,
     stats,
-    utils
+    utils,
+    rlang (>= 0.1.2)
 Suggests:
     knitr,
     testthat,
     magrittr
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
+X-schema.org-applicationCategory: Computing Infrastructure
+X-schema.org-keywords: ropensci, defensive, audit, assert, assertions, sanitization, workflow, checking
+X-schema.org-isPartOf: https://ropensci.org

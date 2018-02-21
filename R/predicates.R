@@ -93,10 +93,8 @@ within_bounds <- function(lower.bound, upper.bound,
   fun <- function(x){
     if(is.null(x))       stop("bounds must be checked on non-null element")
     if(!is.numeric(x))   stop("bounds must only be checked on numerics")
-    lower.operator <- `>=`
-    if(!include.lower) lower.operator <- `>`
-    upper.operator <- `<=`
-    if(!include.upper) upper.operator <- `<`
+    lower.operator <- if(!include.lower) `>` else `>=`
+    upper.operator <- if(!include.upper) `<` else `<=`
     if(allow.na){
       return((lower.operator(x, lower.bound) &
                 upper.operator(x, upper.bound)) | is.na(x))
@@ -163,7 +161,7 @@ in_set <- function(..., allow.na=TRUE){
 
     raw_result <- x %in% set
     if(allow.na){
-      these_are_NAs <- which(is.na(x))
+      these_are_NAs <- is.na(x)
       raw_result[these_are_NAs] <- TRUE
     }
     return(raw_result)
@@ -359,7 +357,7 @@ is_uniq <- function(x, allow.na=FALSE){
   repeats <- x[!raw_result]
   raw_result[x %in% repeats] <- FALSE
   if(!allow.na){
-    these_are_NAs <- which(is.na(x))
+    these_are_NAs <- is.na(x)
     raw_result[these_are_NAs] <- NA
   }
   return(raw_result)
