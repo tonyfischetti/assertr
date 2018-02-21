@@ -509,6 +509,8 @@ verify <- function(data, expr, success_fun=success_continue,
   envir <- data
   enclos <- parent.frame()
   logical.results <- eval(expr, envir, enclos)
+  # NAs are very likely errors, and cause problems in the all() below.
+  logical.results <- ifelse(is.na(logical.results), FALSE, logical.results)
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
   if(!is.null(success_fun_override)){

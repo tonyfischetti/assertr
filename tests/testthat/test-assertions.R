@@ -120,6 +120,9 @@ test_that("verify raises error if verification fails", {
                 "verification \\[a >= 2 | b > 4\\] failed! \\(1 failure\\)")
   expect_output(verify(alist, 2 > 4, error_fun = just.show.error),
                 "verification \\[2 > 4\\] failed! \\(1 failure\\)")
+  # NA values don't compare TRUE
+  expect_output(verify(test.df2, z > -2, , error_fun = just.show.error),
+                "verification \\[z > -2\\] failed! \\(1 failure\\)")
 })
 
 test_that("verify breaks appropriately", {
@@ -714,5 +717,3 @@ test_that("verify works with chaining", {
   }
   expect_output(code_to_test(), "There are 2 errors")
 })
-
-
