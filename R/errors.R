@@ -311,12 +311,12 @@ chain_start <- function(data){
 #' @export
 #' @rdname chaining_functions
 chain_end <- function(data, success_fun=success_continue,
-                      error_fun=error_report){
+                      error_fun=error_report, ...){
   list_of_errors <- attr(data, "assertr_errors")
   attr(data, "assertr_errors") <- NULL
   if(is.null(list_of_errors))
-    return(success_fun(data))
-  error_fun(list_of_errors, data=data)
+    return(success_fun(data, ...))
+  error_fun(list_of_errors, data=data, ...)
 }
 
 
