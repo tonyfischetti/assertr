@@ -13,6 +13,7 @@ Description: Provides functionality to assert conditions
 URL: https://github.com/ropensci/assertr
 BugReports: https://github.com/ropensci/assertr/issues
 License: MIT + file LICENSE
+ByteCompile: TRUE
 LazyData: TRUE
 Imports:
     dplyr (>= 0.7.0),
@@ -27,6 +28,3 @@ Suggests:
     magrittr
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
-X-schema.org-applicationCategory: Computing Infrastructure
-X-schema.org-keywords: ropensci, defensive, audit, assert, assertions, sanitization, workflow, checking
-X-schema.org-isPartOf: https://ropensci.org
