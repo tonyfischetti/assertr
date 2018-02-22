@@ -9,7 +9,8 @@
 #   assert error object and methods   #
 #######################################
 # used by "assert" and "insist"
-make.assertr.assert.error <- function(name.of.predicate,
+make.assertr.assert.error <- function(verb,
+                                      name.of.predicate,
                                       column,
                                       num.violations,
                                       index.of.violations,
@@ -20,7 +21,11 @@ make.assertr.assert.error <- function(name.of.predicate,
 
   this_error <- list()
 
-  this_error$error_df <- data.frame(index=unname(index.of.violations),
+  this_error$error_df <- data.frame(verb=verb,
+                                    redux_fn=NA,
+                                    predicate=name.of.predicate,
+                                    column=column,
+                                    index=unname(index.of.violations),
                                     value=unname(offending.elements))
   this_error$message <- msg
   this_error$num.violations <- num.violations
@@ -33,15 +38,25 @@ make.assertr.assert.error <- function(name.of.predicate,
 }
 
 # used by "assert_rows" and "insist_rows"
-make.assertr.assert_rows.error <- function(name.of.rowredux.fn,
+make.assertr.assert_rows.error <- function(verb,
+                                           name.of.rowredux.fn,
                                            name.of.predicate,
+                                           column,
                                            num.violations,
-                                           loc.violations){
+                                           loc.violations,
+                                           offending.elements){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
                 "' violates predicate '", name.of.predicate,
                 "' ", num.violations, " ", time.or.times)
-  this_error <- list(error_df = data.frame(rownumber=loc.violations),
+  error_df <- data.frame(verb=verb,
+                         redux_fn=name.of.rowredux.fn,
+                         predicate=name.of.predicate,
+                         column=column,
+                         index=loc.violations,
+                         value=offending.elements)
+  rownames(error_df) <- NULL
+  this_error <- list(error_df = error_df,
                      message = msg,
                      num.violations = num.violations,
                      call = name.of.predicate)
@@ -97,10 +112,19 @@ summary.assertr_assert_error <- function(object, ...){
 #####################
 # used by "verify"
 
-make.assertr.verify.error <- function(num.violations, the_call){
+make.assertr.verify.error <- function(verb, num.violations, the_call, logical.results){
   sing.plur <- if (num.violations==1) " failure)" else " failures)"
   msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
-  this_error <- list(message = msg,
+
+  error_df <- data.frame(verb=verb,
+                         redux_fn=NA,
+                         predicate=the_call,
+                         column=NA,
+                         index=logical.results,
+                         value=NA)
+
+  this_error <- list(error_df = error_df,
+                     message = msg,
                      num.violations = num.violations,
                      call = the_call)
   class(this_error) <- c("assertr_verify_error", "assertr_error",
@@ -120,6 +144,7 @@ make.assertr.verify.error <- function(num.violations, the_call){
 print.assertr_verify_error <- function(x, ...){
   cat(x$message)
   cat("\n\n")
+  print(x$error_df)
 }
 
 #' Summarizing assertr's verify errors
@@ -160,12 +185,21 @@ summary.assertr_verify_error <- function(object, ...){ print(object) }
 #'   \item \code{error_stop} - Prints a summary of the errors and
 #'                             halts execution.
 #'   \item \code{error_report} - Prints all the information available
-#'                               about the errors and halts execution.
+#'                               about the errors in a "tidy"
+#'                               \code{data.frame} (including information
+#'                               such as the name of the predicate used,
+#'                               the offending value, etc...) and halts
+#'                               execution.
 #'   \item \code{error_append} - Attaches the errors to a special
 #'    attribute of \code{data} and returns the data. This is chiefly
 #'    to allow assertr errors to be accumulated in a pipeline so that
 #'    all assertions can have a chance to be checked and so that all
 #'    the errors can be displayed at the end of the chain.
+#'   \item \code{error_return} - Returns the raw object containing all
+#'     the errors
+#'   \item \code{error_df_return} - Returns a "tidy" \code{data.frame}
+#'     containing all the errors, including informations such as
+#'     the name of the predicate used, the offending value, etc...
 #'   \item \code{error_logical} - returns FALSE
 #'   \item \code{just_warn} - Prints a summary of the errors but does
 #'    not halt execution, it just issues a warning.
@@ -202,7 +236,7 @@ success_continue <- function(data, ...){ return(data) }
 error_stop <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
-  lapply(errors, summary)
+  lapply(errors, function(x){ summary(x); cat("\n")})
   if(!warn)
     stop("assertr stopped execution", call.=FALSE)
   warning("assertr encountered errors", call.=FALSE)
@@ -222,12 +256,20 @@ just_warn <- function(errors, data=NULL){
 error_report <- function(errors, data=NULL, warn=FALSE, ...){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
+
+  total.num.failures <- sum(unlist(lapply(errors, function(x) x$num.violations)))
+  big.error.frame <- do.call(rbind, lapply(errors, function(x) x$error_df))
   num.of.errors <- length(errors)
-  cat(sprintf("There %s %d error%s:\n",
-              if (num.of.errors==1) "is" else "are",
+  cat(sprintf("There %s %d error%s across %d verb%s:\n",
+              if (total.num.failures==1) "is" else "are",
+              total.num.failures,
+              if (total.num.failures==1) "" else "s",
               num.of.errors,
               if (num.of.errors==1) "" else "s"))
-  lapply(errors, function(x){cat("\n- "); print(x)})
+  cat("- \n")
+  print(big.error.frame)
+  cat("\n")
+
   if(!warn)
     stop("assertr stopped execution", call.=FALSE)
   warning("assertr encountered errors", call.=FALSE)
@@ -255,6 +297,15 @@ error_return <- function(errors, data=NULL){
   if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
     errors <- append(attr(data, "assertr_errors"), errors)
   return(errors)
+}
+
+#' @export
+#' @rdname success_and_error_functions
+error_df_return <- function(errors, data=NULL){
+  if(!is.null(data) && !is.null(attr(data, "assertr_errors")))
+    errors <- append(attr(data, "assertr_errors"), errors)
+  big.error.frame <- do.call(rbind, lapply(errors, function(x) x$error_df))
+  return(big.error.frame)
 }
 
 #' @export

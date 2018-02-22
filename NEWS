@@ -1,3 +1,18 @@
+# assertr 2.4
+
+* errors from all assertr verbs now contain a data.frame holding the
+  verb used, row reduction function (if any), the predicate, the column
+  (or select formula), index, and offending value for each error
+
+* the `error_report` (and new `error_df_return`) will bind the rows of
+  all error data.frames in a list of errors. This is useful for assertr
+  chains that contain multiple different verbs and allows all the errors
+  to be viewed at a glance and, if so desired, computed upon
+
+* switched to using the tidyeval framework and deprecated underscore functions
+
+* bug fixes and performance enhancements
+
 # assertr 2.0.0
 
 * redesigned error and error handling mechanism

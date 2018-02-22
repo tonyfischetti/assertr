@@ -98,7 +98,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
       return(NULL)
     index.of.violations <- which(!col)
     offending.elements <- sub.frame[[col.name]][index.of.violations]
-    an_error <- make.assertr.assert.error(name.of.predicate,
+    an_error <- make.assertr.assert.error("assert",
+                                          name.of.predicate,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
@@ -211,11 +212,15 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
     # NOT calling either function would break the pipeline.
     return(error_fun(list(), data=data))
   loc.violations <- which(!log.vec)
+  offending.elements <- redux[!log.vec]
 
-  error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
+  error <- make.assertr.assert_rows.error("assert_rows",
+                                          name.of.row.redux.fn,
                                           name.of.predicate,
+                                          as.character(keeper.vars),
                                           num.violations,
-                                          loc.violations)
+                                          loc.violations,
+                                          offending.elements)
   error_fun(list(error), data=data)
 
 }
@@ -319,7 +324,8 @@ insist <- function(data, predicate_generator, ...,
       return(NULL)
     index.of.violations <- which(!col)
     offending.elements <- sub.frame[[col.name]][index.of.violations]
-    an_error <- make.assertr.assert.error(name.of.predicate.generator,
+    an_error <- make.assertr.assert.error("insist",
+                                          name.of.predicate.generator,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
@@ -436,11 +442,15 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
     # NOT calling either function would break the pipeline.
     return(error_fun(list(), data=data))
   loc.violations <- which(!log.vec)
+  offending.elements <- redux[!log.vec]
 
-  error <- make.assertr.assert_rows.error(name.of.row.redux.fn,
+  error <- make.assertr.assert_rows.error("insist_rows",
+                                          name.of.row.redux.fn,
                                           name.of.predicate.generator,
+                                          as.character(keeper.vars),
                                           num.violations,
-                                          loc.violations)
+                                          loc.violations,
+                                          offending.elements)
   error_fun(list(error), data=data)
 }
 
@@ -530,6 +540,9 @@ verify <- function(data, expr, success_fun=success_continue,
     return(success_fun(data))
   num.violations <- sum(!logical.results)
   if(num.violations==0) return(error_fun(list(), data=data))
-  error <- make.assertr.verify.error(num.violations, deparse(expr))
+  error <- make.assertr.verify.error("verify",
+                                     num.violations, deparse(expr),
+                                     (1:length(logical.results))[!logical.results])
   error_fun(list(error), data=data)
 }
+

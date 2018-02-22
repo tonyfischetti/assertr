@@ -122,7 +122,10 @@ our.data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">verify</span>(mpg <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cyl) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre></div>
-<pre><code>## verification [mpg &gt;= 0] failed! (1 failure)</code></pre>
+<pre><code>## verification [mpg &gt;= 0] failed! (1 failure)
+## 
+##     verb redux_fn predicate column index value
+## 1 verify       NA  mpg &gt;= 0     NA     5    NA</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
 <p>If we had done this, we would have caught this data error.</p>
 <p>The <code>verify</code> function takes a data frame (its first argument is provided by the <code>%&gt;%</code> operator), and a logical (boolean) expression. Then, <code>verify</code> evaluates that expression using the scope of the provided data frame. If any of the logical values of the expression’s result are <code>FALSE</code>, <code>verify</code> will raise an error that terminates any further processing of the pipeline.</p>
@@ -132,8 +135,8 @@ our.data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cyl) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre></div>
 <pre><code>## Column 'mpg' violates assertion 'within_bounds(0, Inf)' 1 time
-##   index value
-## 1     5 -18.7</code></pre>
+##     verb redux_fn             predicate column index value
+## 1 assert       NA within_bounds(0, Inf)    mpg     5 -18.7</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
 <p>The <code>assert</code> function takes a data frame, a predicate function, and an arbitrary number of columns to apply the predicate function to. The predicate function (a function that returns a logical/boolean value) is then applied to every element of the columns selected, and will raise an error when if it finds violations.</p>
 <p>Internally, the <code>assert</code> function uses <code>dplyr</code>’s <code>select</code> function to extract the columns to test the predicate function on. This allows for complex assertions. Let’s say we wanted to make sure that all values in the dataset are <em>greater</em> than zero (except <code>mpg</code>):</p>
@@ -144,6 +147,12 @@ our.data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cyl) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre></div>
 <pre><code>## Column 'vs' violates assertion 'within_bounds(0, Inf, include.lower = FALSE)' 18 times
+##     verb redux_fn                                    predicate column
+## 1 assert       NA within_bounds(0, Inf, include.lower = FALSE)     vs
+## 2 assert       NA within_bounds(0, Inf, include.lower = FALSE)     vs
+## 3 assert       NA within_bounds(0, Inf, include.lower = FALSE)     vs
+## 4 assert       NA within_bounds(0, Inf, include.lower = FALSE)     vs
+## 5 assert       NA within_bounds(0, Inf, include.lower = FALSE)     vs
 ##   index value
 ## 1     1     0
 ## 2     2     0
@@ -152,7 +161,14 @@ our.data <span class="op">%&gt;%</span>
 ## 5    12     0
 ##   [omitted 13 rows]
 ## 
+## 
 ## Column 'am' violates assertion 'within_bounds(0, Inf, include.lower = FALSE)' 19 times
+##     verb redux_fn                                    predicate column
+## 1 assert       NA within_bounds(0, Inf, include.lower = FALSE)     am
+## 2 assert       NA within_bounds(0, Inf, include.lower = FALSE)     am
+## 3 assert       NA within_bounds(0, Inf, include.lower = FALSE)     am
+## 4 assert       NA within_bounds(0, Inf, include.lower = FALSE)     am
+## 5 assert       NA within_bounds(0, Inf, include.lower = FALSE)     am
 ##   index value
 ## 1     4     0
 ## 2     5     0
@@ -234,9 +250,9 @@ dat <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">group_by</span>(cyl) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg.mpg=</span><span class="kw">mean</span>(mpg))</code></pre></div>
 <pre><code>## Column 'mpg' violates assertion 'within_n_sds(2)' 2 times
-##   index value
-## 1    18  32.4
-## 2    20  33.9</code></pre>
+##     verb redux_fn       predicate column index value
+## 1 insist       NA within_n_sds(2)    mpg    18  32.4
+## 2 insist       NA within_n_sds(2)    mpg    20  33.9</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
 <p>Execution of the pipeline was halted. But now we know exactly which data point violated the predicate that <code>within_n_sds(2)(mtcars$mpg)</code> returned.</p>
 <p>Now that’s an efficient car!</p>
@@ -311,8 +327,10 @@ dat <span class="op">%&gt;%</span>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example.data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">insist_rows</span>(maha_dist, <span class="kw">within_n_mads</span>(<span class="dv">3</span>), dplyr<span class="op">::</span><span class="kw">everything</span>())</code></pre></div>
 <pre><code>## Data frame row reduction 'maha_dist' violates predicate 'within_n_mads(3)' 1 time
-##   rownumber
-## 1         5</code></pre>
+##          verb  redux_fn        predicate               column index
+## 1 insist_rows maha_dist within_n_mads(3) ~dplyr::everything()     5
+##      value
+## 1 12.81899</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
 <p>Check that out! To be clear, this function is running the supplied data frame through the <code>maha_dist</code> function which returns a value for each row corresponding to its mahalanobis distance. (The whole data frame is used because we used the <code>everything()</code> selection function from the <code>dplyr</code> package.) Then, <code>within_n_mads(3)</code> computes on that vector and returns a bounds checking predicate. The bounds checking predicate checks to see that all mahalanobis distances are within 3 median absolute deviations of each other. They are not, and the pipeline errors out.</p>
 <p>This is probably the most powerful construct in <code>assertr</code>–it can find a whole lot of nasty errors that would be very difficult to check for by hand.</p>
@@ -341,8 +359,10 @@ mistake <span class="op">%&gt;%</span><span class="st"> </span>maha_dist <span c
 <p>Look at that! This mistake can easily be picked up by any reasonable bounds checker…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mistake <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">insist_rows</span>(maha_dist, <span class="kw">within_n_mads</span>(<span class="dv">7</span>), dplyr<span class="op">::</span><span class="kw">everything</span>())</code></pre></div>
 <pre><code>## Data frame row reduction 'maha_dist' violates predicate 'within_n_mads(7)' 1 time
-##   rownumber
-## 1       149</code></pre>
+##          verb  redux_fn        predicate               column index
+## 1 insist_rows maha_dist within_n_mads(7) ~dplyr::everything()   149
+##     value
+## 1 56.6992</code></pre>
 <pre><code>## Error: assertr stopped execution</code></pre>
 <p><code>insist</code> and <code>insist_rows</code> are both similar in that they both take predicate generators and not actual predicates. What makes <code>insist_rows</code> different is its usage of a row-reduce data frame.</p>
 <p><code>assert</code> has a row-oriented counterpart, too; it’s called <code>assert_rows</code>. <code>insist</code> is to <code>assert</code> as <code>insist_rows</code> is to <code>assert_rows</code>.</p>

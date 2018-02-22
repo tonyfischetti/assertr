@@ -10,6 +10,7 @@
 \alias{warn_report}
 \alias{error_append}
 \alias{error_return}
+\alias{error_df_return}
 \alias{error_logical}
 \title{Success and error functions}
 \usage{
@@ -28,6 +29,8 @@ warn_report(errors, data = NULL)
 error_append(errors, data = NULL)
 
 error_return(errors, data = NULL)
+
+error_df_return(errors, data = NULL)
 
 error_logical(errors, data = NULL, ...)
 }
@@ -62,12 +65,21 @@ provided by this package:
   \item \code{error_stop} - Prints a summary of the errors and
                             halts execution.
   \item \code{error_report} - Prints all the information available
-                              about the errors and halts execution.
+                              about the errors in a "tidy"
+                              \code{data.frame} (including information
+                              such as the name of the predicate used,
+                              the offending value, etc...) and halts
+                              execution.
   \item \code{error_append} - Attaches the errors to a special
    attribute of \code{data} and returns the data. This is chiefly
    to allow assertr errors to be accumulated in a pipeline so that
    all assertions can have a chance to be checked and so that all
    the errors can be displayed at the end of the chain.
+  \item \code{error_return} - Returns the raw object containing all
+    the errors
+  \item \code{error_df_return} - Returns a "tidy" \code{data.frame}
+    containing all the errors, including informations such as
+    the name of the predicate used, the offending value, etc...
   \item \code{error_logical} - returns FALSE
   \item \code{just_warn} - Prints a summary of the errors but does
    not halt execution, it just issues a warning.
