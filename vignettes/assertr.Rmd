@@ -141,7 +141,7 @@ dat %>%
 ```
 
 This is a powerful advantage over `assert`... but `assert` has one more
-advantage of its own that we heretofore ignored.
+advantage of its own that we've heretofore ignored.
 
 ### assertr's predicates
 
@@ -352,7 +352,7 @@ There's no way of catching this anomaly by looking at each individual
 column separately; the only way to catch it is to view each row as a complete
 observation and compare it to the rest.
 
-To this end, `assertr` provides two functions that take a data frame, and
+To this end, `assertr` provides three functions that take a data frame, and
 reduce each row into a single value. We'll call them *row reduction functions*.
 
 The first one we'll look at is called `maha_dist`. It computes the average
@@ -395,7 +395,10 @@ we used the `everything()` selection function from the `dplyr` package.)
 Then, `within_n_mads(3)` computes on that vector and returns a bounds
 checking predicate. The bounds checking predicate checks to see that all
 mahalanobis distances are within 3 median absolute deviations
-of each other. They are not, and the pipeline errors out.
+of each other. They are not, and the pipeline errors out. Note that the
+`data.frame` of errors that is returned by error report contains the
+verb used (`insist_rows`), the row reduction function, the predicate,
+the column (or columns), the index of the failure and the offendind datum.
 
 This is probably the most powerful construct in `assertr`--it can find a whole
 lot of nasty errors that would be very difficult to check for by hand.
