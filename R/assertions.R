@@ -586,6 +586,6 @@ verify <- function(data, expr, success_fun=success_continue,
     return(success_fun(data))
   num.violations <- sum(!logical.results)
   if(num.violations==0) return(error_fun(list(), data=data))
-  error <- make.assertr.verify.error(num.violations, deparse(expr), validation_id)
+  error <- make.assertr.verify.error(num.violations, paste(deparse(expr), collapse = " "), validation_id)
   error_fun(list(error), data=data)
 }
