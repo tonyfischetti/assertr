@@ -72,6 +72,31 @@ This could be written (in order) using `assertr` like this:
 If any of these assertions were violated, an error would have been raised
 and the pipeline would have been terminated early.
 
+Let's see what the error message look like when you chain
+a bunch of failing assertions together.
+
+```{r}
+    > mtcars %>%
+    +   chain_start %>%
+    +   assert(in_set(1, 2, 3, 4), carb) %>%
+    +   assert_rows(rowMeans, within_bounds(0,5), gear:carb) %>%
+    +   verify(nrow(.)==10) %>%
+    +   verify(mpg < 32) %>%
+    +   chain_end
+    There are 7 errors across 4 verbs:
+    -
+             verb redux_fn           predicate     column index value
+    1      assert     <NA>  in_set(1, 2, 3, 4)       carb    30   6.0
+    2      assert     <NA>  in_set(1, 2, 3, 4)       carb    31   8.0
+    3 assert_rows rowMeans within_bounds(0, 5) ~gear:carb    30   5.5
+    4 assert_rows rowMeans within_bounds(0, 5) ~gear:carb    31   6.5
+    5      verify     <NA>       nrow(.) == 10       <NA>     1    NA
+    6      verify     <NA>            mpg < 32       <NA>    18    NA
+    7      verify     <NA>            mpg < 32       <NA>    20    NA
+
+    Error: assertr stopped execution
+```
+
 ### What does `assertr` give me?
 
 - `verify` - takes a data frame (its first argument is provided by

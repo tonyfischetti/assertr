@@ -6,7 +6,7 @@
 #' See the assertr vignette or the documentation for more information \cr
 #' > \code{vignette("assertr")}
 #'
-#' You may also want to read the documentation for the function that
+#' You may also want to read the documentation for the functions that
 #' \code{assertr} provides:
 #' \itemize{
 #'   \item \code{\link{assert}}
@@ -16,11 +16,16 @@
 #'   \item \code{\link{insist_rows}}
 #'   \item \code{\link{not_na}}
 #'   \item \code{\link{in_set}}
+#'   \item \code{\link{has_all_names}}
+#'   \item \code{\link{is_uniq}}
 #'   \item \code{\link{num_row_NAs}}
 #'   \item \code{\link{maha_dist}}
+#'   \item \code{\link{col_concat}}
 #'   \item \code{\link{within_bounds}}
 #'   \item \code{\link{within_n_sds}}
 #'   \item \code{\link{within_n_mads}}
+#'   \item \code{\link{success_and_error_functions}}
+#'   \item \code{\link{chaining_functions}}
 #'   }
 #'
 #'
@@ -29,15 +34,15 @@
 #' library(dplyr)
 #'
 #' # this confirms that
-#'   # - that the dataset contains more than 10 observations
-#'   # - that the column for 'miles per gallon' (mpg) is a positive number
-#'   # - that the column for 'miles per gallon' (mpg) does not contain a datum
-#'   #   that is outside 4 standard deviations from its mean, and
-#'   # - that the am and vs columns (automatic/manual and v/straight engine,
-#'   #    respectively) contain 0s and 1s only
-#'   # - each row contains at most 2 NAs
-#'   # - each row's mahalanobis distance is within 10 median absolute deviations of
-#'   #   all the distance (for outlier detection)
+#' #   - that the dataset contains more than 10 observations
+#' #   - that the column for 'miles per gallon' (mpg) is a positive number
+#' #   - that the column for 'miles per gallon' (mpg) does not contain a datum
+#' #     that is outside 4 standard deviations from its mean, and
+#' #   - that the am and vs columns (automatic/manual and v/straight engine,
+#' #     respectively) contain 0s and 1s only
+#' #   - each row contains at most 2 NAs
+#' #   - each row's mahalanobis distance is within 10 median absolute deviations of
+#' #     all the distance (for outlier detection)
 #'
 #' mtcars %>%
 #'   verify(nrow(.) > 10) %>%
