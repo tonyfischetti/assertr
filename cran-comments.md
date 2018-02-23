@@ -6,6 +6,4 @@
 ## R CMD check results
 
 When checked locally with --as-cran and --no-manual
-there were no ERRORs, WARNINGS, and one NOTE
-about "License components with restrictions..." which
-I tried to fix--and read the manual about--but could not.
+there were no ERRORs, WARNINGs, or NOTEs
