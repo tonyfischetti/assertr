@@ -515,6 +515,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 verify <- function(data, expr, success_fun=success_continue,
                    error_fun=error_stop){
   expr <- substitute(expr)
+  # expr <- rlang::enexpr(expr)
   # conform to terminology from subset
   envir <- data
   enclos <- parent.frame()
@@ -523,14 +524,13 @@ verify <- function(data, expr, success_fun=success_continue,
   # NAs are very likely errors, and cause problems in the all() below.
   logical.results <- ifelse(is.na(logical.results), FALSE, logical.results)
 
-  # TODO: Are these checks helpful? Is this how they should be reported?
   if (!is.logical(logical.results)) {
-    warning(sprintf("The result of evaluating '", deparse(expr),
-      "' is not a logical vector"))
+    warning("The result of evaluating '", deparse(expr),
+      "' is not a logical vector")
   }
   if (length(logical.results) == 0) {
-    warning(sprintf("The result of evaluating '", deparse(expr),
-      "' has length zero"))
+    warning("The result of evaluating '", deparse(expr),
+      "' has length zero")
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
