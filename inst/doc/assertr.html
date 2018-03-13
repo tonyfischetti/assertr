@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tony Fischetti" />
 
-<meta name="date" content="2018-02-23" />
+<meta name="date" content="2018-03-13" />
 
 <title>Assertive R Programming with assertr</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Assertive R Programming with assertr</h1>
 <h4 class="author"><em>Tony Fischetti</em></h4>
-<h4 class="date"><em>2018-02-23</em></h4>
+<h4 class="date"><em>2018-03-13</em></h4>
 
 
 
@@ -108,9 +108,9 @@ our.data <span class="op">%&gt;%</span>
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    12.4</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    12.4</code></pre>
 <p>This indicates that the average miles per gallon for a 8 cylinder car is a lowly 12.43. However, in the correct dataset it’s really just over 15. Data errors like that are extremely easy to miss because it doesn’t cause an error, and the results look reasonable.</p>
 </div>
 <div id="enter-assertr" class="section level3">
@@ -241,9 +241,9 @@ dat <span class="op">%&gt;%</span>
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    15.1</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    15.1</code></pre>
 <p>Notice what happens when we drop that z-score to 2 standard deviations from the mean</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mtcars <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">insist</span>(<span class="kw">within_n_sds</span>(<span class="dv">2</span>), mpg) <span class="op">%&gt;%</span>
@@ -264,9 +264,9 @@ dat <span class="op">%&gt;%</span>
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    15.1</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    15.1</code></pre>
 <p>Aces!</p>
 <p>I chose to use <code>within_n_sds</code> in this example because people are familiar z-scores. However, for most practical purposes, the related predicate generator <code>within_n_mads</code> is more useful.</p>
 <p>The problem with <code>within_n_sds</code> is the mean and standard deviation are so heavily influenced by outliers, their very presence will compromise attempts to identify them using these statistics. In contrast with <code>within_n_sds</code>, <code>within_n_mads</code> uses the robust statistics, median and median absolute deviation, to identify potentially erroneous data points.</p>
@@ -413,9 +413,9 @@ mistake <span class="op">%&gt;%</span><span class="st"> </span>maha_dist <span c
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    15.1</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    15.1</code></pre>
 <p>In an assertr chain with default options, <code>assert</code>, <code>assert_rows</code>, <code>insist</code>, <code>insist_rows</code>, and <code>verify</code> will stop at the first assertion that yields an error and not go on to process the assertions further down in the chain. For some needs, this is sensible behavior. There are times, however, when we might like to get a report of all assertion violations. For example, one might want to write an R program to download some dataset from the internet and get a detailed report of all deviations from expectation.</p>
 <p>The best thing to do for this use case, is to use the <code>chain_start</code>, and <code>chain_end</code> functions at the beginning and end of a chain of assertr assertions. When <code>chain_start</code> gets called with data, the data gets a special tag that tells the assertr assertions that follow to override their <code>success_fun</code> and <code>error_fun</code> values and replace them with <code>success_continue</code> (which passes the data along if the test passes) and <code>error_append</code> (which we’ve just discussed). After all relevant verifications, <code>chain_end</code> will receive the data (possibly with accumulated error messages attached) and, by default, print a report of all the errors that have been found since the start of the chain.</p>
 <p>Let’s see it in action!</p>
@@ -431,9 +431,9 @@ mistake <span class="op">%&gt;%</span><span class="st"> </span>maha_dist <span c
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    15.1</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    15.1</code></pre>
 <p>Now <em>all</em> assertions will be checked and reported.</p>
 <p>Tip: we can make this whole thing look a lot better by abstracting out all the assertions:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">check_me &lt;-<span class="st"> </span>. <span class="op">%&gt;%</span>
@@ -518,9 +518,9 @@ questionable_mtcars <span class="op">%&gt;%</span>
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    15.1</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    15.1</code></pre>
 <p>There are two problems with this, though…</p>
 <ol style="list-style-type: decimal">
 <li>We may want to abstract this so that we can supply an arbitrary number of IQRs to create the bounds with</li>
@@ -542,9 +542,9 @@ questionable_mtcars <span class="op">%&gt;%</span>
 <pre><code>## # A tibble: 3 x 2
 ##     cyl avg.mpg
 ##   &lt;dbl&gt;   &lt;dbl&gt;
-## 1  4.00    26.7
-## 2  6.00    19.7
-## 3  8.00    15.1</code></pre>
+## 1    4.    26.7
+## 2    6.    19.7
+## 3    8.    15.1</code></pre>
 <p>Super!</p>
 </div>
 <div id="advanced-programming-with-assertion-functions" class="section level3">
