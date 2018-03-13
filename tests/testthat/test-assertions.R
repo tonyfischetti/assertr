@@ -714,3 +714,138 @@ test_that("verify works with chaining", {
   }
   expect_output(code_to_test(), "There are 2 errors")
 })
+###################################
+
+
+##### !!! rlang .data and unquoting
+test_that("all assertions work with .data pronoun without chains", {
+  # Define some data we might accidentally reference outside the test.df frame
+  y <- 0:2
+
+  ## verify() ##
+  # Cases where the name exists:
+  # Also test the logical versions here to make sure nothing too weird is happening.
+  expect_equal(verify(test.df, .data$x <= 2), test.df)  # expect success
+  expect_true(verify(test.df, .data$x <= 2, success_fun = success_logical))
+  expect_output(verify(test.df, .data$x > 2, error_fun = just.show.error),
+                "verification [.data$x > 2] failed! (3 failures)", fixed = TRUE)
+  expect_false(verify(test.df, .data$x > 2, error_fun = error_logical))
+
+  # Cases where the name doesn't exist:
+  expect_error(verify(test.df, .data$y <= 2, error_fun = just.show.error),
+    "Column `y` not found in `.data`", fixed = TRUE)
+  # expect success from y defined above
+  expect_equal(verify(test.df, y <= 2), test.df)
+
+  ## assert() ##
+  expect_equal(assert(test.df, within_bounds(-Inf, 2), .data$x), test.df)
+  expect_output(assert(test.df, within_bounds(2, Inf), .data$x,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_bounds(2, Inf)' 2 times", fixed = TRUE)
+  # Cases where the name doesn't exist:
+  expect_error(assert(test.df, within_bounds(-Inf, 2), .data$y,
+    error_fun = just.show.error),
+    "Column `y` not found in `.data`", fixed = TRUE)
+  # Note that assert(test.df, within_bounds(-Inf, 2), y) would not work because
+  # assert relies on dplyr::select. Use !! varname
+
+  ## insist() ##
+  expect_equal(insist(test.df, within_n_sds(1), .data$x), test.df)
+  expect_output(insist(test.df, within_n_sds(0.1), .data$x,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_n_sds(0.1)' 2 times", fixed = TRUE)
+
+  # Cases where the name doesn't exist:
+  expect_error(insist(test.df, within_n_sds(1), .data$y),
+    "Column `y` not found in `.data`", fixed = TRUE)
+  # Note that insist(test.df, within_n_sds(1), y) would not work because
+  # insist relies on dplyr::select. Use !! y instead.
+})
+
+test_that("all assertions work with .data pronoun in chains", {
+  # Define some data we might accidentally reference outside the test.df frame
+  y <- 0:2
+
+  ## verify() ##
+  # Cases where the name exists:
+  # Also test the logical versions here to make sure nothing too weird is happening.
+  expect_equal(test.df %>% verify(.data$x <= 2), test.df)
+  expect_true(test.df %>% verify(.data$x <= 2, success_fun = success_logical))
+  expect_output(test.df %>% verify(.data$x > 2, error_fun = just.show.error),
+                "verification [.data$x > 2] failed! (3 failures)", fixed = TRUE)
+  expect_false(test.df %>% verify(.data$x > 2, error_fun = error_logical))
+
+  # Cases where the name doesn't exist:
+  expect_error(test.df %>% verify(.data$y <= 2, error_fun = just.show.error),
+    "Column `y` not found in `.data`", fixed = TRUE)
+  expect_equal(test.df %>% verify(y <= 2), test.df)
+
+  ## assert() ##
+  expect_equal(test.df %>% assert(within_bounds(-Inf, 2), .data$x), test.df)
+  expect_output(test.df %>% assert(within_bounds(2, Inf), .data$x,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_bounds(2, Inf)' 2 times", fixed = TRUE)
+  # Cases where the name doesn't exist:
+  expect_error(test.df %>% assert(within_bounds(-Inf, 2), .data$y,
+    error_fun = just.show.error),
+    "Column `y` not found in `.data`", fixed = TRUE)
+  # Note that test.df %>% assert(within_bounds(-Inf, 2), y) would not work because
+  # assert relies on dplyr::select.
+
+  ## insist() ##
+  expect_equal(test.df %>% insist(within_n_sds(1), .data$x), test.df)
+  expect_output(test.df %>% insist(within_n_sds(0.1), .data$x,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_n_sds(0.1)' 2 times", fixed = TRUE)
+
+  # Cases where the name doesn't exist:
+  expect_error(test.df %>% insist(within_n_sds(1), .data$y),
+    "Column `y` not found in `.data`", fixed = TRUE)
+  # Note that test.df %>% insist(within_n_sds(1), y) would not work because
+  # insist relies on dplyr::select.
+})
+
+
+
+test_that("all assertions work with !! unquoting", {
+  x <- 2:4
+  y <- 0:2
+  z <- 3
+  varname <- rlang::quo(x)
+
+  ## verify() ##
+  expect_equal(verify(test.df, !! x > 1), test.df)        # 2:4 > 1
+  expect_equal(verify(test.df, !! x > .data$x), test.df)  # 2:4 > .data$x
+  expect_equal(verify(test.df, !! y == .data$x), test.df) # 0:2 == .data$x
+  expect_equal(verify(test.df, !! varname < 3), test.df)  # x < 3
+
+  expect_output(verify(test.df, !! x < 1, error_fun = just.show.error),
+    "verification [2:4 < 1] failed! (3 failures)", fixed = TRUE)
+  expect_output(verify(test.df, !! x < x, error_fun = just.show.error),
+    "verification [2:4 < x] failed! (3 failures)", fixed = TRUE)
+  expect_output(verify(test.df, !! y != x, error_fun = just.show.error),
+    "verification [0:2 != x] failed! (3 failures)", fixed = TRUE)
+  expect_output(verify(test.df, !! varname > 3, error_fun = just.show.error),
+    # this is a weird error message, but it's fine I guess
+    "verification [(~x) > 3] failed! (3 failures)", fixed = TRUE)
+
+  ## assert() ##
+  # Note that !!min(x) becomes min(2:4), so this works:
+  expect_equal(assert(test.df, within_bounds(-Inf, !!min(x)), x), test.df)
+  expect_equal(assert(test.df, within_bounds(-Inf, 2), !! varname), test.df)
+
+  expect_output(assert(test.df, within_bounds(2, Inf), !! varname,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_bounds(2, Inf)' 2 times",
+    fixed = TRUE)
+  expect_output(assert(test.df, within_bounds(!!z-1, Inf), x,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_bounds(3 - 1, Inf)' 2 times",
+    fixed = TRUE)
+
+  ## insist() ##
+  expect_equal(test.df %>% insist(within_n_sds(!! z), !! varname), test.df)
+  expect_output(test.df %>% insist(within_n_sds(!! z/10), !! varname,
+    error_fun = just.show.error),
+    "Column 'x' violates assertion 'within_n_sds(3/10)' 2 times", fixed = TRUE)
+})
