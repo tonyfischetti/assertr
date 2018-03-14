@@ -515,7 +515,6 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 verify <- function(data, expr, success_fun=success_continue,
                    error_fun=error_stop){
   expr <- substitute(expr)
-  # expr <- rlang::enexpr(expr)
   # conform to terminology from subset
   envir <- data
   enclos <- parent.frame()
@@ -536,13 +535,11 @@ verify <- function(data, expr, success_fun=success_continue,
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
   if(!is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
-      # warning("user defined success_fun overridden by assertr chain")
     success_fun <- success_fun_override
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
   if(!is.null(error_fun_override)){
     if(!identical(error_fun, error_fun_override))
-      # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
 
