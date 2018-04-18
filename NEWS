@@ -1,3 +1,10 @@
+
+# assertr 2.5
+
+* `is_uniq` predicate now accepts multiple vectors and evaluates uniqueness on the combination of them.
+
+* Breaking change: the `allow.na` argument to `is_uniq` must be named. Code like `is_uniq(x, TRUE)` will no longer work. Instead write `is_uniq(x, allow.na = TRUE)`.
+
 # assertr 2.4
 
 * errors from all assertr verbs now contain a data.frame holding the
@@ -71,4 +78,3 @@
 # assertr 0.2
 
 * initial release
-

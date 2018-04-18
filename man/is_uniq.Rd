@@ -4,10 +4,10 @@
 \alias{is_uniq}
 \title{Returns TRUE where no elements appear more than once}
 \usage{
-is_uniq(x, allow.na = FALSE)
+is_uniq(..., allow.na = FALSE)
 }
 \arguments{
-\item{x}{A vector to check for unique elements in}
+\item{...}{One or more vectors to check for unique combinations of elements}
 
 \item{allow.na}{A logical indicating whether NAs should be preserved
 as missing values in the return value (FALSE) or
@@ -29,6 +29,7 @@ of a duplicated value as "non unique", as well.
 \examples{
 
 is_uniq(1:10)
+is_uniq(c(1,1,2,3), c(1,2,2,3))
 
 \dontrun{
 # returns FALSE where a "5" appears

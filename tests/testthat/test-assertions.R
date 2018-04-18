@@ -849,3 +849,32 @@ test_that("all assertions work with !! unquoting", {
     error_fun = just.show.error),
     "Column 'x' violates assertion 'within_n_sds(3/10)' 2 times", fixed = TRUE)
 })
+
+test_that("verify works with variable-argument-length is_uniq", {
+  # These x, y, z should not be used by the is_uniq below because the
+  # predicates use a data mask
+  x <- 2:4
+  y <- 0:2
+  z <- 3
+  varname <- rlang::quo(x)
+
+  # test.df2 <- data.frame(x = c(0, 1, 2),
+  #                        y = c(2, 1.5, 1),
+  #                        z = c(0,NA, -1))
+  expect_equal(verify(test.df2, is_uniq(x)), test.df2)
+  expect_equal(verify(test.df2, is_uniq(x, y)), test.df2)
+  expect_equal(verify(test.df2, is_uniq(x, y, z, allow.na=TRUE)), test.df2)
+  expect_equal(verify(test.df2, is_uniq(!!varname)), test.df2)
+
+  df_dups <- data.frame(x = c(0, 0, 1, 2),
+                             y = c(1, 2, 2, NA),
+                             z = c(1, 1, 2, 3))
+  expect_output(verify(df_dups, is_uniq(x, z), error_fun = just.show.error),
+    "verification [is_uniq(x, z)] failed! (2 failures)", fixed = TRUE)
+  expect_equal(verify(df_dups, is_uniq(x, y, allow.na = TRUE)), df_dups)
+  expect_output(verify(df_dups, is_uniq(x, y), error_fun = just.show.error),
+    "verification [is_uniq(x, y)] failed! (1 failure)", fixed = TRUE)
+
+
+
+})

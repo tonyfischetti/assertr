@@ -292,7 +292,17 @@ test_that("is_uniq errors out when appropriate", {
   expect_error(is_uniq(c()),
                "is_uniq must be called on non-null object")
   expect_error(is_uniq(),
-               ".x. is missing")
+               "is_uniq must be called with some arguments")
+  # Check for argument length too
+  expect_error(is_uniq(1:2, 1:3),
+               "is_uniq must be called with vectors of all the same length")
+  expect_error(is_uniq(1:2, 1),
+               "is_uniq must be called with vectors of all the same length")
+  expect_error(is_uniq(NULL), "is_uniq must be called on non-null objects")
+  expect_error(is_uniq(1, NULL), "is_uniq must be called on non-null objects")
+  # Note that this would have been a perfectly fine call before is_uniq
+  # supported multiple vectors. The FALSE would match the allow.na argument
+  expect_error(is_uniq(1:2, FALSE))
 })
 
 test_that("predicate is tagged for assert function to vectorize", {
@@ -302,4 +312,36 @@ test_that("predicate is tagged for assert function to vectorize", {
 test_that("predicate appropriately assigns the 'call' attribute", {
   expect_equal(attr(is_uniq, "call"), "is_uniq")
 })
+
+test_that("is_uniq works with multiple vectors", {
+  v1 <- c("a", "b", "b", "c")
+  v2 <- c(1, 1, 2, 3)
+  v3 <- c(1, 2, 2, 3)
+  v4 <- c(1, NA, 2, 3)
+  list_col <- list(list(1, 2), list(1, 2), list(3,4), list("b"))
+  expect_equal(is_uniq(list_col), c(FALSE, FALSE, TRUE, TRUE))
+  expect_equal(is_uniq(v1, v1), c(TRUE, FALSE, FALSE, TRUE))
+  expect_equal(is_uniq(v1, v2), c(TRUE, TRUE, TRUE, TRUE))
+  expect_equal(is_uniq(v1, v3), c(TRUE, FALSE, FALSE, TRUE))
+  expect_equal(is_uniq(v1, v4), c(TRUE, NA, TRUE, TRUE))
+  expect_equal(is_uniq(v1, v4, allow.na = TRUE), c(TRUE, TRUE, TRUE, TRUE))
+  # Test numeric to numeric
+  expect_equal(is_uniq(v3, v4), c(TRUE, NA, TRUE, TRUE))
+  expect_equal(is_uniq(v4, v4, allow.na = TRUE), c(TRUE, TRUE, TRUE, TRUE))
+
+  # test lists
+  expect_equal(is_uniq(list_col, list_col), c(FALSE, FALSE, TRUE, TRUE))
+  expect_equal(is_uniq(list_col, v2), c(FALSE, FALSE, TRUE, TRUE))
+  expect_equal(is_uniq(list_col, v3), c(TRUE, TRUE, TRUE, TRUE))
+  expect_equal(is_uniq(list_col, v4), c(TRUE, NA, TRUE, TRUE))
+  expect_equal(is_uniq(list_col, v4, allow.na = TRUE), c(TRUE, TRUE, TRUE, TRUE))
+
+  # Test >2 vectors
+  expect_equal(is_uniq(v1, v2, v3), c(TRUE, TRUE, TRUE, TRUE))
+  expect_equal(is_uniq(v1, v2, v4), c(TRUE, NA, TRUE, TRUE))
+  expect_equal(is_uniq(v1, v2, v4, allow.na = TRUE), c(TRUE, TRUE, TRUE, TRUE))
+
+})
+
+
 ######################################
