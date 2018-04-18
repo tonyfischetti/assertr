@@ -18,3 +18,8 @@ notifications:
   email:
     on_success: change
     on_failure: change
+
+notifications:
+  slack:
+    secure: NL+dR4FTWkZnx+pXdDi7N8YmyxRn/4Y60uliRVb4g6swwzgOTMBWlGYrlFZUtNe5u3IYV5HFh331FucxnwfygpBo9Xb1GuuiIiPOjMUP00h+VUDqwkRAOHOP9oxV4SIAZukk7s4lCm7U/9GA/sz60NsIiciUjT+8c7wV3bmkkHE=
+
