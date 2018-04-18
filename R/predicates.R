@@ -324,7 +324,7 @@ within_n_mads <- function(n, ...){
 #' meant for one vector or column--is that it marks the first occurrence
 #' of a duplicated value as "non unique", as well.
 #'
-#' @param x A vector to check for unique elements in
+#' @param ... One or more vectors to check for unique combinations of elements
 #' @param allow.na A logical indicating whether NAs should be preserved
 #'                 as missing values in the return value (FALSE) or
 #'                 if they should be treated just like any other value
@@ -337,6 +337,7 @@ within_n_mads <- function(n, ...){
 #' @examples
 #'
 #' is_uniq(1:10)
+#' is_uniq(c(1,1,2,3), c(1,2,2,3))
 #'
 #' \dontrun{
 #' # returns FALSE where a "5" appears
@@ -351,17 +352,37 @@ within_n_mads <- function(n, ...){
 #' }
 #'
 #' @export
-is_uniq <- function(x, allow.na=FALSE){
-  if(is.null(x))    stop("is_uniq must be called on non-null object")
-  raw_result <- !duplicated(x)
-  repeats <- x[!raw_result]
-  raw_result[x %in% repeats] <- FALSE
-  if(!allow.na){
-    these_are_NAs <- is.na(x)
-    raw_result[these_are_NAs] <- NA
+is_uniq <- function(..., allow.na=FALSE){
+  dots <- list(...)
+  # Check that the ... arguments are reasonable
+  if (length(dots) == 0)  stop("is_uniq must be called with some arguments")
+  null_vectors <- vapply(dots, is.null, FUN.VALUE = logical(1))
+  if(any(null_vectors))  stop("is_uniq must be called on non-null objects")
+  vector_lengths <- vapply(dots, length, FUN.VALUE = integer(1))
+  if (length(dots) == 1) {
+    x <- dots[[1]]
+    # Simpler code for the common case of one vector
+    result <- !duplicated(x)
+    repeats <- x[!result]
+    result[x %in% repeats] <- FALSE
+    if(!allow.na){
+      these_are_NAs <- is.na(x)
+      result[these_are_NAs] <- NA
+    }
+  } else {
+    if (dplyr::n_distinct(vector_lengths) != 1)
+      stop("is_uniq must be called with vectors of all the same length")
+    # assign names to make as_tibble happy
+    dots_df <- dplyr::as_tibble(stats::setNames(dots, seq_along(dots)))
+    # Use the fromLast argument to flag the first appearance of repeats
+    # TODO: benchmark this 2x duplicated call against other alternatives
+    result <- !(duplicated(dots_df) | duplicated(dots_df, fromLast = TRUE))
+    if(!allow.na){
+      these_are_NAs <- apply(dots_df, FUN = anyNA, MARGIN = 1)
+      result[these_are_NAs] <- NA
+    }
   }
-  return(raw_result)
+  result
 }
 attr(is_uniq, "call") <- "is_uniq"
 attr(is_uniq, "assertr_vectorized") <- TRUE
-
