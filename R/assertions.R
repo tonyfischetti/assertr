@@ -58,7 +58,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.predicate <- lazyeval::expr_text(predicate)
+  name.of.predicate <- rlang::expr_text(predicate)
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
   }
@@ -172,8 +172,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
-  name.of.predicate <- lazyeval::expr_text(predicate)
+  name.of.row.redux.fn <- rlang::expr_text(row_reduction_fn)
+  name.of.predicate <- rlang::expr_text(predicate)
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
   }
@@ -227,7 +227,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
 
 
-#' Raises error if dynamically created predicate is FALSE in any columns selected
+#' Raises error if dynamically created predicate is FALSE in any columns
+#' selected
 #'
 #' Meant for use in a data analysis pipeline, this function applies a predicate
 #' generating function to each of the columns indicated. It will then use these
@@ -284,7 +285,7 @@ insist <- function(data, predicate_generator, ...,
                     error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
+  name.of.predicate.generator <- rlang::expr_text(predicate_generator)
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
   }
@@ -403,8 +404,8 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.row.redux.fn <- lazyeval::expr_text(row_reduction_fn)
-  name.of.predicate.generator <- lazyeval::expr_text(predicate_generator)
+  name.of.row.redux.fn <- rlang::expr_text(row_reduction_fn)
+  name.of.predicate.generator <- rlang::expr_text(predicate_generator)
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
   }
