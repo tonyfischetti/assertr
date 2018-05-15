@@ -137,6 +137,15 @@ test_that("verify breaks appropriately", {
   expect_error(verify(mtcars, 1 > 0, "tree"), "could not find function \"success_fun\"")
   expect_error(verify(mtcars, d > 1), "object 'd' not found")
 })
+
+test_that("verify works within functions", {
+  my_verify <- function(data, expr, success_fun) {
+    verify(data, !!rlang::enexpr(expr), success_fun=success_fun)
+  }
+
+  expect_true(my_verify(mtcars, drat > 2, success_fun=success_logical))
+})
+
 ######################################
 
 
@@ -198,7 +207,7 @@ test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(assert(mtcars, in_set(0,1), vs, tree),
-               "object 'tree' not found")
+               "`tree` must resolve to integer column positions")
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"))
   expect_error(assert("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
@@ -264,7 +273,7 @@ test_that("assert_rows breaks appropriately", {
   expect_error(assert_rows(rowSums, in_set(0,1), mtcars$vs),
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
-               "object 'tree' not found")
+               "`tree` must resolve to integer column positions")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"))
   expect_error(assert_rows("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
@@ -315,7 +324,7 @@ test_that("insist breaks appropriately", {
                "no applicable method for 'select.?' applied to an object of class \"function\"")
   expect_error(insist(mtcars, within_n_sds(5), "vs:am"))
   expect_error(insist(mtcars, within_n_sds(5), tree),
-               "object 'tree' not found")
+               "`tree` must resolve to integer column positions")
   expect_error(insist("tree"),
                "no applicable method for 'select.?' applied to an object of class \"character\"")
   expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),
