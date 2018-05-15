@@ -1,6 +1,5 @@
 ##
-## this file contains the underscore-postfixed SE verbs, to be removed
-## eventually
+## this file contains the underscore-postfixed SE verbs, to be removed eventually
 ##
 
 #' @export
@@ -8,8 +7,7 @@
 #' @rdname assert
 assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
                     error_fun=error_stop){
-  warning("`assert_` is deprecated and will eventually be removed from assertr.
-          ",
+  warning("`assert_` is deprecated and will eventually be removed from assertr.  ",
           "Please use `assert` instead.", call. = FALSE)
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   name.of.predicate <- rlang::expr_text(predicate)
@@ -71,8 +69,7 @@ assert_ <- function(data, predicate, ..., .dots, success_fun=success_continue,
 assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
                          success_fun=success_continue,
                          error_fun=error_stop){
-  warning("`assert_rows_` is deprecated and will eventually be removed from
-          assertr. ",
+  warning("`assert_rows_` is deprecated and will eventually be removed from assertr. ",
           "Please use `assert_rows` instead.", call. = FALSE)
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   name.of.row.redux.fn <- rlang::expr_text(row_reduction_fn)
@@ -130,8 +127,7 @@ assert_rows_ <- function(data, row_reduction_fn, predicate, ..., .dots,
 insist_ <- function(data, predicate_generator, ..., .dots,
                     success_fun=success_continue,
                     error_fun=error_stop){
-  warning("`insist_` is deprecated and will eventually be removed from assertr.
-          ",
+  warning("`insist_` is deprecated and will eventually be removed from assertr.  ",
           "Please use `insist` instead.", call. = FALSE)
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
   name.of.predicate.generator <- rlang::expr_text(predicate_generator)
@@ -194,8 +190,7 @@ insist_ <- function(data, predicate_generator, ..., .dots,
 insist_rows_ <- function(data, row_reduction_fn, predicate_generator, ...,
                          .dots, success_fun=success_continue,
                          error_fun=error_stop){
-  warning("`insist_rows_` is deprecated and will eventually be removed from
-          assertr. ",
+  warning("`insist_rows_` is deprecated and will eventually be removed from assertr. ",
           "Please use `insist_rows` instead.", call. = FALSE)
   sub.frame <- dplyr::select_(data, ..., .dots = .dots)
 
