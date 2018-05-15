@@ -58,7 +58,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.predicate <- rlang::expr_text(predicate)
+  name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
   }
@@ -172,8 +172,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.row.redux.fn <- rlang::expr_text(row_reduction_fn)
-  name.of.predicate <- rlang::expr_text(predicate)
+  name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
+  name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
   }
@@ -285,7 +285,8 @@ insist <- function(data, predicate_generator, ...,
                     error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.predicate.generator <- rlang::expr_text(predicate_generator)
+  name.of.predicate.generator <- rlang::expr_text(
+      rlang::enexpr(predicate_generator))
   if(!is.null(attr(predicate_generator, "call"))){
     name.of.predicate.generator <- attr(predicate_generator, "call")
   }
@@ -404,8 +405,9 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
   sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
-  name.of.row.redux.fn <- rlang::expr_text(row_reduction_fn)
-  name.of.predicate.generator <- rlang::expr_text(predicate_generator)
+  name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
+  name.of.predicate.generator <- rlang::expr_text(
+      rlang::enexpr(predicate_generator))
   if(!is.null(attr(row_reduction_fn, "call"))){
     name.of.row.redux.fn <- attr(row_reduction_fn, "call")
   }
@@ -515,12 +517,9 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #' @export
 verify <- function(data, expr, success_fun=success_continue,
                    error_fun=error_stop){
-  expr <- substitute(expr)
-  # conform to terminology from subset
-  envir <- data
-  enclos <- parent.frame()
+  expr <- rlang::enexpr(expr)
   # Use eval_tidy here to get the .data pronoun and all the eval_tidy benefits
-  logical.results <- rlang::eval_tidy(expr, envir, enclos)
+  logical.results <- rlang::eval_tidy(expr, data, parent.frame())
   # NAs are very likely errors, and cause problems in the all() below.
   logical.results <- ifelse(is.na(logical.results), FALSE, logical.results)
 
