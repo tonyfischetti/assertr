@@ -137,6 +137,15 @@ test_that("verify breaks appropriately", {
   expect_error(verify(mtcars, 1 > 0, "tree"), "could not find function \"success_fun\"")
   expect_error(verify(mtcars, d > 1), "object 'd' not found")
 })
+
+test_that("verify works within functions", {
+  my_verify <- function(data, expr, success_fun) {
+    verify(data, !!rlang::enexpr(expr), success_fun=success_fun)
+  }
+
+  expect_true(my_verify(mtcars, drat > 2, success_fun=success_logical))
+})
+
 ######################################
 
 

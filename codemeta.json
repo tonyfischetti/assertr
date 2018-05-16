@@ -100,17 +100,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "lazyeval",
-      "name": "lazyeval",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      }
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },

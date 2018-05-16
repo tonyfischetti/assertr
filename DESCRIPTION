@@ -19,7 +19,6 @@ Depends: R (>= 3.1.0)
 Imports:
     dplyr (>= 0.7.0),
     MASS,
-    lazyeval,
     stats,
     utils,
     rlang (>= 0.1.2)
