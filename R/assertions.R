@@ -57,7 +57,17 @@
 assert <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  if (length(keeper.vars) < 1) {
+    stop("No columns provided.")
+  }
+
+  sub.frame <- dplyr::select(data, !!!keeper.vars)
+  if (length(sub.frame) < 1) {
+    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    all_columns <- paste(columns_char, collapse = ",")
+    stop(sprintf("No columns in data match: %s", all_columns))
+  }
+
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -170,8 +180,17 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
-  keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  keeper.vars <- dplyr::enquos(...)
+  if (length(keeper.vars) < 1) {
+    stop("No columns provided.")
+  }
+
+  sub.frame <- dplyr::select(data, !!!keeper.vars)
+  if (length(sub.frame) < 1) {
+    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    all_columns <- paste(columns_char, collapse = ",")
+    stop(sprintf("No columns in data match: %s", all_columns))
+  }
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(row_reduction_fn, "call"))){
@@ -283,8 +302,17 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 insist <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
                     error_fun=error_stop){
-  keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  keeper.vars <- dplyr::enquos(...)
+  if (length(keeper.vars) < 1) {
+    stop("No columns provided.")
+  }
+
+  sub.frame <- dplyr::select(data, !!!keeper.vars)
+  if (length(sub.frame) < 1) {
+    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    all_columns <- paste(columns_char, collapse = ",")
+    stop(sprintf("No columns in data match: %s", all_columns))
+  }
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
   if(!is.null(attr(predicate_generator, "call"))){
@@ -403,8 +431,18 @@ insist <- function(data, predicate_generator, ...,
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
-  keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  keeper.vars <- dplyr::enquos(...)
+  if (length(keeper.vars) < 1) {
+    stop("No columns provided.")
+  }
+
+  sub.frame <- dplyr::select(data, !!!keeper.vars)
+  if (length(sub.frame) < 1) {
+    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    all_columns <- paste(columns_char, collapse = ",")
+    stop(sprintf("No columns in data match: %s", all_columns))
+  }
+
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))

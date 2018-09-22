@@ -204,13 +204,11 @@ test_that("assert raises *custom error* if verification fails", {
 })
 
 test_that("assert breaks appropriately", {
-  expect_error(assert(in_set(0,1), mtcars$vs),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
+  expect_error(assert(in_set(0,1), mtcars$vs), "No columns provided")
   expect_error(assert(mtcars, in_set(0,1), vs, tree),
                "object 'tree' not found")
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"))
-  expect_error(assert("tree"),
-               "no applicable method for 'select.?' applied to an object of class \"character\"")
+  expect_error(assert("tree"), "No columns provided")
 })
 
 ######################################
@@ -268,15 +266,13 @@ test_that("assert_rows raises *custom error* if verification fails", {
 })
 
 test_that("assert_rows breaks appropriately", {
-  expect_error(assert_rows(in_set(0,1), mtcars$vs),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
+  expect_error(assert_rows(in_set(0,1), mtcars$vs), "No columns provided")
   expect_error(assert_rows(rowSums, in_set(0,1), mtcars$vs),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
+               "No columns provided")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
                "object 'tree' not found")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"))
-  expect_error(assert_rows("tree"),
-               "no applicable method for 'select.?' applied to an object of class \"character\"")
+  expect_error(assert_rows("tree"), "No columns provided")
 })
 
 ######################################
@@ -320,13 +316,11 @@ test_that("insist raises *custom error* if verification fails", {
 })
 
 test_that("insist breaks appropriately", {
-  expect_error(insist(within_n_sds(5), mtcars$vs),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
+  expect_error(insist(within_n_sds(5), mtcars$vs), "No columns provided")
   expect_error(insist(mtcars, within_n_sds(5), "vs:am"))
   expect_error(insist(mtcars, within_n_sds(5), tree),
                "object 'tree' not found")
-  expect_error(insist("tree"),
-               "no applicable method for 'select.?' applied to an object of class \"character\"")
+  expect_error(insist("tree"), "No columns provided")
   expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),
                "argument must be a numeric vector")
 })
@@ -359,23 +353,21 @@ test_that("insist_rows raises *custom error* if verification fails", {
 })
 
 test_that("insist_rows breaks appropriately", {
-  expect_error(insist_rows(within_n_sds(5), mtcars$vs),
-               "no applicable method for 'select.?' applied to an object of class \"function\"")
-  expect_error(insist_rows(mtcars, within_n_sds(10), vs),
-               "object 'vs' not found")
+  expect_error(insist_rows(within_n_sds(5), mtcars$vs), "No columns provided")
+  expect_error(insist_rows(mtcars, within_n_sds(10), vs), "No columns provided")
   expect_error(insist_rows(mtcars, maha_dist, within_n_sds(10), vs),
                "\"data\" needs to have at least two columns")
   expect_error(insist_rows(mtcars, maha_dist, within_bound(0, 10), vs, am),
                "could not find function \"within_bound\"")
-  expect_error(insist_rows(), "argument \"data\" is missing, with no default")
-  expect_error(insist_rows(mtcars), "argument \"row_reduction_fn\" is missing, with no default")
+  expect_error(insist_rows(), "No columns provided")
+  expect_error(insist_rows(mtcars), "No columns provided")
   expect_error(insist_rows(mtcars, maha_dist, am, vs),
                "object 'am' not found")
   expect_error(insist_rows(mtcars, maha_dist, am, vs, carb),
                "object 'am' not found")
 
   expect_error(insist_rows(lm(Petal.Length ~ Petal.Width, data=iris)),
-               "no applicable method for 'select.?' applied to an object of class \"lm\"")
+               "No columns provided")
 })
 
 ###########################################
@@ -754,7 +746,7 @@ test_that("all assertions work with .data pronoun without chains", {
   # Cases where the name doesn't exist:
   expect_error(assert(test.df, within_bounds(-Inf, 2), .data$y,
     error_fun = just.show.error),
-    "Column `y` not found in `.data`", fixed = TRUE)
+    "No columns in data match: `~.data$y`", fixed = TRUE)
   # Note that assert(test.df, within_bounds(-Inf, 2), y) would not work because
   # assert relies on dplyr::select. Use !! varname
 
@@ -766,7 +758,7 @@ test_that("all assertions work with .data pronoun without chains", {
 
   # Cases where the name doesn't exist:
   expect_error(insist(test.df, within_n_sds(1), .data$y),
-    "Column `y` not found in `.data`", fixed = TRUE)
+    "No columns in data match: `~.data$y", fixed = TRUE)
   # Note that insist(test.df, within_n_sds(1), y) would not work because
   # insist relies on dplyr::select. Use !! y instead.
 })
@@ -797,7 +789,7 @@ test_that("all assertions work with .data pronoun in chains", {
   # Cases where the name doesn't exist:
   expect_error(test.df %>% assert(within_bounds(-Inf, 2), .data$y,
     error_fun = just.show.error),
-    "Column `y` not found in `.data`", fixed = TRUE)
+    "No columns in data match: `~.data$y`", fixed = TRUE)
   # Note that test.df %>% assert(within_bounds(-Inf, 2), y) would not work because
   # assert relies on dplyr::select.
 
@@ -809,7 +801,7 @@ test_that("all assertions work with .data pronoun in chains", {
 
   # Cases where the name doesn't exist:
   expect_error(test.df %>% insist(within_n_sds(1), .data$y),
-    "Column `y` not found in `.data`", fixed = TRUE)
+    "No columns in data match: `~.data$y`", fixed = TRUE)
   # Note that test.df %>% insist(within_n_sds(1), y) would not work because
   # insist relies on dplyr::select.
 })
