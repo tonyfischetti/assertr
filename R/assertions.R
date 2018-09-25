@@ -63,7 +63,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 
   sub.frame <- dplyr::select(data, !!!keeper.vars)
   if (length(sub.frame) < 1) {
-    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    columns_char <- vapply(keeper.vars, rlang::expr_label, character(1))
     all_columns <- paste(columns_char, collapse = ",")
     stop(sprintf("No columns in data match: %s", all_columns))
   }
@@ -187,7 +187,7 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
   sub.frame <- dplyr::select(data, !!!keeper.vars)
   if (length(sub.frame) < 1) {
-    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    columns_char <- vapply(keeper.vars, rlang::expr_label, character(1))
     all_columns <- paste(columns_char, collapse = ",")
     stop(sprintf("No columns in data match: %s", all_columns))
   }
@@ -309,7 +309,7 @@ insist <- function(data, predicate_generator, ...,
 
   sub.frame <- dplyr::select(data, !!!keeper.vars)
   if (length(sub.frame) < 1) {
-    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    columns_char <- vapply(keeper.vars, rlang::expr_label, character(1))
     all_columns <- paste(columns_char, collapse = ",")
     stop(sprintf("No columns in data match: %s", all_columns))
   }
@@ -438,7 +438,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 
   sub.frame <- dplyr::select(data, !!!keeper.vars)
   if (length(sub.frame) < 1) {
-    columns_char <- purrr::map_chr(keeper.vars, rlang::expr_label)
+    columns_char <- vapply(keeper.vars, rlang::expr_label, character(1))
     all_columns <- paste(columns_char, collapse = ",")
     stop(sprintf("No columns in data match: %s", all_columns))
   }
