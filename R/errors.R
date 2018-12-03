@@ -116,12 +116,12 @@ make.assertr.verify.error <- function(verb, num.violations, the_call, logical.re
   sing.plur <- if (num.violations==1) " failure)" else " failures)"
   msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
 
-  error_df <- data.frame(verb=verb,
-                         redux_fn=NA,
-                         predicate=the_call,
-                         column=NA,
-                         index=logical.results,
-                         value=NA)
+  error_df <- data.frame(verb = verb,
+                         redux_fn = NA,
+                         predicate = paste(the_call, collapse=" "),
+                         column = NA,
+                         index = logical.results,
+                         value = NA)
 
   this_error <- list(error_df = error_df,
                      message = msg,
