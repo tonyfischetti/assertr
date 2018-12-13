@@ -1,7 +1,7 @@
 assertr
 ===
 
-![assertr logo](http://statethatiamin.onlythisrose.com/assertrlogo.png)
+![assertr logo](http://statethatiamin.com/media/assertrlogo.png)
 
 [![Build Status](http://travis-ci.org/ropensci/assertr.svg?branch=master)](https://travis-ci.org/ropensci/assertr)
 [![](http://www.r-pkg.org/badges/version/assertr)](https://cran.r-project.org/package=assertr)
