@@ -21,7 +21,7 @@ Imports:
     MASS,
     stats,
     utils,
-    rlang (>= 0.1.2)
+    rlang (>= 0.3.0)
 Suggests:
     knitr,
     testthat,
