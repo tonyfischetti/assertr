@@ -1,3 +1,6 @@
+# assertr 2.6
+
+* bugs due to changes in rlang 0.3.0 fixed.
 
 # assertr 2.5
 
