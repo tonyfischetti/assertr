@@ -57,7 +57,7 @@
 assert <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -171,7 +171,7 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(row_reduction_fn, "call"))){
@@ -284,7 +284,7 @@ insist <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
                     error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
   if(!is.null(attr(predicate_generator, "call"))){
@@ -404,7 +404,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, rlang::UQS(keeper.vars))
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
