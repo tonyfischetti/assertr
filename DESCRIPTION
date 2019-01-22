@@ -1,7 +1,7 @@
 Package: assertr
 Type: Package
 Title: Assertive Programming for R Analysis Pipelines
-Version: 2.5.6
+Version: 2.6
 Authors@R: person("Tony", "Fischetti",
               email="tony.fischetti@gmail.com",
               role = c("aut", "cre"))
@@ -27,4 +27,5 @@ Suggests:
     testthat,
     magrittr
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
+Encoding: UTF-8

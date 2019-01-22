@@ -4,7 +4,8 @@
 \alias{maha_dist}
 \title{Computes mahalanobis distance for each row of data frame}
 \usage{
-maha_dist(data, keep.NA = TRUE, robust = FALSE, stringsAsFactors = FALSE)
+maha_dist(data, keep.NA = TRUE, robust = FALSE,
+  stringsAsFactors = FALSE)
 }
 \arguments{
 \item{data}{A data frame}

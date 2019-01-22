@@ -8,7 +8,8 @@
 \usage{
 chain_start(data)
 
-chain_end(data, success_fun = success_continue, error_fun = error_report)
+chain_end(data, success_fun = success_continue,
+  error_fun = error_report)
 }
 \arguments{
 \item{data}{A data frame}
