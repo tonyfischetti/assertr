@@ -1,7 +1,7 @@
 assertr
 ===
 
-![assertr logo](http://statethatiamin.onlythisrose.com/assertrlogo.png)
+![assertr logo](http://statethatiamin.com/media/assertrlogo.png)
 
 [![Build Status](http://travis-ci.org/ropensci/assertr.svg?branch=master)](https://travis-ci.org/ropensci/assertr)
 [![](http://www.r-pkg.org/badges/version/assertr)](https://cran.r-project.org/package=assertr)
@@ -18,11 +18,12 @@ mechanism but the examples in this README use them for clarity.
 ### Installation
 
 You can install the latest version on CRAN like this
-  
+```r
     install.packages("assertr")
+```
 
 or you can install the bleeding-edge development version like this:
-```{r}
+```r
     install.packages("devtools")
     devtools::install_github("ropensci/assertr")
 ```
@@ -51,7 +52,7 @@ all the distances (for outlier detection)
 
 This could be written (in order) using `assertr` like this:
 
-```{r}
+```r
     library(dplyr)
     library(assertr)
 
@@ -74,7 +75,7 @@ and the pipeline would have been terminated early.
 Let's see what the error message look like when you chain
 a bunch of failing assertions together.
 
-```{r}
+```r
     > mtcars %>%
     +   chain_start %>%
     +   assert(in_set(1, 2, 3, 4), carb) %>%
@@ -176,7 +177,7 @@ detection). It will coerce categorical variables into numerics if it needs to.
 ### More info
 
 For more info, check out the `assertr` vignette
-```{r}
+```r
     > vignette("assertr")
 ```
 Or [read it here](https://CRAN.R-project.org/package=assertr/vignettes/assertr.html)

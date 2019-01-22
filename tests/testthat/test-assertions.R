@@ -146,6 +146,21 @@ test_that("verify works within functions", {
   expect_true(my_verify(mtcars, drat > 2, success_fun=success_logical))
 })
 
+test_that("verify works with long predicates (fix #80)", {
+  my_data <- data.frame(COMMENT=c("foo", "bar", "baz", "Positive Pre-dose"),
+                        USUBJID = "ABCDEFGHIJKLMNOPQRTSU",
+                        stringsAsFactors=FALSE)
+  expect_output(
+    expect_error(
+      verify(my_data,
+             is.na(COMMENT) | (COMMENT %in% "Positive Pre-dose" & USUBJID %in% "ABCDEFGHIJKLMNOPQRTSU")),
+      "assertr stopped execution"
+    ),
+    regexp='is.na(COMMENT) | (COMMENT %in% "Positive Pre-dose" & USUBJID %in%      "ABCDEFGHIJKLMNOPQRTSU")',
+    fixed=TRUE
+  )
+})
+
 ######################################
 
 
