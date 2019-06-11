@@ -2,7 +2,6 @@
 #'
 #' The assertr package supplies a suite of functions designed to verify
 #' assumptions about data early in an analysis pipeline.
-#'
 #' See the assertr vignette or the documentation for more information \cr
 #' > \code{vignette("assertr")}
 #'

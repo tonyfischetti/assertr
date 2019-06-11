@@ -57,7 +57,6 @@
 assert <- function(data, predicate, ..., success_fun=success_continue,
                       error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(predicate, "call"))){
     name.of.predicate <- attr(predicate, "call")
@@ -80,18 +79,28 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
 
+  if(length(keeper.vars)==0)
+    stop("assert requires columns to be selected. Check number of arguments", call.=FALSE)
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
-  log.mat <- sapply(names(sub.frame),
+  log.mat <- sapply(colnames(sub.frame),
                     function(column){
                       this.vector <- sub.frame[[column]]
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
+  if(class(log.mat)=="logical"){
+    log.mat <- matrix(log.mat)
+    colnames(log.mat) <- colnames(sub.frame)
+  }
+
   # if all checks pass *and* there are no leftover errors
   if(all(log.mat) && is.null(attr(data, "assertr_errors")))
     return(success_fun(data))
 
+  #print(names(log.mat))
   errors <- lapply(colnames(log.mat), function(col.name){
+  #errors <- lapply(names(log.mat), function(col.name){
     col <- log.mat[, col.name]
     num.violations <- sum(!col)
     if(num.violations==0)
@@ -171,7 +180,6 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(row_reduction_fn, "call"))){
@@ -196,6 +204,10 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
   if(!is.vectorized.predicate(predicate))
     predicate <- make.predicate.proper(predicate)
+
+  if(length(keeper.vars)==0)
+    stop("assert_rows requires columns to be selected. Check number of argumentsSelect all columns with everything()", call.=FALSE)
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
   redux <- row_reduction_fn(sub.frame)
 
@@ -284,7 +296,6 @@ insist <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
                     error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
   if(!is.null(attr(predicate_generator, "call"))){
@@ -303,6 +314,10 @@ insist <- function(data, predicate_generator, ...,
       # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
+
+  if(length(keeper.vars)==0)
+    stop("insist requires columns to be selected. Check number of arguments", call.=FALSE)
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),
@@ -404,7 +419,6 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          success_fun=success_continue,
                          error_fun=error_stop){
   keeper.vars <- dplyr::quos(...)
-  sub.frame <- dplyr::select(data, !!!(keeper.vars))
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
@@ -427,6 +441,10 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
       # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
   }
+
+  if(length(keeper.vars)==0)
+    stop("insist_rows requires columns to be selected. Check number of arguments", call.=FALSE)
+  sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
   redux <- row_reduction_fn(sub.frame)
 
