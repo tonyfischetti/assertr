@@ -119,10 +119,14 @@ within_bounds <- function(lower.bound, upper.bound,
 #' only returns a function that actually does the checking when called
 #' with a value. This is a convenience function meant to return a
 #' predicate function to be used in an \code{\link{assertr}} assertion.
+#' You can use the `inverse` flag (default FALSE) to check if the
+#' arguments are NOT in the set.
 #'
 #' @param ... objects that make up the set
 #' @param allow.na A logical indicating whether NAs (including NaNs)
 #'        should be permitted (default TRUE)
+#' @param inverse A logical indicating whether it should test
+#'        if arguments are NOT in the set
 #' @return A function that takes one value and returns TRUE
 #'         if the value is in the set defined by the
 #'         arguments supplied by \code{in_set} and FALSE
@@ -135,6 +139,10 @@ within_bounds <- function(lower.bound, upper.bound,
 #' ## is equivalent to
 #'
 #' in_set(3,4)(3)
+#'
+#' # inverting the function works thusly...
+#' in_set(3, 4, inverse=TRUE)(c(5, 2, 3))
+#' # TRUE TRUE FALSE
 #'
 #' # the remainder of division by 2 is always 0 or 1
 #' rem <- 10 %% 2
@@ -152,7 +160,7 @@ within_bounds <- function(lower.bound, upper.bound,
 #'   assert(in_set(0,1), vs, am)
 #'
 #' @export
-in_set <- function(..., allow.na=TRUE){
+in_set <- function(..., allow.na=TRUE, inverse=FALSE){
   the_call <- deparse(sys.call())
   set <- c(...)
   if(!length(set)) stop("can not test for membership in empty set")
@@ -164,6 +172,8 @@ in_set <- function(..., allow.na=TRUE){
       these_are_NAs <- is.na(x)
       raw_result[these_are_NAs] <- TRUE
     }
+    if(inverse)
+      return(ifelse(raw_result==TRUE, FALSE, TRUE))
     return(raw_result)
   }
   attr(fun, "assertr_vectorized") <- TRUE

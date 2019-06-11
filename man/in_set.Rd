@@ -4,13 +4,16 @@
 \alias{in_set}
 \title{Returns TRUE if value in set}
 \usage{
-in_set(..., allow.na = TRUE)
+in_set(..., allow.na = TRUE, inverse = FALSE)
 }
 \arguments{
 \item{...}{objects that make up the set}
 
 \item{allow.na}{A logical indicating whether NAs (including NaNs)
 should be permitted (default TRUE)}
+
+\item{inverse}{A logical indicating whether it should test
+if arguments are NOT in the set}
 }
 \value{
 A function that takes one value and returns TRUE
@@ -25,6 +28,8 @@ supplied. This doesn't actually check the membership of anything--it
 only returns a function that actually does the checking when called
 with a value. This is a convenience function meant to return a
 predicate function to be used in an \code{\link{assertr}} assertion.
+You can use the `inverse` flag (default FALSE) to check if the
+arguments are NOT in the set.
 }
 \examples{
 predicate <- in_set(3,4)
@@ -33,6 +38,10 @@ predicate(4)
 ## is equivalent to
 
 in_set(3,4)(3)
+
+# inverting the function works thusly...
+in_set(3, 4, inverse=TRUE)(c(5, 2, 3))
+# TRUE TRUE FALSE
 
 # the remainder of division by 2 is always 0 or 1
 rem <- 10 \%\% 2
