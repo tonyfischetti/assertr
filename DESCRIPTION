@@ -10,7 +10,8 @@ Description: Provides functionality to assert conditions
     analysis pipelines can fail quickly. Similar to
     'stopifnot()' but more powerful, friendly, and easier
     for use in pipelines.
-URL: https://github.com/ropensci/assertr
+URL: https://docs.ropensci.org/assertr (website)
+    https://github.com/ropensci/assertr
 BugReports: https://github.com/ropensci/assertr/issues
 License: MIT + file LICENSE
 ByteCompile: TRUE
