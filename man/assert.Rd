@@ -6,7 +6,7 @@
 \title{Raises error if predicate is FALSE in any columns selected}
 \usage{
 assert(data, predicate, ..., success_fun = success_continue,
-  error_fun = error_stop)
+  error_fun = error_stop, skip_chain_opts = FALSE)
 
 assert_(data, predicate, ..., .dots, success_fun = success_continue,
   error_fun = error_stop)
@@ -25,6 +25,9 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
+
+\item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
+are used even if assertion is called within a chain.}
 
 \item{.dots}{Use assert_() to select columns using standard evaluation.}
 }

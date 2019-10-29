@@ -582,7 +582,7 @@ check_me <- . %>%
   verify(nrow(mtcars) > 10) %>%
   verify(mpg > 0) %>%
   insist(within_n_sds(4), mpg) %>%
-  assert(in_set(0,1), am, vs)
+  assert(in_set(0,1), am, vs) %>%
   chain_end 
 
 mtcars %>%
@@ -594,7 +594,25 @@ mtcars %>%
 Awesome! Now we can add an arbitrary number of assertions, as the need arises,
 without touching the real logic.
 
+Note: By default, all assertions in chain use `success_continue` and `error_append` functions.
+It allows to continue workflow in both cases and aggregate error logs.
+In some cases (i.e. when you don't want to include error log and just have some error printed),
+you can force using assertion specific success/error callback in chain.
 
+Just use `skip_chain_opts = TRUE` and specify callback inside assertion:
+```
+print_error <- function(errors, data=NULL) {
+  print(errors)
+  return(data)
+}
+mtcars %>%
+  chain_start %>%
+  verify(nrow(mtcars) > 32, error_fun=print_error, skip_chain_opts=TRUE) %>%
+  verify(mpg > 0) %>%
+  insist(within_n_sds(4), mpg) %>%
+  assert(in_set(0,1), am, vs) %>%
+  chain_end 
+```
 
 ### advanced: send email reports using custom error functions
 

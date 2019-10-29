@@ -5,7 +5,7 @@
 \title{Raises error if expression is FALSE anywhere}
 \usage{
 verify(data, expr, success_fun = success_continue,
-  error_fun = error_stop)
+  error_fun = error_stop, skip_chain_opts = FALSE)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}
@@ -17,6 +17,9 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
+
+\item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
+are used even if assertion is called within a chain.}
 }
 \value{
 By default, the \code{data} is returned if predicate assertion

@@ -7,7 +7,8 @@
 after applying row reduction function}
 \usage{
 insist_rows(data, row_reduction_fn, predicate_generator, ...,
-  success_fun = success_continue, error_fun = error_stop)
+  success_fun = success_continue, error_fun = error_stop,
+  skip_chain_opts = FALSE)
 
 insist_rows_(data, row_reduction_fn, predicate_generator, ..., .dots,
   success_fun = success_continue, error_fun = error_stop)
@@ -33,6 +34,9 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
+
+\item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
+are used even if assertion is called within a chain.}
 
 \item{.dots}{Use insist_rows_() to select columns using standard evaluation.}
 }

@@ -161,6 +161,16 @@ test_that("verify works with long predicates (fix #80)", {
   )
 })
 
+test_that("skip_chain_opts doesn't affect functionality outside chain for verify", {
+  expect_equal(verify(mtcars, mtcars$drat > 2, skip_chain_opts=TRUE), mtcars)
+  expect_equal(verify(mtcars, nrow(mtcars) > 30, skip_chain_opts=TRUE), mtcars)
+  expect_true(verify(mtcars, mtcars$drat > 2, success_fun=success_logical, skip_chain_opts=TRUE))
+  expect_true(verify(mtcars, nrow(mtcars) > 30, success_fun=success_logical, skip_chain_opts=TRUE))
+  expect_equal(verify(mtcars, drat > 3, error_fun = error_logical, skip_chain_opts=TRUE), FALSE)
+  expect_output(verify(mtcars, drat > 3, error_fun = just.show.error, skip_chain_opts=TRUE),
+                "verification \\[drat > 3\\] failed! \\(4 failures\\)")
+})
+
 ######################################
 
 
@@ -226,6 +236,16 @@ test_that("assert breaks appropriately", {
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"))
   expect_error(assert("tree"),
                "argument \"predicate\" is missing, with no default")
+})
+
+test_that("skip_chain_opts doesn't affect functionality outside chain for assert", {
+  expect_equal(assert(mtcars, in_set(0,1), vs, am, skip_chain_opts=TRUE), mtcars)
+  expect_equal(assert(mtcars, within_bounds(3,5), gear, skip_chain_opts=TRUE), mtcars)
+  expect_true(assert(mtcars, in_set(0,1), vs, am, success_fun=success_logical, skip_chain_opts=TRUE))
+  expect_true(assert(mtcars, within_bounds(3,5), gear, success_fun=success_logical, skip_chain_opts=TRUE))
+  expect_equal(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun = error_logical, skip_chain_opts=TRUE), FALSE)
+  expect_output(assert(mtcars, within_bounds(3.5,4.5), gear, error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times.*")
 })
 
 ######################################
@@ -294,6 +314,18 @@ test_that("assert_rows breaks appropriately", {
                "argument \"row_reduction_fn\" is missing, with no default")
 })
 
+test_that("skip_chain_opts doesn't affect functionality outside chain for assert_rows", {
+  expect_equal(assert_rows(mtcars, rowSums, within_bounds(0,2), vs, am, skip_chain_opts=TRUE), mtcars)
+  expect_equal(assert_rows(mtcars, num_row_NAs, within_bounds(0,.1), dplyr::everything(), skip_chain_opts=TRUE),
+               mtcars)
+  expect_true(assert_rows(mtcars, rowSums, within_bounds(0,2), vs, am, success_fun=success_logical, skip_chain_opts=TRUE))
+  expect_true(assert_rows(mtcars, num_row_NAs, within_bounds(0,.1), dplyr::everything(), success_fun=success_logical, skip_chain_opts=TRUE))
+  expect_output(assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am, error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Data frame row reduction 'rowSums' violates predicate 'within_bounds\\(1, 2\\)' 12 times")
+  expect_output(assert_rows(mtcars, num_row_NAs, within_bounds(1,2), dplyr::everything(), error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Data frame row reduction 'num_row_NAs' violates predicate 'within_bounds\\(1, 2\\)' 32 times")
+})
+
 ######################################
 
 
@@ -346,6 +378,19 @@ test_that("insist breaks appropriately", {
                "argument must be a numeric vector")
 })
 
+test_that("skip_chain_opts doesn't affect functionality outside chain for insist", {
+  expect_equal(insist(our.iris, within_n_sds(3), Sepal.Length, skip_chain_opts=TRUE), our.iris)
+  expect_equal(insist(our.iris.3, within_n_sds(2), Sepal.Length, skip_chain_opts=TRUE), our.iris.3)
+  expect_equal(insist(our.iris, within_n_sds(3), Sepal.Length, success_fun=give.validation, skip_chain_opts=TRUE),
+               "great job!")
+  expect_equal(insist(our.iris.3, within_n_sds(2), Sepal.Length, success_fun=function(x){return("noice!")}, skip_chain_opts=TRUE),
+               "noice!")
+  expect_output(insist(our.iris, within_n_sds(2), Sepal.Length, error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 6 times")
+  expect_output(insist(our.iris.2, within_n_sds(2), Sepal.Length, error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 5 times")
+})
+
 ######################################
 
 
@@ -393,6 +438,21 @@ test_that("insist_rows breaks appropriately", {
                "argument \"row_reduction_fn\" is missing, with no default")
 })
 
+test_that("skip_chain_opts doesn't affect functionality outside chain for insist_rows", {
+  expect_equal(insist_rows(our.iris, maha_dist, within_n_sds(6), dplyr::everything(), skip_chain_opts=TRUE),
+               our.iris)
+  expect_equal(insist_rows(our.iris, maha_dist, within_n_mads(10), Sepal.Length:Species, skip_chain_opts=TRUE),
+               our.iris)
+  expect_output(insist_rows(our.iris, maha_dist, within_n_sds(4), dplyr::everything(), error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(4\\)' 1 time")
+  expect_output(insist_rows(our.iris, maha_dist, within_n_sds(2), dplyr::everything(), error_fun = just.show.error, skip_chain_opts=TRUE),
+                "Data frame row reduction 'maha_dist' violates predicate 'within_n_sds\\(2\\)' 8 times")
+  expect_error(insist_rows(within_n_sds(5), mtcars$vs, skip_chain_opts=TRUE),
+               "argument \"predicate_generator\" is missing, with no default")
+  expect_error(insist_rows(mtcars, within_n_sds(10), vs, skip_chain_opts=TRUE),
+               "object 'vs' not found")
+})
+
 ###########################################
 
 
@@ -420,6 +480,16 @@ ret_num_off_errors <- function(errors, data=NULL, warn=FALSE, ...){
               ifelse(num.of.errors==1,"", "s")))
 }
 
+success_message <- function(data=NULL) {
+  message("Assertion passed")
+  return(data)
+}
+
+error_message <- function(errors, data=NULL) {
+  message("Assertion failed")
+  return(data)
+}
+
 ##### !!! chaining: assert
 test_that("assert works with chaining", {
 
@@ -432,6 +502,15 @@ test_that("assert works with chaining", {
   }
   expect_equal(code_to_test(), test.df)
 
+  # only assert with print state on success in chain
+  code_to_test <- function() {
+    test.df %>%
+      chain_start %>%
+      assert(in_set(0,1,2), x, success_fun = success_message, skip_chain_opts = TRUE) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion passed")
+
   # only assert with error
   code_to_test <- function() {
     test.df %>%
@@ -440,6 +519,15 @@ test_that("assert works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There is 1 error")
+
+  # only assert with printed state on error in chain
+  code_to_test <- function() {
+    test.df %>%
+      chain_start %>%
+      assert(in_set(0,1), x, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
 
   # two asserts with no error
   code_to_test <- function() {
@@ -461,6 +549,16 @@ test_that("assert works with chaining", {
   }
   expect_output(code_to_test(), "There is 1 error")
 
+  # two asserts with error (1st) and chain callback overwriten
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert(in_set(0,1), x, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      assert(within_bounds(1,2),y) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
+
   # only assert with error (2st)
   code_to_test <- function() {
     test.df2 %>%
@@ -480,6 +578,16 @@ test_that("assert works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There are 2 errors")
+
+  # two asserts with two errors and one callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert(within_bounds(1,1.5),y, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      assert(in_set(0,1), x) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(expect_message(code_to_test(), "Assertion failed"), "There is 1 error")
 })
 
 
@@ -495,6 +603,15 @@ test_that("assert_rows works with chaining", {
   }
   expect_equal(code_to_test(), test.df2)
 
+  # only assert_rows with print state on success in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(col_concat, is_uniq, x, y, success_fun = success_message, skip_chain_opts = TRUE) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion passed")
+
   # only assert_row with error
   code_to_test <- function() {
     test.df2 %>%
@@ -503,6 +620,15 @@ test_that("assert_rows works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There is 1 error")
+
+  # only assert_rows with printed state on error in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(rowSums, not_na, x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
 
   # two asserts_row with no error
   code_to_test <- function() {
@@ -524,6 +650,16 @@ test_that("assert_rows works with chaining", {
   }
   expect_output(code_to_test(), "There is 1 error")
 
+  # two assert_rows with error (1st) and callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(rowSums, is.character, x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      assert_rows(col_concat, is.character, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
+
   # only assert_rows with error (2st)
   code_to_test <- function() {
     test.df2 %>%
@@ -543,6 +679,16 @@ test_that("assert_rows works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There are 2 errors")
+
+  # only assert_rows with two errors and one callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      assert_rows(col_concat, is.numeric, x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      assert_rows(rowSums, is.character, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(expect_message(code_to_test(), "Assertion failed"))
 })
 
 
@@ -560,6 +706,15 @@ test_that("insist works with chaining", {
   }
   expect_equal(code_to_test(), test.df2)
 
+  # only insist with print state on success in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(5), x, y, z, success_fun = success_message, skip_chain_opts = TRUE) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion passed")
+
   # only insist with error (3 of them, though)
   code_to_test <- function() {
     test.df2 %>%
@@ -568,6 +723,15 @@ test_that("insist works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There are 3 errors")
+
+  # only insist with printed state on error in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(.4), x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
 
   # two insists with no error
   code_to_test <- function() {
@@ -589,6 +753,16 @@ test_that("insist works with chaining", {
   }
   expect_output(code_to_test(), "There are 3 errors")
 
+  # two insists with error (1st) and callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_mads(.4), x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      insist(within_n_sds(5), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
+
   # two insists with error (2st)
   code_to_test <- function() {
     test.df2 %>%
@@ -608,9 +782,17 @@ test_that("insist works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There are 6 errors")
+
+  # two insists with two errors and one callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist(within_n_sds(.4), x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      insist(within_n_mads(.4), x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(expect_message(code_to_test(), "Assertion failed"))
 })
-
-
 
 
 ##### !!! chaining: insist_rows
@@ -625,6 +807,15 @@ test_that("insist_rows works with chaining", {
   }
   expect_equal(code_to_test(), test.df2)
 
+  # only insist_rows with print state on success in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) TRUE}, x, y, z, success_fun = success_message, skip_chain_opts = TRUE) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion passed")
+
   # only insist_rows with error (3 of them, though)
   code_to_test <- function() {
     test.df2 %>%
@@ -633,6 +824,15 @@ test_that("insist_rows works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There is 1 error")
+
+  # only insist_rows with printed state on error in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
 
   # two insists_rows with no error
   code_to_test <- function() {
@@ -654,6 +854,16 @@ test_that("insist_rows works with chaining", {
   }
   expect_output(code_to_test(), "There is 1 error")
 
+  # two insists_rows with error (1st) and callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      insist_rows(col_concat, function(x){function(...) TRUE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
+
   # two insists with error (2st)
   code_to_test <- function() {
     test.df2 %>%
@@ -673,8 +883,17 @@ test_that("insist_rows works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There are 2 errors")
-})
 
+  # two insists_rows with two errors and one callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      insist_rows(col_concat, function(x){function(...) FALSE}, x, y, z, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      insist_rows(maha_dist, function(x){function(...) FALSE}, x, y, z) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(expect_message(code_to_test(), "Assertion failed"), "There is 1 error")
+})
 
 
 ##### !!! chaining: verify
@@ -689,6 +908,15 @@ test_that("verify works with chaining", {
   }
   expect_equal(code_to_test(), test.df2)
 
+  # only verify with print state on success in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x >= 0, success_fun = success_message, skip_chain_opts = TRUE) %>%
+      chain_end %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion passed")
+
   # only verify with error
   code_to_test <- function() {
     test.df2 %>%
@@ -697,6 +925,15 @@ test_that("verify works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There is 1 error")
+
+  # only verify with printed state on error in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x > 0, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
 
   # two verify with no error
   code_to_test <- function() {
@@ -718,6 +955,16 @@ test_that("verify works with chaining", {
   }
   expect_output(code_to_test(), "There is 1 error")
 
+  # two verify with error (1st) and callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(x > 0, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      verify(y > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_message(code_to_test(), "Assertion failed")
+
   # two verify with error (2st)
   code_to_test <- function() {
     test.df2 %>%
@@ -737,6 +984,16 @@ test_that("verify works with chaining", {
       chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
   }
   expect_output(code_to_test(), "There are 2 errors")
+
+  # two verify with two errors and one callback overwritten in chain
+  code_to_test <- function() {
+    test.df2 %>%
+      chain_start %>%
+      verify(y > 2, error_fun = error_message, skip_chain_opts = TRUE) %>%
+      verify(x > 0) %>%
+      chain_end(error_fun=ret_num_off_errors) %>% strip_attributes
+  }
+  expect_output(expect_message(code_to_test(), "Assertion failed"), "There is 1 error")
 })
 ###################################
 

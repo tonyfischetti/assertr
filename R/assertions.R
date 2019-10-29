@@ -22,6 +22,8 @@
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
+#' @param skip_chain_opts If TRUE, \code{success_fun} and \code{error_fun}
+#'                        are used even if assertion is called within a chain.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -55,7 +57,7 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
-                      error_fun=error_stop){
+                      error_fun=error_stop, skip_chain_opts=FALSE){
   keeper.vars <- dplyr::quos(...)
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(predicate, "call"))){
@@ -63,13 +65,13 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
-  if(!is.null(success_fun_override)){
+  if(!skip_chain_opts && !is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
       # warning("user defined success_fun overridden by assertr chain")
     success_fun <- success_fun_override
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
-  if(!is.null(error_fun_override)){
+  if(!skip_chain_opts && !is.null(error_fun_override)){
     if(!identical(error_fun, error_fun_override))
       # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
@@ -145,6 +147,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
+#' @param skip_chain_opts If TRUE, \code{success_fun} and \code{error_fun}
+#'                        are used even if assertion is called within a chain.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -178,7 +182,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 #'
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
                          success_fun=success_continue,
-                         error_fun=error_stop){
+                         error_fun=error_stop, skip_chain_opts=FALSE){
   keeper.vars <- dplyr::quos(...)
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
@@ -190,13 +194,13 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
-  if(!is.null(success_fun_override)){
+  if(!skip_chain_opts && !is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
       # warning("user defined success_fun overridden by assertr chain")
     success_fun <- success_fun_override
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
-  if(!is.null(error_fun_override)){
+  if(!skip_chain_opts && !is.null(error_fun_override)){
     if(!identical(error_fun, error_fun_override))
       # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
@@ -262,6 +266,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
+#' @param skip_chain_opts If TRUE, \code{success_fun} and \code{error_fun}
+#'                        are used even if assertion is called within a chain.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -294,7 +300,7 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 #' @export
 insist <- function(data, predicate_generator, ...,
                     success_fun=success_continue,
-                    error_fun=error_stop){
+                    error_fun=error_stop, skip_chain_opts=FALSE){
   keeper.vars <- dplyr::quos(...)
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
@@ -303,13 +309,13 @@ insist <- function(data, predicate_generator, ...,
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
-  if(!is.null(success_fun_override)){
+  if(!skip_chain_opts && !is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
       # warning("user defined success_fun overridden by assertr chain")
     success_fun <- success_fun_override
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
-  if(!is.null(error_fun_override)){
+  if(!skip_chain_opts && !is.null(error_fun_override)){
     if(!identical(error_fun, error_fun_override))
       # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
@@ -385,6 +391,8 @@ insist <- function(data, predicate_generator, ...,
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
+#' @param skip_chain_opts If TRUE, \code{success_fun} and \code{error_fun}
+#'                        are used even if assertion is called within a chain.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -417,7 +425,7 @@ insist <- function(data, predicate_generator, ...,
 #'
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                          success_fun=success_continue,
-                         error_fun=error_stop){
+                         error_fun=error_stop, skip_chain_opts=FALSE){
   keeper.vars <- dplyr::quos(...)
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate.generator <- rlang::expr_text(
@@ -430,13 +438,13 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
-  if(!is.null(success_fun_override)){
+  if(!skip_chain_opts && !is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
       # warning("user defined success_fun overridden by assertr chain")
     success_fun <- success_fun_override
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
-  if(!is.null(error_fun_override)){
+  if(!skip_chain_opts && !is.null(error_fun_override)){
     if(!identical(error_fun, error_fun_override))
       # warning("user defined error_fun overriden by assertr chain")
     error_fun <- error_fun_override
@@ -493,6 +501,8 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #'                    returning \code{data}.
 #' @param error_fun Function to call if assertion fails. Defaults to printing
 #'                  a summary of all errors.
+#' @param skip_chain_opts If TRUE, \code{success_fun} and \code{error_fun}
+#'                        are used even if assertion is called within a chain.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -534,7 +544,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #'
 #' @export
 verify <- function(data, expr, success_fun=success_continue,
-                   error_fun=error_stop){
+                   error_fun=error_stop, skip_chain_opts=FALSE){
   expr <- rlang::enexpr(expr)
   # Use eval_tidy here to get the .data pronoun and all the eval_tidy benefits
   logical.results <- rlang::eval_tidy(expr, data, parent.frame())
@@ -551,12 +561,12 @@ verify <- function(data, expr, success_fun=success_continue,
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
-  if(!is.null(success_fun_override)){
+  if(!skip_chain_opts && !is.null(success_fun_override)){
     if(!identical(success_fun, success_fun_override))
     success_fun <- success_fun_override
   }
   error_fun_override <- attr(data, "assertr_in_chain_error_fun_override")
-  if(!is.null(error_fun_override)){
+  if(!skip_chain_opts && !is.null(error_fun_override)){
     if(!identical(error_fun, error_fun_override))
     error_fun <- error_fun_override
   }
