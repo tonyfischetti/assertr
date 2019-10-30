@@ -4,6 +4,9 @@
 \alias{success_and_error_functions}
 \alias{success_logical}
 \alias{success_continue}
+\alias{success_append}
+\alias{success_report}
+\alias{success_df_return}
 \alias{error_stop}
 \alias{just_warn}
 \alias{error_report}
@@ -17,6 +20,12 @@
 success_logical(data, ...)
 
 success_continue(data, ...)
+
+success_append(data, ...)
+
+success_report(data, ...)
+
+success_df_return(data, ...)
 
 error_stop(errors, data = NULL, warn = FALSE, ...)
 
@@ -50,12 +59,22 @@ passes or fails is configurable via the \code{success_fun}
 and \code{error_fun} parameters, respectively.
 The \code{success_fun} parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
-write your own success handler function, but there are two
+write your own success handler function, but there are a few
 provided by this package:
 \itemize{
   \item \code{success_continue} - just returns the data that was
                                    passed into the assertion function
   \item \code{success_logical} - returns TRUE
+  \item \code{success_append} - returns the data that was
+                                passed into the assertion function
+                                but also stores basic information about
+                                verification result
+  \item \code{success_report} - When success results are stored, and each
+                                verification ended up with success prints
+                                summary of all successful validations
+  \item \code{success_df_return} - When success results are stored, and each
+                                   verification ended up with success prints
+                                   data.frame with verification results
 }
 The \code{error_fun} parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can

@@ -57,7 +57,8 @@
 #'
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
-                      error_fun=error_stop, skip_chain_opts=FALSE){
+                   error_fun=error_stop, skip_chain_opts=FALSE){
+
   keeper.vars <- dplyr::quos(...)
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
   if(!is.null(attr(predicate, "call"))){
@@ -96,9 +97,10 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
     colnames(log.mat) <- colnames(sub.frame)
   }
 
-  # if all checks pass *and* there are no leftover errors
-  if(all(log.mat) && is.null(attr(data, "assertr_errors")))
-    return(success_fun(data))
+  # if all checks pass in current assertion
+  if(all(log.mat))
+    return(success_fun(data, "assert", name.of.predicate, colnames(log.mat), NA))
+
 
   #print(names(log.mat))
   errors <- lapply(colnames(log.mat), function(col.name){
@@ -217,16 +219,11 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
 
-  # if all checks pass *and* there are no leftover errors
-  if(all(log.vec) && is.null(attr(data, "assertr_errors")))
-    return(success_fun(data))
+  # if all checks pass in current assertion
+  if(all(log.vec))
+    return(success_fun(data, "assert_rows", name.of.predicate, colnames(sub.frame), name.of.row.redux.fn))
 
   num.violations <- sum(!log.vec)
-  if(num.violations==0)
-    # There are errors, just no new ones, so calling success
-    # is inappropriate, so we must call the error function.
-    # NOT calling either function would break the pipeline.
-    return(error_fun(list(), data=data))
   loc.violations <- which(!log.vec)
   offending.elements <- redux[!log.vec]
 
@@ -336,9 +333,9 @@ insist <- function(data, predicate_generator, ...,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
-  # if all checks pass *and* there are no leftover errors
-  if(all(log.mat) && is.null(attr(data, "assertr_errors")))
-    return(success_fun(data))
+  # if all checks pass in current assertion
+  if(all(log.mat))
+    return(success_fun(data, "insist", name.of.predicate.generator, colnames(sub.frame), NA))
 
   errors <- lapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
@@ -461,15 +458,10 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
   log.vec <- apply.predicate.to.vector(redux, predicate)
 
   # if all checks pass *and* there are no leftover errors
-  if(all(log.vec) && is.null(attr(data, "assertr_errors")))
-    return(success_fun(data))
+  if(all(log.vec))
+    return(success_fun(data, "insist_rows", name.of.predicate.generator, colnames(sub.frame), name.of.row.redux.fn))
 
   num.violations <- sum(!log.vec)
-  if(num.violations==0)
-    # There are errors, just no new ones, so calling success
-    # is inappropriate, so we must call the error function.
-    # NOT calling either function would break the pipeline.
-    return(error_fun(list(), data=data))
   loc.violations <- which(!log.vec)
   offending.elements <- redux[!log.vec]
 
@@ -571,11 +563,10 @@ verify <- function(data, expr, success_fun=success_continue,
     error_fun <- error_fun_override
   }
 
-  # if all checks pass *and* there are no leftover errors
-  if(all(logical.results) && is.null(attr(data, "assertr_errors")))
-    return(success_fun(data))
+  # if all checks pass in current assertion
+  if(all(logical.results))
+    return(success_fun(data, "verify", deparse(expr), NA, NA))
   num.violations <- sum(!logical.results)
-  if(num.violations==0) return(error_fun(list(), data=data))
   error <- make.assertr.verify.error("verify",
                                      num.violations, deparse(expr),
                                      (1:length(logical.results))[!logical.results])

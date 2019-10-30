@@ -474,13 +474,27 @@ and `error_fun` parameters, respectively.
 
 The `success_fun` parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
-write your own success handler function, but there are two
+write your own success handler function, but there are a few
 provided by this package:
 
   * `success_continue` - just returns the data that was passed into the
-    assertion function (this is default)
+    assertion function (this is default).
 
   * `success_logical` - returns TRUE
+  
+  * `success_append` - returns the data that was passed into the assertion 
+    function but also attaches basic information about verification result
+    to a special attribute of `data`.
+
+  * `success_report` - when success results are stored 
+    (`chain_start(store_results=TRUE)`), and each verification ended up with 
+    success prints summary of all successful validations (when being in chan) 
+    or simple verification result for single check and returns data.
+    
+  * `success_df_return` - when success results are stored 
+    (`chain_start(store_results=TRUE)`), and each verification ended up with success 
+    prints data.frame with verification results (can be used for `chain_end` or 
+    single verification).
 
 The `error_fun` parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
@@ -613,6 +627,18 @@ mtcars %>%
   assert(in_set(0,1), am, vs) %>%
   chain_end 
 ```
+
+You may also store validation successful results by using `store_success=TRUE`:
+```
+mtcars %>%
+  chain_start(store_success=TRUE) %>%
+  verify(nrow(mtcars) == 32) %>%
+  verify(mpg > 0) %>%
+  insist(within_n_sds(4), mpg) %>%
+  assert(in_set(0,1), am, vs) %>%
+  chain_end(success_fun=success_df_return)
+```
+
 
 ### advanced: send email reports using custom error functions
 
