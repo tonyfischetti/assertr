@@ -12,6 +12,7 @@
 \alias{error_report}
 \alias{warn_report}
 \alias{error_append}
+\alias{warning_append}
 \alias{error_return}
 \alias{error_df_return}
 \alias{error_logical}
@@ -39,6 +40,8 @@ error_report(errors, data = NULL, warn = FALSE, ...)
 warn_report(errors, data = NULL)
 
 error_append(errors, data = NULL)
+
+warning_append(errors, data = NULL)
 
 error_return(errors, data = NULL)
 
