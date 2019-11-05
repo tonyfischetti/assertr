@@ -1,6 +1,6 @@
 context("success_fun and error_fun in errors.R")
 
-success_result <- function(verb, the_call, columns, row_redux_call) {
+success_result <- function(verb, the_call, columns, row_redux_call, description) {
   row_redux_message <- ""
   if (!is.na(row_redux_call))
     row_redux_message <- paste0(" on ", row_redux_call, " row reduction")
@@ -10,7 +10,8 @@ success_result <- function(verb, the_call, columns, row_redux_call) {
     message = msg,
     call = the_call,
     columns = columns,
-    row_redux_call = row_redux_call
+    row_redux_call = row_redux_call,
+    description = description
   )
   class(success) <- c("assertr_success", "success", "condition")
   list(success)
@@ -22,8 +23,8 @@ get_assertr_success <- function(assertion) {
 
 test_that("success_append appends varification result to data", {
   expect_equal(
-    get_assertr_success(success_append(mtcars, "method", "rule", "column", "redux")),
-    success_result("method", "rule", "column", "redux")
+    get_assertr_success(success_append(mtcars, "method", "rule", "column", "redux", NA)),
+    success_result("method", "rule", "column", "redux", NA)
   )
 })
 
@@ -292,13 +293,14 @@ test_that("success_report works fine with verification methods", {
 
 })
 
-success_df <- function(verb, message, call, columns, row_redux_call) {
+success_df <- function(verb, message, call, columns, row_redux_call, description) {
   data.frame(
     verb = verb,
     message = message,
     call = call,
     columns = columns,
     row_redux_call = row_redux_call,
+    description = description,
     stringsAsFactors = FALSE
   )
 }
@@ -307,13 +309,13 @@ test_that("success_df_return works fine with verification methods", {
   # single assert rule outside chain
   expect_equal(
     assert(mtcars, in_set(0, 1), am, success_fun = success_df_return),
-    success_df("assert", "verification [in_set(0, 1)] passed!", "in_set(0, 1)", "am", NA)
+    success_df("assert", "verification [in_set(0, 1)] passed!", "in_set(0, 1)", "am", NA, NA)
   )
 
   # single assert rule inside chain
   expect_equal(
     mtcars %>% chain_start(store_success = TRUE) %>% assert(in_set(0, 1), am) %>% chain_end(success_df_return),
-    success_df("assert", "verification [in_set(0, 1)] passed!", "in_set(0, 1)", "am", NA)
+    success_df("assert", "verification [in_set(0, 1)] passed!", "in_set(0, 1)", "am", NA, NA)
   )
 
   # single assert rule inside chain without store_success
@@ -328,7 +330,9 @@ test_that("success_df_return works fine with verification methods", {
       assert(in_set(0, 1), am) %>%
       assert(in_set(0, 1), vs) %>%
       chain_end(success_df_return),
-    success_df(rep("assert", 2), rep("verification [in_set(0, 1)] passed!", 2), rep("in_set(0, 1)", 2), c("am", "vs"), rep(NA, 2))
+    success_df(
+      rep("assert", 2), rep("verification [in_set(0, 1)] passed!", 2),
+      rep("in_set(0, 1)", 2), c("am", "vs"), rep(NA, 2), rep(NA, 2))
   )
 
   # two assert rules inside chain without store_success = TRUE
@@ -343,13 +347,13 @@ test_that("success_df_return works fine with verification methods", {
   # single verify rule outside chain
   expect_equal(
     mtcars %>% verify(drat > 2, success_fun = success_df_return),
-    success_df("verify", "verification [drat > 2] passed!", "drat > 2", NA, NA)
+    success_df("verify", "verification [drat > 2] passed!", "drat > 2", NA, NA, NA)
   )
 
   # single verify rule inside chain
   expect_equal(
     mtcars %>% chain_start(store_success = TRUE) %>% verify(drat > 2) %>% chain_end(success_df_return),
-    success_df("verify", "verification [drat > 2] passed!", "drat > 2", NA, NA)
+    success_df("verify", "verification [drat > 2] passed!", "drat > 2", NA, NA, NA)
   )
 
   # single verify rule inside chain without store_success
@@ -366,7 +370,7 @@ test_that("success_df_return works fine with verification methods", {
       chain_end(success_df_return),
     success_df(
       rep("verify", 2), c("verification [drat > 2] passed!", "verification [am %in% c(0, 1)] passed!"),
-      c("drat > 2", "am %in% c(0, 1)"), rep(NA, 2), rep(NA, 2))
+      c("drat > 2", "am %in% c(0, 1)"), rep(NA, 2), rep(NA, 2), rep(NA, 2))
   )
 
   # two verify rules inside chain without store_success = TRUE
@@ -381,7 +385,9 @@ test_that("success_df_return works fine with verification methods", {
   # single assert_rows rule outside chain
   expect_equal(
     assert_rows(mtcars, rowSums, within_bounds(0,2), vs, am, success_fun = success_df_return),
-    success_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction passed!", "within_bounds(0, 2)", "vs, am", "rowSums")
+    success_df(
+      "assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction passed!",
+      "within_bounds(0, 2)", "vs, am", "rowSums", NA)
   )
 
   # single assert_rows rule inside chain
@@ -389,7 +395,9 @@ test_that("success_df_return works fine with verification methods", {
     mtcars %>% chain_start(store_success = TRUE) %>%
       assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
       chain_end(success_df_return),
-    success_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction passed!", "within_bounds(0, 2)", "vs, am", "rowSums")
+    success_df(
+      "assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction passed!",
+      "within_bounds(0, 2)", "vs, am", "rowSums", NA)
   )
 
   # single assert_rows rule inside chain without store_success
@@ -407,7 +415,7 @@ test_that("success_df_return works fine with verification methods", {
     success_df(
       rep("assert_rows", 2),
       c("verification [within_bounds(0, 2)] on rowSums row reduction passed!", "verification [within_bounds(0, 0.1)] on num_row_NAs row reduction passed!"),
-      c("within_bounds(0, 2)", "within_bounds(0, 0.1)"), rep("vs, am", 2), c("rowSums", "num_row_NAs")
+      c("within_bounds(0, 2)", "within_bounds(0, 0.1)"), rep("vs, am", 2), c("rowSums", "num_row_NAs"), rep(NA, 2)
     )
   )
 
@@ -423,7 +431,7 @@ test_that("success_df_return works fine with verification methods", {
   # single insist rule outside chain
   expect_equal(
     insist(mtcars, within_n_sds(5), vs, success_fun = success_df_return),
-    success_df("insist", "verification [within_n_sds(5)] passed!", "within_n_sds(5)", "vs", NA)
+    success_df("insist", "verification [within_n_sds(5)] passed!", "within_n_sds(5)", "vs", NA, NA)
   )
 
   # single insist rule inside chain
@@ -431,7 +439,7 @@ test_that("success_df_return works fine with verification methods", {
     mtcars %>% chain_start(store_success = TRUE) %>%
       insist(within_n_sds(5), vs) %>%
       chain_end(success_df_return),
-    success_df("insist", "verification [within_n_sds(5)] passed!", "within_n_sds(5)", "vs", NA)
+    success_df("insist", "verification [within_n_sds(5)] passed!", "within_n_sds(5)", "vs", NA, NA)
   )
 
   # single insist rule inside chain without store_success
@@ -447,7 +455,7 @@ test_that("success_df_return works fine with verification methods", {
       insist(within_n_sds(5), am) %>%
       chain_end(success_df_return),
     success_df(
-      rep("insist", 2), rep("verification [within_n_sds(5)] passed!", 2), rep("within_n_sds(5)", 2), c("vs", "am"), rep(NA, 2)
+      rep("insist", 2), rep("verification [within_n_sds(5)] passed!", 2), rep("within_n_sds(5)", 2), c("vs", "am"), rep(NA, 2), rep(NA, 2)
     )
   )
 
@@ -464,7 +472,7 @@ test_that("success_df_return works fine with verification methods", {
   expect_equal(
     insist_rows(iris, maha_dist, within_n_sds(6), Sepal.Length:Petal.Length, success_fun = success_df_return),
     success_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction passed!", "within_n_sds(6)",
-               "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist")
+               "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist", NA)
   )
 
   # single insist_rows rule inside chain
@@ -473,7 +481,7 @@ test_that("success_df_return works fine with verification methods", {
       insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
       chain_end(success_df_return),
     success_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction passed!", "within_n_sds(6)",
-               "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist")
+               "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist", NA)
   )
 
   # single insist_rows rule inside chain without store_success
@@ -490,9 +498,9 @@ test_that("success_df_return works fine with verification methods", {
       chain_end(success_df_return),
     rbind(
       success_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction passed!", "within_n_sds(6)",
-                 "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist"),
+                 "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist", NA),
       success_df("insist_rows", "verification [within_n_sds(7)] on maha_dist row reduction passed!", "within_n_sds(7)",
-                 "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist")
+                 "Sepal.Length, Sepal.Width, Petal.Length", "maha_dist", NA)
     )
   )
 
@@ -510,20 +518,21 @@ test_that("success_df_return works fine with verification methods", {
 
 # defects
 
-defect_result <- function(verb, the_call, columns, row_redux_call) {
+defect_result <- function(verb, the_call, columns, row_redux_call, description) {
   row_redux_message <- ""
   if (!is.na(row_redux_call))
     row_redux_message <- paste0(" on ", row_redux_call, " row reduction")
   msg <- paste0("verification [", the_call, "]", row_redux_message, " omitted due to data defect!")
-  success <- list(
+  defect <- list(
     verb = verb,
     message = msg,
     call = the_call,
     columns = columns,
-    row_redux_call = row_redux_call
+    row_redux_call = row_redux_call,
+    description = description
   )
-  class(success) <- c("assertr_defect", "defect", "condition")
-  list(success)
+  class(defect) <- c("assertr_defect", "defect", "condition")
+  list(defect)
 }
 
 get_assertr_defect <- function(assertion) {
@@ -532,8 +541,8 @@ get_assertr_defect <- function(assertion) {
 
 test_that("success_defect appends omitted verification due to defect of data", {
   expect_equal(
-    get_assertr_defect(defect_append(NULL, mtcars, "method", "rule", "column", "redux")),
-    defect_result("method", "rule", "column", "redux")
+    get_assertr_defect(defect_append(NULL, mtcars, "method", "rule", "column", "redux", NA)),
+    defect_result("method", "rule", "column", "redux", NA)
   )
 })
 
@@ -823,13 +832,14 @@ test_that("defect_report works fine with verification methods", {
 
 })
 
-defect_df <- function(verb, message, call, columns, row_redux_call) {
+defect_df <- function(verb, message, call, columns, row_redux_call, description) {
   data.frame(
     verb = verb,
     message = message,
     call = call,
     columns = columns,
     row_redux_call = row_redux_call,
+    description = description,
     stringsAsFactors = FALSE
   )
 }
@@ -848,13 +858,13 @@ test_that("defect_df_return works fine with verification methods", {
   expect_equal(
     defected_data %>%
     assert(in_set(0, 1), am, defect_fun = defect_df_return),
-    defect_df("assert", "verification [in_set(0, 1)] omitted due to data defect!", "in_set(0, 1)", "am", NA)
+    defect_df("assert", "verification [in_set(0, 1)] omitted due to data defect!", "in_set(0, 1)", "am", NA, NA)
   )
 
   # single assert rule inside chain
   expect_equal(
     defected_data_in_chain %>% assert(in_set(0, 1), am) %>% chain_end(error_fun = defect_df_return),
-    defect_df("assert", "verification [in_set(0, 1)] omitted due to data defect!", "in_set(0, 1)", "am", NA)
+    defect_df("assert", "verification [in_set(0, 1)] omitted due to data defect!", "in_set(0, 1)", "am", NA, NA)
   )
 
   # single assert rule on not defected data inside chain
@@ -869,7 +879,9 @@ test_that("defect_df_return works fine with verification methods", {
       assert(in_set(0, 1), am) %>%
       assert(in_set(0, 1), vs) %>%
       chain_end(error_fun = defect_df_return),
-    defect_df(rep("assert", 2), rep("verification [in_set(0, 1)] omitted due to data defect!", 2), rep("in_set(0, 1)", 2), c("am", "vs"), rep(NA, 2))
+    defect_df(
+      rep("assert", 2), rep("verification [in_set(0, 1)] omitted due to data defect!", 2),
+      rep("in_set(0, 1)", 2), c("am", "vs"), rep(NA, 2), rep(NA, 2))
   )
 
   # two assert rules on not defected data inside chain
@@ -884,13 +896,13 @@ test_that("defect_df_return works fine with verification methods", {
   # single verify rule on defected data outside chain
   expect_equal(
     defected_data %>% verify(drat > 2, defect_fun = defect_df_return),
-    defect_df("verify", "verification [drat > 2] omitted due to data defect!", "drat > 2", NA, NA)
+    defect_df("verify", "verification [drat > 2] omitted due to data defect!", "drat > 2", NA, NA, NA)
   )
 
   # single verify rule on defected data inside chain
   expect_equal(
     defected_data_in_chain %>% verify(drat > 2) %>% chain_end(error_fun = defect_df_return),
-    defect_df("verify", "verification [drat > 2] omitted due to data defect!", "drat > 2", NA, NA)
+    defect_df("verify", "verification [drat > 2] omitted due to data defect!", "drat > 2", NA, NA, NA)
   )
 
   # single verify rule on not defected data inside chain without store_defect
@@ -907,7 +919,7 @@ test_that("defect_df_return works fine with verification methods", {
       chain_end(error_fun = defect_df_return),
     defect_df(
       rep("verify", 2), c("verification [drat > 2] omitted due to data defect!", "verification [am %in% c(0, 1)] omitted due to data defect!"),
-      c("drat > 2", "am %in% c(0, 1)"), rep(NA, 2), rep(NA, 2))
+      c("drat > 2", "am %in% c(0, 1)"), rep(NA, 2), rep(NA, 2), rep(NA, 2))
   )
 
   # two verify rules on not defected data inside
@@ -923,7 +935,8 @@ test_that("defect_df_return works fine with verification methods", {
   expect_equal(
     defected_data %>%
       assert_rows(rowSums, within_bounds(0,2), vs, am, defect_fun = defect_df_return),
-    defect_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!", "within_bounds(0, 2)", "vs, am", "rowSums")
+    defect_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!",
+              "within_bounds(0, 2)", "vs, am", "rowSums", NA)
   )
 
   # single assert_rows rule on defected data inside chain
@@ -931,7 +944,8 @@ test_that("defect_df_return works fine with verification methods", {
     defected_data_in_chain %>%
       assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
       chain_end(error_fun = defect_df_return),
-    defect_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!", "within_bounds(0, 2)", "vs, am", "rowSums")
+    defect_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!",
+              "within_bounds(0, 2)", "vs, am", "rowSums", NA)
   )
 
   # single assert_rows rule on defected data inside chain without store_defect
@@ -949,7 +963,7 @@ test_that("defect_df_return works fine with verification methods", {
     defect_df(
       rep("assert_rows", 2),
       c("verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!", "verification [within_bounds(0, 0.1)] on num_row_NAs row reduction omitted due to data defect!"),
-      c("within_bounds(0, 2)", "within_bounds(0, 0.1)"), rep("vs, am", 2), c("rowSums", "num_row_NAs")
+      c("within_bounds(0, 2)", "within_bounds(0, 0.1)"), rep("vs, am", 2), c("rowSums", "num_row_NAs"), rep(NA, 2)
     )
   )
 
@@ -966,7 +980,7 @@ test_that("defect_df_return works fine with verification methods", {
   expect_equal(
     defected_data %>%
       insist(within_n_sds(5), vs, defect_fun = defect_df_return),
-    defect_df("insist", "verification [within_n_sds(5)] omitted due to data defect!", "within_n_sds(5)", "vs", NA)
+    defect_df("insist", "verification [within_n_sds(5)] omitted due to data defect!", "within_n_sds(5)", "vs", NA, NA)
   )
 
   # single insist rule on defected data inside chain
@@ -974,7 +988,7 @@ test_that("defect_df_return works fine with verification methods", {
     defected_data_in_chain %>%
       insist(within_n_sds(5), vs) %>%
       chain_end(error_fun = defect_df_return),
-    defect_df("insist", "verification [within_n_sds(5)] omitted due to data defect!", "within_n_sds(5)", "vs", NA)
+    defect_df("insist", "verification [within_n_sds(5)] omitted due to data defect!", "within_n_sds(5)", "vs", NA, NA)
   )
 
   # single insist rule on defected data inside chain without store_defect
@@ -990,7 +1004,7 @@ test_that("defect_df_return works fine with verification methods", {
       insist(within_n_sds(5), am) %>%
       chain_end(error_fun = defect_df_return),
     defect_df(
-      rep("insist", 2), rep("verification [within_n_sds(5)] omitted due to data defect!", 2), rep("within_n_sds(5)", 2), c("vs", "am"), rep(NA, 2)
+      rep("insist", 2), rep("verification [within_n_sds(5)] omitted due to data defect!", 2), rep("within_n_sds(5)", 2), c("vs", "am"), rep(NA, 2), rep(NA, 2)
     )
   )
 
@@ -1009,7 +1023,7 @@ test_that("defect_df_return works fine with verification methods", {
       insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE, error_fun = error_append) %>%
       insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length, defect_fun = defect_df_return),
     defect_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(6)",
-               "Sepal.Length:Petal.Length", "maha_dist")
+               "Sepal.Length:Petal.Length", "maha_dist", NA)
   )
 
   # single insist_rows rule on defected data inside chain
@@ -1019,7 +1033,7 @@ test_that("defect_df_return works fine with verification methods", {
       insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
       chain_end(error_fun = defect_df_return),
     defect_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(6)",
-               "Sepal.Length:Petal.Length", "maha_dist")
+               "Sepal.Length:Petal.Length", "maha_dist", NA)
   )
 
   # single insist_rows rule on defected data inside chain without store_defect
@@ -1039,9 +1053,9 @@ test_that("defect_df_return works fine with verification methods", {
       chain_end(error_fun = defect_df_return),
     rbind(
       defect_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(6)",
-                 "Sepal.Length:Petal.Length", "maha_dist"),
+                 "Sepal.Length:Petal.Length", "maha_dist", NA),
       defect_df("insist_rows", "verification [within_n_sds(7)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(7)",
-                 "Sepal.Length:Petal.Length", "maha_dist")
+                 "Sepal.Length:Petal.Length", "maha_dist", NA)
     )
   )
 

@@ -29,6 +29,8 @@
 #'                   \code{defect_fun} function.
 #' @param defect_fun Function to call when data is defected. Defaults to skipping
 #'                   assertion and storing info about it in special attribute.
+#' @param description Custom description of the rule. Is stored in result
+#'                    reports ans data.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -63,7 +65,8 @@
 #' @export
 assert <- function(data, predicate, ..., success_fun=success_continue,
                    error_fun=error_stop, skip_chain_opts=FALSE,
-                   obligatory=FALSE, defect_fun=defect_append){
+                   obligatory=FALSE, defect_fun=defect_append,
+                   description=NA){
 
   keeper.vars <- dplyr::quos(...)
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
@@ -92,7 +95,9 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
     stop("assert requires columns to be selected. Check number of arguments", call.=FALSE)
 
   if(isTRUE(attr(data, "assertr_data_defected")))
-    return(defect_fun(attr(data, "assertr_errors"), data, "assert", name.of.predicate, as.character(dplyr::enexprs(...)), NA))
+    return(defect_fun(
+      attr(data, "assertr_errors"), data, "assert", name.of.predicate,
+      as.character(dplyr::enexprs(...)), NA, description))
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
@@ -109,7 +114,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 
   # if all checks pass in current assertion
   if(all(log.mat))
-    return(success_fun(data, "assert", name.of.predicate, colnames(log.mat), NA))
+    return(success_fun(data, "assert", name.of.predicate, colnames(log.mat), NA, description))
 
   # if errors occured and verification was obligatory
   if(obligatory)
@@ -129,7 +134,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          description)
     return(an_error)
   })
 
@@ -169,6 +175,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 #'                   \code{defect_fun} function.
 #' @param defect_fun Function to call when data is defected. Defaults to skipping
 #'                   assertion and storing info about it in special attribute.
+#' @param description Custom description of the rule. Is stored in result
+#'                    reports ans data.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -203,7 +211,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 assert_rows <- function(data, row_reduction_fn, predicate, ...,
                         success_fun=success_continue,
                         error_fun=error_stop, skip_chain_opts=FALSE,
-                        obligatory=FALSE, defect_fun=defect_append){
+                        obligatory=FALSE, defect_fun=defect_append,
+                        description=NA){
   keeper.vars <- dplyr::quos(...)
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate <- rlang::expr_text(rlang::enexpr(predicate))
@@ -234,7 +243,9 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
     stop("assert_rows requires columns to be selected. Check number of argumentsSelect all columns with everything()", call.=FALSE)
 
   if(isTRUE(attr(data, "assertr_data_defected")))
-    return(defect_fun(attr(data, "assertr_errors"), data, "assert_rows", name.of.predicate, as.character(dplyr::enexprs(...)), name.of.row.redux.fn))
+    return(defect_fun(
+      attr(data, "assertr_errors"), data, "assert_rows", name.of.predicate,
+      as.character(dplyr::enexprs(...)), name.of.row.redux.fn, description))
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
@@ -244,7 +255,9 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
   # if all checks pass in current assertion
   if(all(log.vec))
-    return(success_fun(data, "assert_rows", name.of.predicate, colnames(sub.frame), name.of.row.redux.fn))
+    return(success_fun(
+      data, "assert_rows", name.of.predicate, colnames(sub.frame),
+      name.of.row.redux.fn, description))
 
   # if errors occured and verification was obligatory
   if(obligatory)
@@ -260,7 +273,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                                           as.character(keeper.vars),
                                           num.violations,
                                           loc.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          description)
   error_fun(list(error), data=data)
 
 }
@@ -297,6 +311,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 #'                   \code{defect_fun} function.
 #' @param defect_fun Function to call when data is defected. Defaults to skipping
 #'                   assertion and storing info about it in special attribute.
+#' @param description Custom description of the rule. Is stored in result
+#'                    reports ans data.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -330,7 +346,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 insist <- function(data, predicate_generator, ...,
                    success_fun=success_continue,
                    error_fun=error_stop, skip_chain_opts=FALSE,
-                   obligatory=FALSE, defect_fun=defect_append){
+                   obligatory=FALSE, defect_fun=defect_append,
+                   description=NA){
   keeper.vars <- dplyr::quos(...)
   name.of.predicate.generator <- rlang::expr_text(
       rlang::enexpr(predicate_generator))
@@ -357,7 +374,7 @@ insist <- function(data, predicate_generator, ...,
   if(isTRUE(attr(data, "assertr_data_defected")))
     return(defect_fun(
       attr(data, "assertr_errors"), data, "insist",
-      name.of.predicate.generator, as.character(dplyr::enexprs(...)), NA)
+      name.of.predicate.generator, as.character(dplyr::enexprs(...)), NA, description)
     )
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
@@ -375,7 +392,7 @@ insist <- function(data, predicate_generator, ...,
 
   # if all checks pass in current assertion
   if(all(log.mat))
-    return(success_fun(data, "insist", name.of.predicate.generator, colnames(sub.frame), NA))
+    return(success_fun(data, "insist", name.of.predicate.generator, colnames(sub.frame), NA, description))
 
   # if errors occured and verification was obligatory
   if(obligatory)
@@ -393,7 +410,8 @@ insist <- function(data, predicate_generator, ...,
                                           col.name,
                                           num.violations,
                                           index.of.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          description)
     return(an_error)
   })
 
@@ -439,6 +457,8 @@ insist <- function(data, predicate_generator, ...,
 #'                   \code{defect_fun} function.
 #' @param defect_fun Function to call when data is defected. Defaults to skipping
 #'                   assertion and storing info about it in special attribute.
+#' @param description Custom description of the rule. Is stored in result
+#'                    reports ans data.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -472,7 +492,8 @@ insist <- function(data, predicate_generator, ...,
 insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                         success_fun=success_continue,
                         error_fun=error_stop, skip_chain_opts=FALSE,
-                        obligatory=FALSE, defect_fun=defect_append){
+                        obligatory=FALSE, defect_fun=defect_append,
+                        description=NA){
   keeper.vars <- dplyr::quos(...)
   name.of.row.redux.fn <- rlang::expr_text(rlang::enexpr(row_reduction_fn))
   name.of.predicate.generator <- rlang::expr_text(
@@ -503,7 +524,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
   if(isTRUE(attr(data, "assertr_data_defected")))
     return(defect_fun(
       attr(data, "assertr_errors"), data, "insist_rows", name.of.predicate.generator,
-      as.character(dplyr::enexprs(...)), name.of.row.redux.fn)
+      as.character(dplyr::enexprs(...)), name.of.row.redux.fn, description)
     )
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
@@ -516,7 +537,9 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 
   # if all checks pass *and* there are no leftover errors
   if(all(log.vec))
-    return(success_fun(data, "insist_rows", name.of.predicate.generator, colnames(sub.frame), name.of.row.redux.fn))
+    return(success_fun(
+      data, "insist_rows", name.of.predicate.generator,
+      colnames(sub.frame), name.of.row.redux.fn, description))
 
   # if errors occured and verification was obligatory
   if(obligatory)
@@ -532,7 +555,8 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                                           as.character(keeper.vars),
                                           num.violations,
                                           loc.violations,
-                                          offending.elements)
+                                          offending.elements,
+                                          description)
   error_fun(list(error), data=data)
 }
 
@@ -561,6 +585,8 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #'                   \code{defect_fun} function.
 #' @param defect_fun Function to call when data is defected. Defaults to skipping
 #'                   assertion and storing info about it in special attribute.
+#' @param description Custom description of the rule. Is stored in result
+#'                    reports ans data.
 #'
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
@@ -603,11 +629,12 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #' @export
 verify <- function(data, expr, success_fun=success_continue,
                    error_fun=error_stop, skip_chain_opts=FALSE,
-                   obligatory=FALSE, defect_fun=defect_append){
+                   obligatory=FALSE, defect_fun=defect_append,
+                   description=NA){
   expr <- rlang::enexpr(expr)
 
   if(isTRUE(attr(data, "assertr_data_defected")))
-    return(defect_fun(attr(data, "assertr_errors"), data, "verify", deparse(expr), NA, NA))
+    return(defect_fun(attr(data, "assertr_errors"), data, "verify", deparse(expr), NA, NA, description))
   # Use eval_tidy here to get the .data pronoun and all the eval_tidy benefits
   logical.results <- rlang::eval_tidy(expr, data, parent.frame())
   # NAs are very likely errors, and cause problems in the all() below.
@@ -635,7 +662,7 @@ verify <- function(data, expr, success_fun=success_continue,
 
   # if all checks pass in current assertion
   if(all(logical.results))
-    return(success_fun(data, "verify", deparse(expr), NA, NA))
+    return(success_fun(data, "verify", deparse(expr), NA, NA, description))
 
   # if errors occured and verification was obligatory
   if(obligatory)
@@ -644,6 +671,7 @@ verify <- function(data, expr, success_fun=success_continue,
   num.violations <- sum(!logical.results)
   error <- make.assertr.verify.error("verify",
                                      num.violations, deparse(expr),
-                                     (1:length(logical.results))[!logical.results])
+                                     (1:length(logical.results))[!logical.results],
+                                     description)
   error_fun(list(error), data=data)
 }

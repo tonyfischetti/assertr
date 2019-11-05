@@ -7,7 +7,7 @@
 \usage{
 assert(data, predicate, ..., success_fun = success_continue,
   error_fun = error_stop, skip_chain_opts = FALSE,
-  obligatory = FALSE, defect_fun = defect_append)
+  obligatory = FALSE, defect_fun = defect_append, description = NA)
 
 assert_(data, predicate, ..., .dots, success_fun = success_continue,
   error_fun = error_stop)
@@ -36,6 +36,9 @@ For defected data, all the following rules are handled by
 
 \item{defect_fun}{Function to call when data is defected. Defaults to skipping
 assertion and storing info about it in special attribute.}
+
+\item{description}{Custom description of the rule. Is stored in result
+reports ans data.}
 
 \item{.dots}{Use assert_() to select columns using standard evaluation.}
 }

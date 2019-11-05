@@ -14,7 +14,8 @@ make.assertr.assert.error <- function(verb,
                                       column,
                                       num.violations,
                                       index.of.violations,
-                                      offending.elements){
+                                      offending.elements,
+                                      description){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Column '", column, "' violates assertion '",
                 name.of.predicate,"' ", num.violations, " ", time.or.times)
@@ -30,6 +31,7 @@ make.assertr.assert.error <- function(verb,
   this_error$message <- msg
   this_error$num.violations <- num.violations
   this_error$call <- name.of.predicate
+  this_error$description <- description
 
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
@@ -44,7 +46,8 @@ make.assertr.assert_rows.error <- function(verb,
                                            column,
                                            num.violations,
                                            loc.violations,
-                                           offending.elements){
+                                           offending.elements,
+                                           description){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
                 "' violates predicate '", name.of.predicate,
@@ -59,7 +62,8 @@ make.assertr.assert_rows.error <- function(verb,
   this_error <- list(error_df = error_df,
                      message = msg,
                      num.violations = num.violations,
-                     call = name.of.predicate)
+                     call = name.of.predicate,
+                     description = description)
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")
@@ -80,6 +84,8 @@ make.assertr.assert_rows.error <- function(verb,
 #'
 #' @export
 print.assertr_assert_error <- function(x, ...){
+  if (!is.na(x$description))
+    cat(x$description, "\n")
   cat(x$message)
   cat("\n")
   print(x$error_df)
@@ -95,6 +101,8 @@ print.assertr_assert_error <- function(x, ...){
 #'
 #' @export
 print.assertr_success <- function(x, ...){
+  if (!is.na(x$description))
+    cat(x$description, "\n")
   cat(paste0(x$verb, ":"), x$message)
   if (length(x$columns) > 2 || !is.na(x$columns)) {
     cat(paste(" Verified columns:", paste0(x$columns, collapse = " ")), "\n")
@@ -113,6 +121,8 @@ print.assertr_success <- function(x, ...){
 #'
 #' @export
 print.assertr_defect <- function(x, ...){
+  if (!is.na(x$description))
+    cat(x$description, "\n")
   cat(paste0(x$verb, ":"), x$message)
   if (length(x$columns) > 2 || !is.na(x$columns)) {
     cat(paste(" Columns passed to assertion:", paste0(x$columns, collapse = " ")), "\n")
@@ -147,7 +157,7 @@ summary.assertr_assert_error <- function(object, ...){
 #####################
 # used by "verify"
 
-make.assertr.verify.error <- function(verb, num.violations, the_call, logical.results){
+make.assertr.verify.error <- function(verb, num.violations, the_call, logical.results, description){
   sing.plur <- if (num.violations==1) " failure)" else " failures)"
   msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
 
@@ -161,7 +171,8 @@ make.assertr.verify.error <- function(verb, num.violations, the_call, logical.re
   this_error <- list(error_df = error_df,
                      message = msg,
                      num.violations = num.violations,
-                     call = the_call)
+                     call = the_call,
+                     description = description)
   class(this_error) <- c("assertr_verify_error", "assertr_error",
                          "error", "condition")
   return(this_error)
@@ -177,6 +188,8 @@ make.assertr.verify.error <- function(verb, num.violations, the_call, logical.re
 #'
 #' @export
 print.assertr_verify_error <- function(x, ...){
+  if (!is.na(x$description))
+    cat(x$description, "\n")
   cat(x$message)
   cat("\n\n")
   print(x$error_df)
@@ -292,6 +305,7 @@ success_append <- function(data, ...){
   the_call <- ..2
   columns <- ..3
   row_redux_call <- ..4
+  description <- ..5
   row_redux_message <- ""
   if (!is.na(row_redux_call))
     row_redux_message <- paste0(" on ", row_redux_call, " row reduction")
@@ -301,7 +315,8 @@ success_append <- function(data, ...){
     message = msg,
     call = paste0(the_call, collapse = " "),
     columns = columns,
-    row_redux_call = row_redux_call
+    row_redux_call = row_redux_call,
+    description = description
   )
   class(this_success) <- c("assertr_success", "success", "condition")
   if(is.null(attr(data, "assertr_success")))
@@ -348,6 +363,7 @@ success_df_return <- function(data, ...){
       call = success$call,
       columns = success$columns,
       row_redux_call = success$row_redux_call,
+      description = success$description,
       stringsAsFactors = FALSE
     )
   }
@@ -469,6 +485,7 @@ defect_append <- function(errors, data, ...){
   the_call <- ..2
   columns <- ..3
   row_redux_call <- ..4
+  description <- ..5
   row_redux_message <- ""
   if (!is.na(row_redux_call))
     row_redux_message <- paste0(" on ", row_redux_call, " row reduction")
@@ -478,7 +495,8 @@ defect_append <- function(errors, data, ...){
     message = msg,
     call = paste0(the_call, collapse = " "),
     columns = columns,
-    row_redux_call = row_redux_call
+    row_redux_call = row_redux_call,
+    description = description
   )
   class(this_defect) <- c("assertr_defect", "defect", "condition")
   if(is.null(attr(data, "assertr_defect")))
@@ -525,6 +543,7 @@ defect_df_return <- function(errors, data, ...){
       call = defect$call,
       columns = defect$columns,
       row_redux_call = defect$row_redux_call,
+      description = defect$description,
       stringsAsFactors = FALSE
     )
   }

@@ -9,7 +9,7 @@ after applying row reduction function}
 insist_rows(data, row_reduction_fn, predicate_generator, ...,
   success_fun = success_continue, error_fun = error_stop,
   skip_chain_opts = FALSE, obligatory = FALSE,
-  defect_fun = defect_append)
+  defect_fun = defect_append, description = NA)
 
 insist_rows_(data, row_reduction_fn, predicate_generator, ..., .dots,
   success_fun = success_continue, error_fun = error_stop)
@@ -45,6 +45,9 @@ For defected data, all the following rules are handled by
 
 \item{defect_fun}{Function to call when data is defected. Defaults to skipping
 assertion and storing info about it in special attribute.}
+
+\item{description}{Custom description of the rule. Is stored in result
+reports ans data.}
 
 \item{.dots}{Use insist_rows_() to select columns using standard evaluation.}
 }
