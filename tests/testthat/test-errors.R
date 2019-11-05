@@ -506,3 +506,553 @@ test_that("success_df_return works fine with verification methods", {
   )
 
 })
+
+
+# defects
+
+defect_result <- function(verb, the_call, columns, row_redux_call) {
+  row_redux_message <- ""
+  if (!is.na(row_redux_call))
+    row_redux_message <- paste0(" on ", row_redux_call, " row reduction")
+  msg <- paste0("verification [", the_call, "]", row_redux_message, " omitted due to data defect!")
+  success <- list(
+    verb = verb,
+    message = msg,
+    call = the_call,
+    columns = columns,
+    row_redux_call = row_redux_call
+  )
+  class(success) <- c("assertr_defect", "defect", "condition")
+  list(success)
+}
+
+get_assertr_defect <- function(assertion) {
+  attr(assertion, "assertr_defect")
+}
+
+test_that("success_defect appends omitted verification due to defect of data", {
+  expect_equal(
+    get_assertr_defect(defect_append(NULL, mtcars, "method", "rule", "column", "redux")),
+    defect_result("method", "rule", "column", "redux")
+  )
+})
+
+test_that("defect_report works fine with verification methods", {
+  defected_data <- mtcars %>%
+    assert(in_set(0, 2), vs, obligatory = TRUE, error_fun = error_append)
+  defected_data_in_chain <- mtcars %>% chain_start() %>%
+    assert(in_set(0, 2), vs, obligatory = TRUE)
+  not_defected_data <- mtcars %>%
+    assert(in_set(0, 2), vs, error_fun = error_append)
+  not_defected_data_in_chain <- mtcars %>% chain_start() %>%
+    assert(in_set(0, 2), vs)
+
+  # single assert rule on defected data outside chain
+  expect_output(
+    defected_data %>%
+      assert(in_set(0, 1), am, defect_fun = defect_report),
+    "assert: verification \\[in_set\\(0, 1\\)\\] omitted due to data defect! Columns passed to assertion: am "
+  )
+
+  # single assert rule on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      assert(in_set(0, 1), am) %>%
+      chain_end(error_fun = defect_report),
+    "1 assertion omitted: \\nassert: verification \\[in_set\\(0, 1\\)\\] omitted due to data defect! Columns passed to assertion: am "
+  )
+
+  # single assert rule inside chain without marking rule as obligatory
+  expect_output(
+    not_defected_data_in_chain %>% chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # two assert rules on defected data outside chain
+  expect_output(
+    defected_data %>%
+      assert(in_set(0, 1), am, defect_fun = defect_report) %>%
+      assert(in_set(0, 1), vs, defect_fun = defect_report),
+    paste0(
+      "assert: verification \\[in_set\\(0, 1\\)\\] omitted due to data defect! Columns passed to assertion: am \\n",
+      "assert: verification \\[in_set\\(0, 1\\)\\] omitted due to data defect! Columns passed to assertion: vs "
+    )
+  )
+
+  # two assert rule on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      assert(in_set(0, 1), am) %>%
+      assert(in_set(0, 1), vs) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "2 assertions omitted: \\n",
+      "assert: verification \\[in_set\\(0, 1\\)\\] omitted due to data defect! Columns passed to assertion: am \\n",
+      "assert: verification \\[in_set\\(0, 1\\)\\] omitted due to data defect! Columns passed to assertion: vs "
+    )
+  )
+
+  # two assert rule on defected data inside chain without store_success = TRUE
+  expect_output(
+    not_defected_data_in_chain %>%
+      assert(in_set(0, 1), vs) %>%
+      chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # single verify rule on defected data outside chain
+  expect_output(
+    defected_data %>%
+      verify(drat > 2, defect_fun = defect_report),
+    "verify: verification \\[drat > 2\\] omitted due to data defect!"
+  )
+
+  # single verify rule on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>% verify(drat > 2) %>% chain_end(error_fun = defect_report),
+    "1 assertion omitted: \\nverify: verification \\[drat > 2\\] omitted due to data defect!"
+  )
+
+  # single verify rule on not defected data inside chain
+  expect_output(
+    not_defected_data_in_chain %>% verify(drat > 2) %>% chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # two verify rules on defected data outside chain
+  expect_output(
+    defected_data %>%
+      verify(drat > 2, defect_fun = defect_report) %>%
+      verify(am %in% c(0, 1), defect_fun = defect_report),
+    "verify: verification \\[drat > 2\\] omitted due to data defect!\\nverify: verification \\[am %in% c\\(0, 1\\)\\] omitted due to data defect!"
+  )
+
+  # two verify rules on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      verify(drat > 2) %>%
+      verify(am %in% c(0, 1)) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "2 assertions omitted: \\n",
+      "verify: verification \\[drat > 2\\] omitted due to data defect!\\n",
+      "verify: verification \\[am %in% c\\(0, 1\\)\\] omitted due to data defect!"
+    )
+  )
+
+  # two verify rules on not defected data inside chain
+  expect_output(
+    not_defected_data_in_chain %>%
+      verify(drat > 2) %>%
+      verify(am %in% c(0, 1)) %>%
+      chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # single assert_rows defected rule outside chain
+  expect_output(
+    defected_data %>%
+    assert_rows(rowSums, within_bounds(0,2), vs, am, defect_fun = defect_report),
+    "assert_rows: verification \\[within_bounds\\(0, 2\\)\\] on rowSums row reduction omitted due to data defect! Columns passed to assertion: vs am "
+  )
+
+  # single assert_rows defected rule inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "1 assertion omitted: \\nassert_rows: verification \\[within_bounds\\(0, 2\\)\\] on rowSums row reduction omitted due to data defect! ",
+      "Columns passed to assertion: vs am ")
+  )
+
+  # single assert_rows on not defected data inside chain
+  expect_output(
+    not_defected_data_in_chain %>% assert_rows(rowSums, within_bounds(0,2), vs, am) %>% chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # two assert_rows rule on defected data outside chain
+  expect_output(
+    defected_data %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am, defect_fun = defect_report) %>%
+      assert_rows(num_row_NAs, within_bounds(0,.1), vs, am, defect_fun = defect_report),
+    paste0(
+      "assert_rows: verification \\[within_bounds\\(0, 2\\)\\] on rowSums row reduction omitted due to data defect! Columns passed to assertion: vs am ",
+      "\\nassert_rows: verification \\[within_bounds\\(0, 0.1\\)\\] on num_row_NAs row reduction omitted due to data defect! Columns passed to assertion: vs am "
+    )
+  )
+
+  # two assert_rows rules on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
+      assert_rows(num_row_NAs, within_bounds(0,.1), vs, am) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "2 assertions omitted: \\nassert_rows: verification \\[within_bounds\\(0, 2\\)\\] on rowSums row reduction omitted due to data defect! ",
+      "Columns passed to assertion: vs am \\nassert_rows: verification \\[within_bounds\\(0, 0.1\\)\\] on num_row_NAs row reduction ",
+      "omitted due to data defect! Columns passed to assertion: vs am "
+    )
+  )
+
+  # two assert_rows rule on not defected data inside chain
+  expect_output(
+    not_defected_data_in_chain %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
+      assert_rows(num_row_NAs, within_bounds(0,.1), vs, am) %>%
+      chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # single insist rule on defected data outside chain
+  expect_output(
+    defected_data %>%
+      insist(within_n_sds(5), vs, defect_fun = defect_report),
+    "insist: verification \\[within_n_sds\\(5\\)\\] omitted due to data defect! Columns passed to assertion: vs "
+  )
+
+  # single insist rule on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      insist(within_n_sds(5), vs) %>%
+      chain_end(error_fun = defect_report),
+    "1 assertion omitted: \\ninsist: verification \\[within_n_sds\\(5\\)\\] omitted due to data defect! Columns passed to assertion: vs "
+  )
+
+  # single insist rule on non defected data inside chain
+  expect_output(
+    not_defected_data_in_chain %>% insist(within_n_sds(5), vs) %>% chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # two insist rule on defected data outside chain
+  expect_output(
+    defected_data %>%
+      insist(within_n_sds(5), vs, defect_fun = defect_report) %>%
+      insist(within_n_sds(5), am, defect_fun = defect_report),
+    paste0(
+      "insist: verification \\[within_n_sds\\(5\\)\\] omitted due to data defect! Columns passed to assertion: vs \\n",
+      "insist: verification \\[within_n_sds\\(5\\)\\] omitted due to data defect! Columns passed to assertion: am "
+    )
+  )
+
+  # two insist rule on defected data inside chain
+  expect_output(
+    defected_data_in_chain %>%
+      insist(within_n_sds(5), vs) %>%
+      insist(within_n_sds(5), am) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "2 assertions omitted: \\n",
+      "insist: verification \\[within_n_sds\\(5\\)\\] omitted due to data defect! Columns passed to assertion: vs \\n",
+      "insist: verification \\[within_n_sds\\(5\\)\\] omitted due to data defect! Columns passed to assertion: am "
+    )
+  )
+
+  # two insist rule on non defected data inside chain
+  expect_output(
+    not_defected_data_in_chain %>%
+      insist(within_n_sds(5), vs) %>%
+      insist(within_n_sds(5), am) %>%
+      chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # single insist_rows on defected data outside chain
+  expect_output(
+    iris %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length, defect_fun = defect_report),
+    "insist_rows: verification \\[within_n_sds\\(6\\)\\] on maha_dist row reduction omitted due to data defect! Columns passed to assertion: Sepal.Length:Petal.Length "
+  )
+
+  # single insist_rows on defected data inside chain
+  expect_output(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "1 assertion omitted: \\ninsist_rows: verification \\[within_n_sds\\(6\\)\\] on maha_dist row reduction omitted due to data defect! ",
+      "Columns passed to assertion: Sepal.Length:Petal.Length "
+    )
+  )
+
+  # single insist_rows on not defected data inside chain
+  expect_output(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>% chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+  # two insist_rows rule on not defected data outside chain
+  expect_silent(
+    iris %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length, defect_fun = defect_report) %>%
+      insist_rows(maha_dist, within_n_sds(7), Sepal.Length:Petal.Length, defect_fun = defect_report)
+  )
+
+  # two insist_rows rule on defected data inside chain
+  expect_output(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
+      insist_rows(maha_dist, within_n_sds(7), Sepal.Length:Petal.Length) %>%
+      chain_end(error_fun = defect_report),
+    paste0(
+      "2 assertions omitted: \\n",
+      "insist_rows: verification \\[within_n_sds\\(6\\)\\] on maha_dist row reduction omitted due to data defect! ",
+      "Columns passed to assertion: Sepal.Length:Petal.Length \\n",
+      "insist_rows: verification \\[within_n_sds\\(7\\)\\] on maha_dist row reduction omitted due to data defect! ",
+      "Columns passed to assertion: Sepal.Length:Petal.Length "
+    )
+  )
+
+  # two insist_rows rule on non defected data inside chain
+  expect_output(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
+      insist_rows(maha_dist, within_n_sds(7), Sepal.Length:Petal.Length) %>%
+      chain_end(error_fun = defect_report),
+    "No rules run on defected data."
+  )
+
+})
+
+defect_df <- function(verb, message, call, columns, row_redux_call) {
+  data.frame(
+    verb = verb,
+    message = message,
+    call = call,
+    columns = columns,
+    row_redux_call = row_redux_call,
+    stringsAsFactors = FALSE
+  )
+}
+
+test_that("defect_df_return works fine with verification methods", {
+  defected_data <- mtcars %>%
+    assert(in_set(0, 2), vs, obligatory = TRUE, error_fun = error_append)
+  defected_data_in_chain <- mtcars %>% chain_start() %>%
+    assert(in_set(0, 2), vs, obligatory = TRUE)
+  not_defected_data <- mtcars %>%
+    assert(in_set(0, 2), vs, error_fun = error_append)
+  not_defected_data_in_chain <- mtcars %>% chain_start() %>%
+    assert(in_set(0, 2), vs)
+
+  # single assert rule outside chain
+  expect_equal(
+    defected_data %>%
+    assert(in_set(0, 1), am, defect_fun = defect_df_return),
+    defect_df("assert", "verification [in_set(0, 1)] omitted due to data defect!", "in_set(0, 1)", "am", NA)
+  )
+
+  # single assert rule inside chain
+  expect_equal(
+    defected_data_in_chain %>% assert(in_set(0, 1), am) %>% chain_end(error_fun = defect_df_return),
+    defect_df("assert", "verification [in_set(0, 1)] omitted due to data defect!", "in_set(0, 1)", "am", NA)
+  )
+
+  # single assert rule on not defected data inside chain
+  expect_error(
+    not_defected_data_in_chain %>% assert(in_set(0, 1), am) %>% chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # two assert rules on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>%
+      assert(in_set(0, 1), am) %>%
+      assert(in_set(0, 1), vs) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df(rep("assert", 2), rep("verification [in_set(0, 1)] omitted due to data defect!", 2), rep("in_set(0, 1)", 2), c("am", "vs"), rep(NA, 2))
+  )
+
+  # two assert rules on not defected data inside chain
+  expect_error(
+    not_defected_data_in_chain %>%
+      assert(in_set(0, 1), am) %>%
+      assert(in_set(0, 1), vs) %>%
+      chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # single verify rule on defected data outside chain
+  expect_equal(
+    defected_data %>% verify(drat > 2, defect_fun = defect_df_return),
+    defect_df("verify", "verification [drat > 2] omitted due to data defect!", "drat > 2", NA, NA)
+  )
+
+  # single verify rule on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>% verify(drat > 2) %>% chain_end(error_fun = defect_df_return),
+    defect_df("verify", "verification [drat > 2] omitted due to data defect!", "drat > 2", NA, NA)
+  )
+
+  # single verify rule on not defected data inside chain without store_defect
+  expect_error(
+    not_defected_data_in_chain %>% verify(drat > 2) %>% chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # two verify rules on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>%
+      verify(drat > 2) %>%
+      verify(am %in% c(0, 1)) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df(
+      rep("verify", 2), c("verification [drat > 2] omitted due to data defect!", "verification [am %in% c(0, 1)] omitted due to data defect!"),
+      c("drat > 2", "am %in% c(0, 1)"), rep(NA, 2), rep(NA, 2))
+  )
+
+  # two verify rules on not defected data inside
+  expect_error(
+    not_defected_data_in_chain %>%
+      verify(drat > 2) %>%
+      verify(am %in% c(0, 1)) %>%
+      chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # single assert_rows rule on defected data outside chain
+  expect_equal(
+    defected_data %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am, defect_fun = defect_df_return),
+    defect_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!", "within_bounds(0, 2)", "vs, am", "rowSums")
+  )
+
+  # single assert_rows rule on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df("assert_rows", "verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!", "within_bounds(0, 2)", "vs, am", "rowSums")
+  )
+
+  # single assert_rows rule on defected data inside chain without store_defect
+  expect_error(
+    not_defected_data_in_chain %>% assert_rows(rowSums, within_bounds(0,2), vs, am) %>% chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # two assert_rows rules on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>%
+      assert_rows(rowSums, within_bounds(0,2), vs, am) %>%
+      assert_rows(num_row_NAs, within_bounds(0,.1), vs, am) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df(
+      rep("assert_rows", 2),
+      c("verification [within_bounds(0, 2)] on rowSums row reduction omitted due to data defect!", "verification [within_bounds(0, 0.1)] on num_row_NAs row reduction omitted due to data defect!"),
+      c("within_bounds(0, 2)", "within_bounds(0, 0.1)"), rep("vs, am", 2), c("rowSums", "num_row_NAs")
+    )
+  )
+
+  # two assert_rows rules on defected data inside chain without store_defect = TRUE
+  expect_error(
+    not_defected_data_in_chain %>%
+      verify(drat > 2) %>%
+      verify(am %in% c(0, 1)) %>%
+      chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # single insist rule on defected data outside chain
+  expect_equal(
+    defected_data %>%
+      insist(within_n_sds(5), vs, defect_fun = defect_df_return),
+    defect_df("insist", "verification [within_n_sds(5)] omitted due to data defect!", "within_n_sds(5)", "vs", NA)
+  )
+
+  # single insist rule on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>%
+      insist(within_n_sds(5), vs) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df("insist", "verification [within_n_sds(5)] omitted due to data defect!", "within_n_sds(5)", "vs", NA)
+  )
+
+  # single insist rule on defected data inside chain without store_defect
+  expect_error(
+    not_defected_data_in_chain %>% insist(within_n_sds(5), vs) %>% chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # two insist rules on defected data inside chain
+  expect_equal(
+    defected_data_in_chain %>%
+      insist(within_n_sds(5), vs) %>%
+      insist(within_n_sds(5), am) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df(
+      rep("insist", 2), rep("verification [within_n_sds(5)] omitted due to data defect!", 2), rep("within_n_sds(5)", 2), c("vs", "am"), rep(NA, 2)
+    )
+  )
+
+  # two insist rules on defected data inside chain without store_defect = TRUE
+  expect_error(
+    not_defected_data_in_chain %>%
+      insist(within_n_sds(5), vs) %>%
+      insist(within_n_sds(5), am) %>%
+      chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # single insist_rows rule on defected data outside chain
+  expect_equal(
+    iris %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length, defect_fun = defect_df_return),
+    defect_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(6)",
+               "Sepal.Length:Petal.Length", "maha_dist")
+  )
+
+  # single insist_rows rule on defected data inside chain
+  expect_equal(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
+      chain_end(error_fun = defect_df_return),
+    defect_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(6)",
+               "Sepal.Length:Petal.Length", "maha_dist")
+  )
+
+  # single insist_rows rule on defected data inside chain without store_defect
+  expect_error(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>% chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+  # two insist_rows rules on defected data inside chain
+  expect_equal(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, obligatory = TRUE, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
+      insist_rows(maha_dist, within_n_sds(7), Sepal.Length:Petal.Length) %>%
+      chain_end(error_fun = defect_df_return),
+    rbind(
+      defect_df("insist_rows", "verification [within_n_sds(6)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(6)",
+                 "Sepal.Length:Petal.Length", "maha_dist"),
+      defect_df("insist_rows", "verification [within_n_sds(7)] on maha_dist row reduction omitted due to data defect!", "within_n_sds(7)",
+                 "Sepal.Length:Petal.Length", "maha_dist")
+    )
+  )
+
+  # two insist_rows rules on defected data inside chain without store_defect = TRUE
+  expect_error(
+    iris %>% chain_start %>%
+      insist_rows(maha_dist, within_n_sds(3), Sepal.Length:Petal.Length, error_fun = error_append) %>%
+      insist_rows(maha_dist, within_n_sds(6), Sepal.Length:Petal.Length) %>%
+      insist_rows(maha_dist, within_n_sds(7), Sepal.Length:Petal.Length) %>%
+      chain_end(error_fun = defect_df_return),
+    "No rules run on defected data."
+  )
+
+})

@@ -7,14 +7,11 @@
 \method{print}{assertr_success}(x, ...)
 }
 \arguments{
-\item{x}{An assertr_assert_success object}
+\item{x}{An assertr_success object}
 
 \item{...}{Further arguments passed to or from other methods}
 }
 \description{
 `print` method for class "assertr_success"
 This prints the success message along with columns that were checked.
-}
-\seealso{
-\code{\link{summary.assertr_assert_success}}
 }

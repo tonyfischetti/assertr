@@ -8,7 +8,8 @@ row reduction function}
 \usage{
 assert_rows(data, row_reduction_fn, predicate, ...,
   success_fun = success_continue, error_fun = error_stop,
-  skip_chain_opts = FALSE)
+  skip_chain_opts = FALSE, obligatory = FALSE,
+  defect_fun = defect_append)
 
 assert_rows_(data, row_reduction_fn, predicate, ..., .dots,
   success_fun = success_continue, error_fun = error_stop)
@@ -33,6 +34,13 @@ a summary of all errors.}
 
 \item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
 are used even if assertion is called within a chain.}
+
+\item{obligatory}{If TRUE and assertion failed the data is marked as defected.
+For defected data, all the following rules are handled by
+\code{defect_fun} function.}
+
+\item{defect_fun}{Function to call when data is defected. Defaults to skipping
+assertion and storing info about it in special attribute.}
 
 \item{.dots}{Use assert_rows_() to select columns using standard evaluation.}
 }

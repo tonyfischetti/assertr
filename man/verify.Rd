@@ -5,7 +5,8 @@
 \title{Raises error if expression is FALSE anywhere}
 \usage{
 verify(data, expr, success_fun = success_continue,
-  error_fun = error_stop, skip_chain_opts = FALSE)
+  error_fun = error_stop, skip_chain_opts = FALSE,
+  obligatory = FALSE, defect_fun = defect_append)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}
@@ -20,6 +21,13 @@ a summary of all errors.}
 
 \item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
 are used even if assertion is called within a chain.}
+
+\item{obligatory}{If TRUE and assertion failed the data is marked as defected.
+For defected data, all the following rules are handled by
+\code{defect_fun} function.}
+
+\item{defect_fun}{Function to call when data is defected. Defaults to skipping
+assertion and storing info about it in special attribute.}
 }
 \value{
 By default, the \code{data} is returned if predicate assertion

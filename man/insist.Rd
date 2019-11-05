@@ -7,7 +7,8 @@
 selected}
 \usage{
 insist(data, predicate_generator, ..., success_fun = success_continue,
-  error_fun = error_stop, skip_chain_opts = FALSE)
+  error_fun = error_stop, skip_chain_opts = FALSE,
+  obligatory = FALSE, defect_fun = defect_append)
 
 insist_(data, predicate_generator, ..., .dots,
   success_fun = success_continue, error_fun = error_stop)
@@ -32,6 +33,13 @@ a summary of all errors.}
 
 \item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
 are used even if assertion is called within a chain.}
+
+\item{obligatory}{If TRUE and assertion failed the data is marked as defected.
+For defected data, all the following rules are handled by
+\code{defect_fun} function.}
+
+\item{defect_fun}{Function to call when data is defected. Defaults to skipping
+assertion and storing info about it in special attribute.}
 
 \item{.dots}{Use insist_() to select columns using standard evaluation.}
 }

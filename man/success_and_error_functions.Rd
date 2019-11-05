@@ -15,6 +15,9 @@
 \alias{error_return}
 \alias{error_df_return}
 \alias{error_logical}
+\alias{defect_append}
+\alias{defect_report}
+\alias{defect_df_return}
 \title{Success and error functions}
 \usage{
 success_logical(data, ...)
@@ -42,6 +45,12 @@ error_return(errors, data = NULL)
 error_df_return(errors, data = NULL)
 
 error_logical(errors, data = NULL, ...)
+
+defect_append(errors, data, ...)
+
+defect_report(errors, data, ...)
+
+defect_df_return(errors, data, ...)
 }
 \arguments{
 \item{data}{A data frame}
@@ -104,5 +113,25 @@ provided by this package:
    not halt execution, it just issues a warning.
   \item \code{warn_report} - Prints all the information available
   about the errors but does not halt execution, it just issues a warning.
+  \item \code{defect_report} - For single rule and defected data it displays
+  short info about skipping current assertion. For \code{chain_end} sums
+  up all skipped rules for defected data.
+  \item \code{defect_df_return} - For single rule and defected data it returns
+  info data.frame about skipping current assertion. For \code{chain_end}
+  returns all skipped rules info data.frame for defected data.
+ }
+You may find the third type of data verification result. In a scenario
+when validation rule was obligatory (obligatory = TRUE) in order to execute the
+following ones we may want to skip them and register that fact.
+In order to do this there exist three callbacks reacting to defected
+data:
+ \itemize{
+  \item \code{defect_report} - For single rule and defected data it displays
+  short info about skipping current assertion.
+  \item \code{defect_df_return} - For single rule and defected data it returns
+  info data.frame about skipping current assertion.
+  \item \code{defect_append} - Appends info about skipped rule due to data
+  defect into one of data attributes. Rules skipped on defected data, or its summary, can
+  be returned with proper error_fun callback in \code{chain_end}.
  }
 }

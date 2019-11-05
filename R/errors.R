@@ -90,15 +90,32 @@ print.assertr_assert_error <- function(x, ...){
 #' `print` method for class "assertr_success"
 #' This prints the success message along with columns that were checked.
 #'
-#' @param x An assertr_assert_success object
+#' @param x An assertr_success object
 #' @param ... Further arguments passed to or from other methods
-#' @seealso \code{\link{summary.assertr_assert_success}}
 #'
 #' @export
 print.assertr_success <- function(x, ...){
   cat(paste0(x$verb, ":"), x$message)
   if (length(x$columns) > 2 || !is.na(x$columns)) {
     cat(paste(" Verified columns:", paste0(x$columns, collapse = " ")), "\n")
+  } else {
+    cat("\n")
+  }
+}
+
+#' Printing assertr's defect
+#'
+#' `print` method for class "assertr_defect"
+#' This prints the defect message along with columns that were checked.
+#'
+#' @param x An assertr_defect object
+#' @param ... Further arguments passed to or from other methods
+#'
+#' @export
+print.assertr_defect <- function(x, ...){
+  cat(paste0(x$verb, ":"), x$message)
+  if (length(x$columns) > 2 || !is.na(x$columns)) {
+    cat(paste(" Columns passed to assertion:", paste0(x$columns, collapse = " ")), "\n")
   } else {
     cat("\n")
   }
@@ -229,6 +246,26 @@ summary.assertr_verify_error <- function(object, ...){ print(object) }
 #'    not halt execution, it just issues a warning.
 #'   \item \code{warn_report} - Prints all the information available
 #'   about the errors but does not halt execution, it just issues a warning.
+#'   \item \code{defect_report} - For single rule and defected data it displays
+#'   short info about skipping current assertion. For \code{chain_end} sums
+#'   up all skipped rules for defected data.
+#'   \item \code{defect_df_return} - For single rule and defected data it returns
+#'   info data.frame about skipping current assertion. For \code{chain_end}
+#'   returns all skipped rules info data.frame for defected data.
+#'  }
+#' You may find the third type of data verification result. In a scenario
+#' when validation rule was obligatory (obligatory = TRUE) in order to execute the
+#' following ones we may want to skip them and register that fact.
+#' In order to do this there exist three callbacks reacting to defected
+#' data:
+#'  \itemize{
+#'   \item \code{defect_report} - For single rule and defected data it displays
+#'   short info about skipping current assertion.
+#'   \item \code{defect_df_return} - For single rule and defected data it returns
+#'   info data.frame about skipping current assertion.
+#'   \item \code{defect_append} - Appends info about skipped rule due to data
+#'   defect into one of data attributes. Rules skipped on defected data, or its summary, can
+#'   be returned with proper error_fun callback in \code{chain_end}.
 #'  }
 #' @name success_and_error_functions
 NULL
@@ -420,6 +457,91 @@ error_logical <- function(errors, data=NULL, ...){
   return(FALSE)
 }
 
+
+##########################
+#   defect functions   #
+##########################
+
+#' @export
+#' @rdname success_and_error_functions
+defect_append <- function(errors, data, ...){
+  verb <- ..1
+  the_call <- ..2
+  columns <- ..3
+  row_redux_call <- ..4
+  row_redux_message <- ""
+  if (!is.na(row_redux_call))
+    row_redux_message <- paste0(" on ", row_redux_call, " row reduction")
+  msg <- paste0("verification [", the_call, "]", row_redux_message, " omitted due to data defect!")
+  this_defect <- list(
+    verb = verb,
+    message = msg,
+    call = paste0(the_call, collapse = " "),
+    columns = columns,
+    row_redux_call = row_redux_call
+  )
+  class(this_defect) <- c("assertr_defect", "defect", "condition")
+  if(is.null(attr(data, "assertr_defect")))
+    attr(data, "assertr_defect") <- list()
+  attr(data, "assertr_defect") <- append(attr(data, "assertr_defect"), list(this_defect))
+  return(data)
+}
+
+#' @export
+#' @rdname success_and_error_functions
+defect_report <- function(errors, data, ...){
+  n_assertions <- length(attr(data, "assertr_defect"))
+  if(is.null(attr(data, "assertr_in_chain_success_fun_override"))) {
+    # single verification case
+    data <- defect_append(errors, data, ...)
+    print(attr(data, "assertr_defect")[[1]])
+  } else {
+    # chain_end case
+    if (n_assertions==0) {
+      cat("No rules run on defected data.")
+      return(data)
+    }
+    result <- "assertion"
+    if (n_assertions>1)
+      result <- "assertions"
+    cat(n_assertions, result, "omitted:", "\n")
+    lapply(attr(data, "assertr_defect"), print)
+    attr(data, "assertr_in_chain_success_fun_override") <- NULL
+  }
+  attr(data, "assertr_defect") <- NULL
+  return(invisible(data))
+}
+
+#' @export
+#' @rdname success_and_error_functions
+defect_df_return <- function(errors, data, ...){
+  n_assertions <- length(attr(data, "assertr_defect"))
+  defect_to_df <- function(defect) {
+    if (!identical(defect$columns, NA))
+      defect$columns <- paste0(defect$columns, collapse = ", ")
+    data.frame(
+      verb = defect$verb,
+      message = defect$message,
+      call = defect$call,
+      columns = defect$columns,
+      row_redux_call = defect$row_redux_call,
+      stringsAsFactors = FALSE
+    )
+  }
+  if(is.null(attr(data, "assertr_in_chain_success_fun_override"))) {
+    # single verification case
+    data <- defect_append(errors, data, ...)
+    defect_df <- defect_to_df(attr(data, "assertr_defect")[[1]])
+  } else {
+    # chain_end case
+    if (n_assertions==0) {
+      stop("No rules run on defected data.")
+    }
+    defect_df <- do.call(rbind, lapply(attr(data, "assertr_defect"), defect_to_df))
+    attr(data, "assertr_in_chain_success_fun_override") <- NULL
+  }
+  return(defect_df)
+}
 
 ##########################
 #   chaining functions   #
