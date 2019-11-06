@@ -80,15 +80,15 @@ has_all_names <- function(...){
   all(check_this %in% given_names)
 }
 
-#' Returns TRUE if data.frame columns have specified class
+#' Returns TRUE if data.frame columns have a specified class
 #'
 #' This is meant to be used with `assertr`'s `verify` function to check
-#' for the existence of specific column class in a `data.frame` that is
+#' for the existence of a specific column class in a `data.frame` that is
 #' piped to `verify`.
 #'
-#' @param ... A arbitrary amount of quoted column names to check for
+#' @param ... An arbitrary amount of quoted column names to check for
 #' @param class Expected class for chosen columns.
-#' @return TRUE is all classes are correc, FALSE if not
+#' @return TRUE if all classes are correct, FALSE if not
 #' @examples
 #'
 #' verify(mtcars, has_class("mpg", "wt", class = "numeric"))

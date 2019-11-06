@@ -116,25 +116,25 @@ provided by this package:
    not halt execution, it just issues a warning.
   \item \code{warn_report} - Prints all the information available
   about the errors but does not halt execution, it just issues a warning.
-  \item \code{defect_report} - For single rule and defected data it displays
+  \item \code{defect_report} - For single rule and defective data it displays
   short info about skipping current assertion. For \code{chain_end} sums
-  up all skipped rules for defected data.
-  \item \code{defect_df_return} - For single rule and defected data it returns
+  up all skipped rules for defective data.
+  \item \code{defect_df_return} - For single rule and defective data it returns
   info data.frame about skipping current assertion. For \code{chain_end}
-  returns all skipped rules info data.frame for defected data.
+  returns all skipped rules info data.frame for defective data.
  }
 You may find the third type of data verification result. In a scenario
 when validation rule was obligatory (obligatory = TRUE) in order to execute the
 following ones we may want to skip them and register that fact.
-In order to do this there exist three callbacks reacting to defected
+In order to do this there are three callbacks reacting to defective
 data:
  \itemize{
-  \item \code{defect_report} - For single rule and defected data it displays
+  \item \code{defect_report} - For single rule and defective data it displays
   short info about skipping current assertion.
-  \item \code{defect_df_return} - For single rule and defected data it returns
+  \item \code{defect_df_return} - For single rule and defective data it returns
   info data.frame about skipping current assertion.
   \item \code{defect_append} - Appends info about skipped rule due to data
-  defect into one of data attributes. Rules skipped on defected data, or its summary, can
+  defect into one of data attributes. Rules skipped on defective data, or its summary, can
   be returned with proper error_fun callback in \code{chain_end}.
  }
 }

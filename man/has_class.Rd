@@ -2,21 +2,21 @@
 % Please edit documentation in R/utils.R
 \name{has_class}
 \alias{has_class}
-\title{Returns TRUE if data.frame columns have specified class}
+\title{Returns TRUE if data.frame columns have a specified class}
 \usage{
 has_class(..., class)
 }
 \arguments{
-\item{...}{A arbitrary amount of quoted column names to check for}
+\item{...}{An arbitrary amount of quoted column names to check for}
 
 \item{class}{Expected class for chosen columns.}
 }
 \value{
-TRUE is all classes are correc, FALSE if not
+TRUE if all classes are correct, FALSE if not
 }
 \description{
 This is meant to be used with `assertr`'s `verify` function to check
-for the existence of specific column class in a `data.frame` that is
+for the existence of a specific column class in a `data.frame` that is
 piped to `verify`.
 }
 \examples{

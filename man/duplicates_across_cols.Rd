@@ -33,13 +33,13 @@ library(magrittr)            # for piping operator
 correct_df <- data.frame(id = 1:5, sub_id = letters[1:5], work_id = LETTERS[1:5])
 correct_df \%>\%
   assert_rows(duplicates_across_cols, in_set(FALSE), id, sub_id, work_id)
-  # pases because each subset of correct_df variables is key
+  # passes because each subset of correct_df variables is key
 
 \dontrun{
 incorrect_df <- data.frame(id = 1:5, sub_id = letters[1:5], age = c(10, 20, 20, 15, 30))
 incorrect_df \%>\%
   assert_rows(duplicates_across_cols, in_set(FALSE), id, sub_id, age)
-  # failes because age is not key of the data (age == 20 is placed twice)
+  # fails because age is not key of the data (age == 20 is placed twice)
 }
 
 }

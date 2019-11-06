@@ -2,7 +2,7 @@
 % Please edit documentation in R/predicates.R
 \name{not_in_set}
 \alias{not_in_set}
-\title{Returns TRUE if value in not in set}
+\title{Returns TRUE if value is not in set}
 \usage{
 not_in_set(..., allow.na = TRUE, inverse = FALSE)
 }
@@ -20,7 +20,7 @@ A function that takes one value and returns TRUE
 }
 \description{
 This function returns a predicate function that will take a single
-value and return TRUE if the value is not a member of the set of objects
+value and returns TRUE if the value is not a member of the set of objects
 supplied. This doesn't actually check the membership of anything--it
 only returns a function that actually does the checking when called
 with a value. This is a convenience function meant to return a

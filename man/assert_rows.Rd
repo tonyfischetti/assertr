@@ -35,15 +35,15 @@ a summary of all errors.}
 \item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
 are used even if assertion is called within a chain.}
 
-\item{obligatory}{If TRUE and assertion failed the data is marked as defected.
-For defected data, all the following rules are handled by
+\item{obligatory}{If TRUE and assertion failed the data is marked as defective.
+For defective data, all the following rules are handled by
 \code{defect_fun} function.}
 
-\item{defect_fun}{Function to call when data is defected. Defaults to skipping
+\item{defect_fun}{Function to call when data is defective. Defaults to skipping
 assertion and storing info about it in special attribute.}
 
 \item{description}{Custom description of the rule. Is stored in result
-reports ans data.}
+reports and data.}
 
 \item{.dots}{Use assert_rows_() to select columns using standard evaluation.}
 }

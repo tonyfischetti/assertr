@@ -489,12 +489,12 @@ provided by this package:
 
   * `success_report` - when success results are stored 
     (`chain_start(store_results=TRUE)`), and each verification ended up with 
-    success prints summary of all successful validations (when being in chan) 
+    success, it prints a summary of all successful validations (when being in chan) 
     or simple verification result for single check and returns data.
     
   * `success_df_return` - when success results are stored 
-    (`chain_start(store_results=TRUE)`), and each verification ended up with success 
-    prints data.frame with verification results (can be used for `chain_end` or 
+    (`chain_start(store_results=TRUE)`), and each verification ended up with success, 
+    it prints data.frame with verification results (can be used for `chain_end` or 
     single verification).
 
 The `error_fun` parameter takes a function that takes
@@ -522,13 +522,13 @@ provided by this package:
   * `warn_report` - Prints all the information available
   about the errors but does not halt execution, it just issues a warning.
   
-  * `defect_report` - For single rule and defected data it displays
-  short info about skipping current assertion. For `chain_end` sums
-  up all skipped rules for defected data. 
+  * `defect_report` - For single rule and defective data it displays
+  short info about skipping the current assertion. For `chain_end` sums
+  up all skipped rules for defective data. 
   
-  * `defect_df_return` - For single rule and defected data it returns
+  * `defect_df_return` - For single rule and defective data it returns
   info data.frame about skipping current assertion. For `chain_end`
-  returns all skipped rules info data.frame for defected data.
+  returns all skipped rules info data.frame for defective data.
 
 The `defect_fun` parameter takes a function that takes
 the data passed to the assertion function as a parameter. 
@@ -537,22 +537,22 @@ that was marked as obligatory failed (see below section).
 You can write your own defect handler function, but there are a few
 provided by this package:
 
-  * `defect_append` - Attaches the assertion call info on defected 
+  * `defect_append` - Attaches the assertion call info on defective 
   data to a special attribute of `data` and returns the data.
 
-  * `defect_report` - For single rule and defected data it displays
+  * `defect_report` - For single rule and defective data it displays
   short info about skipping current assertion. For `chain_end` sums
-  up all skipped rules for defected data. 
+  up all skipped rules for defective data. 
   
-  * `defect_df_return` - For single rule and defected data it returns
+  * `defect_df_return` - For single rule and defective data it returns
   info data.frame about skipping current assertion. For `chain_end`
-  returns all skipped rules info data.frame for defected data.
+  returns all skipped rules info data.frame for defective data.
 
 ### Obligatory assertions
 
-You may find situation in which some rules are not idependent.
+You may find a situation in which some rules are not independent.
 
-In example:
+For example:
 ```{r, eval=FALSE, purl = FALSE}
 mtcars_without_am <- mtcars %>% 
   dplyr::select(-am)
@@ -562,22 +562,22 @@ mtcars_without_am %>%
   
 ```
 
-`assert` requires existence of `am` and `vs` columns, what is checked
+`assert` requires existence of `am` and `vs` columns, which are checked
 previously by `verify` assertion.
-In above example, we want to store info about all errors after
-assertions is finished but it won't happen. No `am` column in 
-data returns error not related to assertion check. As a result
+In the above example, we want to store info about all errors after
+assertions are finished but it won't happen. A missing `am` column in 
+the data returns error not related to assertion check. As a result
 code execution ends up with not handled error.
 
 To allow such situations obligatory rules were introduced.
-You create obligatory rule by adding `obligatory = TRUE` inside
+You can create an obligatory rule by adding `obligatory = TRUE` inside
 assertion function.
-What rule was obligatory and failed, the data is marked as defected
+When a rule was obligatory and failed, the data is marked as defective
 and each following rule will be handled by `defect_fun` function.
 By default `defect_fun=defect_append` which registers information about
-running assertion on defected data and skips the rule execution.
+running assertion on defective data and skips the rule execution.
 
-Below we display information about skipped rule with using `defect_report`:
+Below we display information about a skipped rule by using `defect_report`:
 ```{r purl = FALSE}
 mtcars_without_am <- mtcars %>% 
   dplyr::select(-am)
@@ -672,10 +672,11 @@ mtcars %>%
 Awesome! Now we can add an arbitrary number of assertions, as the need arises,
 without touching the real logic.
 
-Note: By default, all assertions in chain use `success_continue` and `error_append` functions.
-It allows to continue workflow in both cases and aggregate error logs.
-In some cases (i.e. when you don't want to include error log and just have some error printed),
-you can force using assertion specific success/error callback in chain.
+Note: By default, all assertions in the chain use `success_continue` and 
+`error_append` functions.
+It allows you to continue workflow in both cases and aggregate error logs.
+In some cases (i.e. when you don't want to include the error log and just have some error printed),
+you can require using assertion specific success/error callback in chain.
 
 Just use `skip_chain_opts = TRUE` and specify callback inside assertion:
 ```
