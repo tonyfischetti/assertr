@@ -120,6 +120,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
   if(obligatory)
     attr(data, "assertr_data_defected") <- TRUE
 
+  assertion.id <- generate_id()
   #print(names(log.mat))
   errors <- lapply(colnames(log.mat), function(col.name){
   #errors <- lapply(names(log.mat), function(col.name){
@@ -135,7 +136,8 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                                           num.violations,
                                           index.of.violations,
                                           offending.elements,
-                                          description)
+                                          description,
+                                          assertion.id)
     return(an_error)
   })
 
@@ -266,6 +268,7 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
   num.violations <- sum(!log.vec)
   loc.violations <- which(!log.vec)
   offending.elements <- redux[!log.vec]
+  assertion.id <- generate_id()
 
   error <- make.assertr.assert_rows.error("assert_rows",
                                           name.of.row.redux.fn,
@@ -274,7 +277,8 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
                                           num.violations,
                                           loc.violations,
                                           offending.elements,
-                                          description)
+                                          description,
+                                          assertion.id)
   error_fun(list(error), data=data)
 
 }
@@ -398,6 +402,8 @@ insist <- function(data, predicate_generator, ...,
   if(obligatory)
     attr(data, "assertr_data_defected") <- TRUE
 
+  assertion.id <- generate_id()
+
   errors <- lapply(colnames(log.mat), function(col.name){
     col <- log.mat[, col.name]
     num.violations <- sum(!col)
@@ -411,7 +417,8 @@ insist <- function(data, predicate_generator, ...,
                                           num.violations,
                                           index.of.violations,
                                           offending.elements,
-                                          description)
+                                          description,
+                                          assertion.id)
     return(an_error)
   })
 
@@ -548,6 +555,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
   num.violations <- sum(!log.vec)
   loc.violations <- which(!log.vec)
   offending.elements <- redux[!log.vec]
+  assertion.id <- generate_id()
 
   error <- make.assertr.assert_rows.error("insist_rows",
                                           name.of.row.redux.fn,
@@ -556,7 +564,8 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
                                           num.violations,
                                           loc.violations,
                                           offending.elements,
-                                          description)
+                                          description,
+                                          assertion.id)
   error_fun(list(error), data=data)
 }
 
@@ -669,9 +678,10 @@ verify <- function(data, expr, success_fun=success_continue,
     attr(data, "assertr_data_defected") <- TRUE
 
   num.violations <- sum(!logical.results)
+  assertion.id <- generate_id()
   error <- make.assertr.verify.error("verify",
                                      num.violations, deparse(expr),
                                      (1:length(logical.results))[!logical.results],
-                                     description)
+                                     description, assertion.id)
   error_fun(list(error), data=data)
 }

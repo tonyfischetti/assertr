@@ -107,3 +107,7 @@ has_class <- function(..., class){
   given_classes <- lapply(check_this, function(name) class(parent$.top_env[[name]]))
   all(given_classes %in% class)
 }
+
+generate_id <- function() {
+  paste0(sample(c(LETTERS, letters, 0:9), 20, TRUE), collapse = "")
+}

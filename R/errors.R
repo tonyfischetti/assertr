@@ -15,7 +15,8 @@ make.assertr.assert.error <- function(verb,
                                       num.violations,
                                       index.of.violations,
                                       offending.elements,
-                                      description){
+                                      description,
+                                      assertion.id){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Column '", column, "' violates assertion '",
                 name.of.predicate,"' ", num.violations, " ", time.or.times)
@@ -32,6 +33,7 @@ make.assertr.assert.error <- function(verb,
   this_error$num.violations <- num.violations
   this_error$call <- name.of.predicate
   this_error$description <- description
+  this_error$assertion.id <- assertion.id
 
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
@@ -47,7 +49,8 @@ make.assertr.assert_rows.error <- function(verb,
                                            num.violations,
                                            loc.violations,
                                            offending.elements,
-                                           description){
+                                           description,
+                                           assertion.id){
   time.or.times <- if (num.violations==1) "time" else "times"
   msg <- paste0("Data frame row reduction '", name.of.rowredux.fn,
                 "' violates predicate '", name.of.predicate,
@@ -63,7 +66,8 @@ make.assertr.assert_rows.error <- function(verb,
                      message = msg,
                      num.violations = num.violations,
                      call = name.of.predicate,
-                     description = description)
+                     description = description,
+                     assertion.id = assertion.id)
 
   class(this_error) <- c("assertr_assert_error", "assertr_error",
                          "error", "condition")
@@ -157,7 +161,8 @@ summary.assertr_assert_error <- function(object, ...){
 #####################
 # used by "verify"
 
-make.assertr.verify.error <- function(verb, num.violations, the_call, logical.results, description){
+make.assertr.verify.error <- function(verb, num.violations, the_call,
+                                      logical.results, description, assertion.id){
   sing.plur <- if (num.violations==1) " failure)" else " failures)"
   msg <- paste0("verification [", the_call, "] failed! (", num.violations, sing.plur)
 
@@ -172,7 +177,8 @@ make.assertr.verify.error <- function(verb, num.violations, the_call, logical.re
                      message = msg,
                      num.violations = num.violations,
                      call = the_call,
-                     description = description)
+                     description = description,
+                     assertion.id = assertion.id)
   class(this_error) <- c("assertr_verify_error", "assertr_error",
                          "error", "condition")
   return(this_error)
