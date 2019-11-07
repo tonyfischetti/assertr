@@ -108,7 +108,7 @@ print.assertr_success <- function(x, ...){
   if (!is.na(x$description))
     cat(x$description, "\n")
   cat(paste0(x$verb, ":"), x$message)
-  if (length(x$columns) > 2 || !is.na(x$columns)) {
+  if ((length(x$columns) > 2) || !identical(x$columns, NA)) {
     cat(paste(" Verified columns:", paste0(x$columns, collapse = " ")), "\n")
   } else {
     cat("\n")
@@ -128,7 +128,7 @@ print.assertr_defect <- function(x, ...){
   if (!is.na(x$description))
     cat(x$description, "\n")
   cat(paste0(x$verb, ":"), x$message)
-  if (length(x$columns) > 2 || !is.na(x$columns)) {
+  if ((length(x$columns) > 2) || !identical(x$columns, NA)) {
     cat(paste(" Columns passed to assertion:", paste0(x$columns, collapse = " ")), "\n")
   } else {
     cat("\n")
