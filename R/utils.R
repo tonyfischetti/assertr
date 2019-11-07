@@ -79,3 +79,47 @@ has_all_names <- function(...){
   given_names <- given_names[given_names != ".data"]
   all(check_this %in% given_names)
 }
+
+#' Returns TRUE if data.frame columns have a specified class
+#'
+#' This is meant to be used with `assertr`'s `verify` function to check
+#' for the existence of a specific column class in a `data.frame` that is
+#' piped to `verify`.
+#'
+#' @param ... An arbitrary amount of quoted column names to check for
+#' @param class Expected class for chosen columns.
+#' @return TRUE if all classes are correct, FALSE if not
+#' @examples
+#'
+#' verify(mtcars, has_class("mpg", "wt", class = "numeric"))
+#'
+#' library(magrittr)   # for pipe operator
+#'
+#' \dontrun{
+#' mtcars %>%
+#'   verify(has_class("mpg", class = "character"))  # fails
+#' }
+#'
+#' @export
+has_class <- function(..., class){
+  check_this <- list(...)
+  parent <- parent.frame()
+  given_classes <- lapply(check_this, function(name) class(parent$.top_env[[name]]))
+  all(given_classes %in% class)
+}
+
+
+#' Generates random ID string
+#'
+#' This is used to generate id for each assertion error.
+#'
+#' For single assertion that checks multiple columns, each error log
+#' is stored as a separate element. We provide the ID to allow
+#' detecting which errors come from the same assertion.
+#'
+generate_id <- function() {
+  paste0(
+    paste0(sample(c(LETTERS, letters, 0:9), 5, TRUE), collapse = ""),
+    round(as.numeric(Sys.time())*1000)
+  )
+}

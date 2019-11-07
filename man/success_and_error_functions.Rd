@@ -4,19 +4,32 @@
 \alias{success_and_error_functions}
 \alias{success_logical}
 \alias{success_continue}
+\alias{success_append}
+\alias{success_report}
+\alias{success_df_return}
 \alias{error_stop}
 \alias{just_warn}
 \alias{error_report}
 \alias{warn_report}
 \alias{error_append}
+\alias{warning_append}
 \alias{error_return}
 \alias{error_df_return}
 \alias{error_logical}
+\alias{defect_append}
+\alias{defect_report}
+\alias{defect_df_return}
 \title{Success and error functions}
 \usage{
 success_logical(data, ...)
 
 success_continue(data, ...)
+
+success_append(data, ...)
+
+success_report(data, ...)
+
+success_df_return(data, ...)
 
 error_stop(errors, data = NULL, warn = FALSE, ...)
 
@@ -28,11 +41,19 @@ warn_report(errors, data = NULL)
 
 error_append(errors, data = NULL)
 
+warning_append(errors, data = NULL)
+
 error_return(errors, data = NULL)
 
 error_df_return(errors, data = NULL)
 
 error_logical(errors, data = NULL, ...)
+
+defect_append(errors, data, ...)
+
+defect_report(errors, data, ...)
+
+defect_df_return(errors, data, ...)
 }
 \arguments{
 \item{data}{A data frame}
@@ -50,12 +71,22 @@ passes or fails is configurable via the \code{success_fun}
 and \code{error_fun} parameters, respectively.
 The \code{success_fun} parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
-write your own success handler function, but there are two
+write your own success handler function, but there are a few
 provided by this package:
 \itemize{
   \item \code{success_continue} - just returns the data that was
                                    passed into the assertion function
   \item \code{success_logical} - returns TRUE
+  \item \code{success_append} - returns the data that was
+                                passed into the assertion function
+                                but also stores basic information about
+                                verification result
+  \item \code{success_report} - When success results are stored, and each
+                                verification ended up with success prints
+                                summary of all successful validations
+  \item \code{success_df_return} - When success results are stored, and each
+                                   verification ended up with success prints
+                                   data.frame with verification results
 }
 The \code{error_fun} parameter takes a function that takes
 the data passed to the assertion function as a parameter. You can
@@ -85,5 +116,25 @@ provided by this package:
    not halt execution, it just issues a warning.
   \item \code{warn_report} - Prints all the information available
   about the errors but does not halt execution, it just issues a warning.
+  \item \code{defect_report} - For single rule and defective data it displays
+  short info about skipping current assertion. For \code{chain_end} sums
+  up all skipped rules for defective data.
+  \item \code{defect_df_return} - For single rule and defective data it returns
+  info data.frame about skipping current assertion. For \code{chain_end}
+  returns all skipped rules info data.frame for defective data.
+ }
+You may find the third type of data verification result. In a scenario
+when validation rule was obligatory (obligatory = TRUE) in order to execute the
+following ones we may want to skip them and register that fact.
+In order to do this there are three callbacks reacting to defective
+data:
+ \itemize{
+  \item \code{defect_report} - For single rule and defective data it displays
+  short info about skipping current assertion.
+  \item \code{defect_df_return} - For single rule and defective data it returns
+  info data.frame about skipping current assertion.
+  \item \code{defect_append} - Appends info about skipped rule due to data
+  defect into one of data attributes. Rules skipped on defective data, or its summary, can
+  be returned with proper error_fun callback in \code{chain_end}.
  }
 }

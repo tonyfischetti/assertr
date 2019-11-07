@@ -181,6 +181,52 @@ in_set <- function(..., allow.na=TRUE, inverse=FALSE){
   return(fun)
 }
 
+#' Returns TRUE if value is not in set
+#'
+#' This function returns a predicate function that will take a single
+#' value and returns TRUE if the value is not a member of the set of objects
+#' supplied. This doesn't actually check the membership of anything--it
+#' only returns a function that actually does the checking when called
+#' with a value. This is a convenience function meant to return a
+#' predicate function to be used in an \code{\link{assertr}} assertion.
+#'
+#' @param ... objects that make up the set
+#' @param allow.na A logical indicating whether NAs (including NaNs)
+#'        should be permitted (default TRUE)
+#' @return A function that takes one value and returns TRUE
+#'         if the value is not in the set defined by the
+#'         arguments supplied by \code{not_in_set} and FALSE
+#'         otherwise
+#' @seealso \code{\link{in_set}}
+#' @examples
+#' predicate <- not_in_set(3,4)
+#' predicate(5)
+#'
+#' ## is equivalent to
+#'
+#' not_in_set(3,4)(5)
+#'
+#' @export
+not_in_set <- function(..., allow.na=TRUE, inverse=FALSE){
+  the_call <- deparse(sys.call())
+  set <- c(...)
+  if(!length(set)) stop("can not test for membership in empty set")
+  fun <- function(x){
+    if(is.null(x)) stop("nothing to check set membership to")
+
+    raw_result <- !(x %in% set)
+    if(allow.na){
+      these_are_NAs <- is.na(x)
+      raw_result[these_are_NAs] <- TRUE
+    }
+    if(inverse)
+      return(ifelse(raw_result==TRUE, FALSE, TRUE))
+    return(raw_result)
+  }
+  attr(fun, "assertr_vectorized") <- TRUE
+  attr(fun, "call") <- the_call
+  return(fun)
+}
 
 #' Return a function to create z-score checking predicate
 #'

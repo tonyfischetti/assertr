@@ -6,7 +6,8 @@
 \title{Raises error if predicate is FALSE in any columns selected}
 \usage{
 assert(data, predicate, ..., success_fun = success_continue,
-  error_fun = error_stop)
+  error_fun = error_stop, skip_chain_opts = FALSE,
+  obligatory = FALSE, defect_fun = defect_append, description = NA)
 
 assert_(data, predicate, ..., .dots, success_fun = success_continue,
   error_fun = error_stop)
@@ -25,6 +26,19 @@ returning \code{data}.}
 
 \item{error_fun}{Function to call if assertion fails. Defaults to printing
 a summary of all errors.}
+
+\item{skip_chain_opts}{If TRUE, \code{success_fun} and \code{error_fun}
+are used even if assertion is called within a chain.}
+
+\item{obligatory}{If TRUE and assertion failed the data is marked as defective.
+For defective data, all the following rules are handled by
+\code{defect_fun} function.}
+
+\item{defect_fun}{Function to call when data is defective. Defaults to skipping
+assertion and storing info about it in special attribute.}
+
+\item{description}{Custom description of the rule. Is stored in result
+reports and data.}
 
 \item{.dots}{Use assert_() to select columns using standard evaluation.}
 }
