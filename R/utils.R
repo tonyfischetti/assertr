@@ -108,6 +108,18 @@ has_class <- function(..., class){
   all(given_classes %in% class)
 }
 
+
+#' Generates random ID string
+#'
+#' This is used to generate id for each assertion error.
+#'
+#' For single assertion that checks multiple columns, each error log
+#' is stored as a separate element. We provide the ID to allow
+#' detecting which errors come from the same assertion.
+#'
 generate_id <- function() {
-  paste0(sample(c(LETTERS, letters, 0:9), 20, TRUE), collapse = "")
+  paste0(
+    paste0(sample(c(LETTERS, letters, 0:9), 5, TRUE), collapse = ""),
+    round(as.numeric(Sys.time())*1000)
+  )
 }

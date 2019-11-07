@@ -212,7 +212,7 @@ not_in_set <- function(..., allow.na=TRUE, inverse=FALSE){
   set <- c(...)
   if(!length(set)) stop("can not test for membership in empty set")
   fun <- function(x){
-    if(is.null(x))       stop("nothing to check set membership to")
+    if(is.null(x)) stop("nothing to check set membership to")
 
     raw_result <- !(x %in% set)
     if(allow.na){
