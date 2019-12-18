@@ -6,13 +6,15 @@
 \alias{chain_end}
 \title{Chaining functions}
 \usage{
-chain_start(data)
+chain_start(data, store_success = FALSE)
 
 chain_end(data, success_fun = success_continue,
   error_fun = error_report)
 }
 \arguments{
 \item{data}{A data frame}
+
+\item{store_success}{If TRUE each successful assertion is stored in chain.}
 
 \item{success_fun}{Function to call if assertion passes. Defaults to
 returning \code{data}.}

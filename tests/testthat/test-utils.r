@@ -31,3 +31,23 @@ test_that("has_all_names works with verify", {
   expect_equal(verify(mtcars, has_all_names(mpg_var, wt_var)), mtcars)
   expect_equal(mtcars %>% verify(has_all_names(mpg_var, wt_var)), mtcars)
 })
+
+### has_class ###
+
+test_that("has_class works with verify", {
+
+  expect_equal(verify(mtcars, has_class("mpg", class = "numeric")), mtcars)
+  expect_equal(
+    mtcars %>% verify(has_class("mpg", "wt", class = "numeric")), mtcars)
+
+  expect_output(
+    mtcars %>% verify(has_class("mpg", class = "character"), error_fun = just.show.error),
+    "verification [has_class(\"mpg\", class = \"character\")] failed! (1 failure)",
+    fixed = TRUE
+  )
+
+  mpg_var <- "mpg"
+  wt_var <- "wt"
+  expect_equal(verify(mtcars, has_class(mpg_var, class = "numeric")), mtcars)
+  expect_equal(mtcars %>% verify(has_class(mpg_var, wt_var, class = "numeric")), mtcars)
+})

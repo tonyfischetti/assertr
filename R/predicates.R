@@ -181,7 +181,6 @@ in_set <- function(..., allow.na=TRUE, inverse=FALSE){
   return(fun)
 }
 
-
 #' Return a function to create z-score checking predicate
 #'
 #' This function takes one argument, the number of standard deviations
