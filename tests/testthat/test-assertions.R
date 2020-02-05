@@ -222,7 +222,7 @@ test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
                "assert requires columns to be selected. Check number of arguments")
   expect_error(assert(mtcars, in_set(0,1), vs, tree),
-               "object 'tree' not found")
+               class="error")
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"))
   expect_error(assert("tree"),
                "argument \"predicate\" is missing, with no default")
@@ -288,7 +288,7 @@ test_that("assert_rows breaks appropriately", {
   expect_error(assert_rows(rowSums, in_set(0,1), mtcars$vs),
                "assert_rows requires columns to be selected. Check number of arguments")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
-               "object 'tree' not found")
+               class="error")
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"))
   expect_error(assert_rows("tree"),
                "argument \"row_reduction_fn\" is missing, with no default")
@@ -339,7 +339,7 @@ test_that("insist breaks appropriately", {
                "insist requires columns to be selected. Check number of arguments")
   expect_error(insist(mtcars, within_n_sds(5), "vs:am"))
   expect_error(insist(mtcars, within_n_sds(5), tree),
-               "object 'tree' not found")
+               class="error")
   expect_error(insist("tree"),
                "argument \"predicate_generator\" is missing, with no default")
   expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),
