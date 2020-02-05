@@ -3,7 +3,6 @@
 \docType{package}
 \name{assertr}
 \alias{assertr}
-\alias{assertr-package}
 \title{assertr: Assertive programming for R analysis pipeline.}
 \description{
 The assertr package supplies a suite of functions designed to verify

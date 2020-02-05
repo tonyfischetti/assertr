@@ -6,11 +6,24 @@
 \title{Raises error if dynamically created predicate is FALSE for any row
 after applying row reduction function}
 \usage{
-insist_rows(data, row_reduction_fn, predicate_generator, ...,
-  success_fun = success_continue, error_fun = error_stop)
+insist_rows(
+  data,
+  row_reduction_fn,
+  predicate_generator,
+  ...,
+  success_fun = success_continue,
+  error_fun = error_stop
+)
 
-insist_rows_(data, row_reduction_fn, predicate_generator, ..., .dots,
-  success_fun = success_continue, error_fun = error_stop)
+insist_rows_(
+  data,
+  row_reduction_fn,
+  predicate_generator,
+  ...,
+  .dots,
+  success_fun = success_continue,
+  error_fun = error_stop
+)
 }
 \arguments{
 \item{data}{A data frame}

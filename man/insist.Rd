@@ -6,11 +6,22 @@
 \title{Raises error if dynamically created predicate is FALSE in any columns
 selected}
 \usage{
-insist(data, predicate_generator, ..., success_fun = success_continue,
-  error_fun = error_stop)
+insist(
+  data,
+  predicate_generator,
+  ...,
+  success_fun = success_continue,
+  error_fun = error_stop
+)
 
-insist_(data, predicate_generator, ..., .dots,
-  success_fun = success_continue, error_fun = error_stop)
+insist_(
+  data,
+  predicate_generator,
+  ...,
+  .dots,
+  success_fun = success_continue,
+  error_fun = error_stop
+)
 }
 \arguments{
 \item{data}{A data frame}

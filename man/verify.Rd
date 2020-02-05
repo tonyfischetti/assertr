@@ -4,8 +4,7 @@
 \alias{verify}
 \title{Raises error if expression is FALSE anywhere}
 \usage{
-verify(data, expr, success_fun = success_continue,
-  error_fun = error_stop)
+verify(data, expr, success_fun = success_continue, error_fun = error_stop)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}

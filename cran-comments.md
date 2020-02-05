@@ -1,6 +1,6 @@
 ## Test environments
-* local macOS Sierra 10.14 install, R 3.5.2
-* ubuntu (on travis-ci), R 3.5.1
+* local macOS High Sierra 10.13 install, R 3.6.0
+* local Debian 10, R-devel
 * win-builder (devel and release)
 
 ## R CMD check results

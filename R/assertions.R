@@ -89,7 +89,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
-  if(class(log.mat)=="logical"){
+  if("logical" %in% class(log.mat)){
     log.mat <- matrix(log.mat)
     colnames(log.mat) <- colnames(sub.frame)
   }
