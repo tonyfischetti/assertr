@@ -328,8 +328,13 @@ test_that("assert raises *custom error* if verification fails", {
 test_that("assert breaks appropriately", {
   expect_error(assert(in_set(0,1), mtcars$vs),
                "assert requires columns to be selected. Check number of arguments")
-  expect_error(assert(mtcars, in_set(0,1), vs, tree),
-               "object 'tree' not found")
+  expect_error(
+    object = {
+      assert(mtcars, in_set(0,1), vs, tree)
+      },
+    regexp = "Column `tree` doesn't exist",
+    class = "error"
+    )
   expect_error(assert(mtcars, in_set(0,1), vs, "tree"))
   expect_error(assert("tree"),
                "argument \"predicate\" is missing, with no default")
@@ -427,8 +432,20 @@ test_that("assert_rows breaks appropriately", {
                "argument \"predicate\" is missing, with no default")
   expect_error(assert_rows(rowSums, in_set(0,1), mtcars$vs),
                "assert_rows requires columns to be selected. Check number of arguments")
-  expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, tree),
-               "object 'tree' not found")
+  expect_error(
+    object = {
+      assert_rows(
+        data = mtcars,
+        row_reduction_fn = rowSums,
+        predicate = in_set(0,1,2),
+        vs,
+        am,
+        tree
+        )
+      },
+    regexp = "Column `tree` doesn't exist",
+    class = "error"
+    )
   expect_error(assert_rows(mtcars, rowSums, in_set(0,1,2), vs, am, "tree"))
   expect_error(assert_rows("tree"),
                "argument \"row_reduction_fn\" is missing, with no default")
@@ -502,8 +519,13 @@ test_that("insist breaks appropriately", {
   expect_error(insist(within_n_sds(5), mtcars$vs),
                "insist requires columns to be selected. Check number of arguments")
   expect_error(insist(mtcars, within_n_sds(5), "vs:am"))
-  expect_error(insist(mtcars, within_n_sds(5), tree),
-               "object 'tree' not found")
+  expect_error(
+    object = {
+      insist(data = mtcars, predicate_generator = within_n_sds(5), tree)
+      },
+    regexp = "Column `tree` doesn't exist",
+    class = "error"
+    )
   expect_error(insist("tree"),
                "argument \"predicate_generator\" is missing, with no default")
   expect_error(insist(iris, within_n_sds(5), Petal.Width:Species),

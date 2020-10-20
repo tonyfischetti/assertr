@@ -107,11 +107,6 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
 
-  if(class(log.mat)=="logical"){
-    log.mat <- matrix(log.mat)
-    colnames(log.mat) <- colnames(sub.frame)
-  }
-
   # if all checks pass in current assertion
   if(all(log.mat))
     return(success_fun(data, "assert", name.of.predicate, colnames(log.mat), NA, description))
