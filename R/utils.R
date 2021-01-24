@@ -32,6 +32,7 @@ is.vectorized.predicate <- function(predicate){
 
 apply.predicate.to.vector <- function(a.column, predicate){
   res <- logical(length(a.column))
+
   if(is.vectorized.predicate(predicate))
     res <- predicate(a.column)
   else
