@@ -4,9 +4,16 @@
 \alias{verify}
 \title{Raises error if expression is FALSE anywhere}
 \usage{
-verify(data, expr, success_fun = success_continue,
-  error_fun = error_stop, skip_chain_opts = FALSE,
-  obligatory = FALSE, defect_fun = defect_append, description = NA)
+verify(
+  data,
+  expr,
+  success_fun = success_continue,
+  error_fun = error_stop,
+  skip_chain_opts = FALSE,
+  obligatory = FALSE,
+  defect_fun = defect_append,
+  description = NA
+)
 }
 \arguments{
 \item{data}{A data frame, list, or environment}

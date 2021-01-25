@@ -4,8 +4,13 @@
 \alias{within_bounds}
 \title{Creates bounds checking predicate}
 \usage{
-within_bounds(lower.bound, upper.bound, include.lower = TRUE,
-  include.upper = TRUE, allow.na = TRUE)
+within_bounds(
+  lower.bound,
+  upper.bound,
+  include.lower = TRUE,
+  include.upper = TRUE,
+  allow.na = TRUE
+)
 }
 \arguments{
 \item{lower.bound}{The lowest permitted value}

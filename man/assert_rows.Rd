@@ -6,13 +6,28 @@
 \title{Raises error if predicate is FALSE for any row after applying
 row reduction function}
 \usage{
-assert_rows(data, row_reduction_fn, predicate, ...,
-  success_fun = success_continue, error_fun = error_stop,
-  skip_chain_opts = FALSE, obligatory = FALSE,
-  defect_fun = defect_append, description = NA)
+assert_rows(
+  data,
+  row_reduction_fn,
+  predicate,
+  ...,
+  success_fun = success_continue,
+  error_fun = error_stop,
+  skip_chain_opts = FALSE,
+  obligatory = FALSE,
+  defect_fun = defect_append,
+  description = NA
+)
 
-assert_rows_(data, row_reduction_fn, predicate, ..., .dots,
-  success_fun = success_continue, error_fun = error_stop)
+assert_rows_(
+  data,
+  row_reduction_fn,
+  predicate,
+  ...,
+  .dots,
+  success_fun = success_continue,
+  error_fun = error_stop
+)
 }
 \arguments{
 \item{data}{A data frame}
