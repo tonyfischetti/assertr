@@ -8,18 +8,13 @@ has_only_names(...)
 }
 \arguments{
 \item{...}{A arbitrary amount of quoted names to check for}
-
-\item{exact}{Should the names be in an exact order (`TRUE`) or any order
-(`FALSE`)?}
 }
 \value{
 TRUE is all names exist, FALSE if not
 }
 \description{
 This function checks parent frame environment for a specific set of names; if
-more columns are present than those specified, an error is raised.  The
-specified names can be in any order, or the argument `exact=TRUE` can be used
-if name order matters.
+more columns are present than those specified, an error is raised.
 }
 \details{
 This is meant to be used with `assertr`'s `verify` function to check
@@ -28,14 +23,23 @@ piped to `verify`. It can also work on a non-`data.frame` list.
 }
 \examples{
 
-# The last two columns names are switched in order, but exact is not TRUE, so
-# it passes.
+# The last two columns names are switched in order, but all column names are
+# present, so it passes.
 verify(
   mtcars,
   has_only_names(c(
     "mpg", "cyl", "disp", "hp", "drat", "wt", "qsec", "vs", "am",
     "carb", "gear"
   ))
+)
+
+# More than one set of character strings can be provided.
+verify(
+  mtcars,
+  has_only_names(
+    c("mpg", "cyl", "disp", "hp", "drat", "wt", "qsec", "vs", "am"),
+    c("carb", "gear")
+  )
 )
 
 \dontrun{

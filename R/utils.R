@@ -85,29 +85,34 @@ has_all_names <- function(...){
 #' Returns TRUE if data.frame or list has only the specified names
 #'
 #' This function checks parent frame environment for a specific set of names; if
-#' more columns are present than those specified, an error is raised.  The
-#' specified names can be in any order, or the argument `exact=TRUE` can be used
-#' if name order matters.
+#' more columns are present than those specified, an error is raised.
 #' 
 #' This is meant to be used with `assertr`'s `verify` function to check
 #' for the existence of specific column names in a `data.frame` that is
 #' piped to `verify`. It can also work on a non-`data.frame` list.
 #' 
 #' @inheritParams has_all_names
-#' @param exact Should the names be in an exact order (`TRUE`) or any order
-#'   (`FALSE`)?
 #' @family Name verification
 #' @return TRUE is all names exist, FALSE if not
 #' @examples
 #' 
-#' # The last two columns names are switched in order, but exact is not TRUE, so
-#' # it passes.
+#' # The last two columns names are switched in order, but all column names are
+#' # present, so it passes.
 #' verify(
 #'   mtcars,
 #'   has_only_names(c(
 #'     "mpg", "cyl", "disp", "hp", "drat", "wt", "qsec", "vs", "am",
 #'     "carb", "gear"
 #'   ))
+#' )
+#' 
+#' # More than one set of character strings can be provided.
+#' verify(
+#'   mtcars,
+#'   has_only_names(
+#'     c("mpg", "cyl", "disp", "hp", "drat", "wt", "qsec", "vs", "am"),
+#'     c("carb", "gear")
+#'   )
 #' )
 #' 
 #' \dontrun{
