@@ -1325,7 +1325,11 @@ test_that("all assertions work with .data pronoun without chains", {
 
   ## assert() ##
   expect_equal(assert(test.df, within_bounds(-Inf, 2), .data$x), test.df)
-  expect_error(assert(test.df, within_bounds(2, Inf), .data$x))
+  expect_output(
+    expect_error(assert(test.df, within_bounds(2, Inf), .data$x)),
+    regexp="Column 'x' violates assertion 'within_bounds(2, Inf)' 2 times",
+    fixed=TRUE
+  )
   # Cases where the name doesn't exist:
   expect_error(assert(test.df, within_bounds(-Inf, 2), .data$y))
   # Note that assert(test.df, within_bounds(-Inf, 2), y) would not work because
