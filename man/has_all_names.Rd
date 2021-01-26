@@ -42,4 +42,8 @@ mtcars \%>\%
 }
 \seealso{
 \code{\link{exists}}
+
+Other Name verification: 
+\code{\link{has_only_names}()}
 }
+\concept{Name verification}

@@ -50,6 +50,7 @@ apply.predicate.to.vector <- function(a.column, predicate){
 #'
 #' @param ... A arbitrary amount of quoted names to check for
 #' @return TRUE if all names exist, FALSE if not
+#' @family Name verification
 #' @seealso \code{\link{exists}}
 #' @examples
 #'
@@ -79,6 +80,59 @@ has_all_names <- function(...){
   given_names <- rlang::env_names(parent$.top_env)
   given_names <- given_names[given_names != ".data"]
   all(check_this %in% given_names)
+}
+
+#' Returns TRUE if data.frame or list has only the specified names
+#'
+#' This function checks parent frame environment for a specific set of names; if
+#' more columns are present than those specified, an error is raised.  The
+#' specified names can be in any order, or the argument `exact=TRUE` can be used
+#' if name order matters.
+#' 
+#' This is meant to be used with `assertr`'s `verify` function to check
+#' for the existence of specific column names in a `data.frame` that is
+#' piped to `verify`. It can also work on a non-`data.frame` list.
+#' 
+#' @inheritParams has_all_names
+#' @param exact Should the names be in an exact order (`TRUE`) or any order
+#'   (`FALSE`)?
+#' @family Name verification
+#' @return TRUE is all names exist, FALSE if not
+#' @examples
+#' 
+#' # The last two columns names are switched in order, but exact is not TRUE, so
+#' # it passes.
+#' verify(
+#'   mtcars,
+#'   has_only_names(c(
+#'     "mpg", "cyl", "disp", "hp", "drat", "wt", "qsec", "vs", "am",
+#'     "carb", "gear"
+#'   ))
+#' )
+#' 
+#' \dontrun{
+#' # The some columns are missing, so it fails.
+#' verify(mtcars, has_only_names("mpg"))
+#' }
+#' @export
+has_only_names <- function(...) {
+  # Collect all arguments
+  check_this <- unlist(list(...))
+  # Ensure a clear error message if other classes are passed in.
+  stopifnot("Arguments to 'has_only_names()' must be character strings."=is.character(check_this))
+  parent <- parent.frame()
+  given_names <- rlang::env_names(parent$.top_env)
+  given_names <- given_names[given_names != ".data"]
+  # Verification of exact column order is not feasible because of the conversion
+  # to an environment before this function sees the data.  When converted to an
+  # environment, the order of names appears to become arbitrary.
+  if (length(check_this) != length(given_names)) {
+    # extra names exist
+    FALSE
+  } else {
+    # The names may be in any order
+    length(setdiff(check_this, given_names)) == 0
+  }
 }
 
 #' Returns TRUE if data.frame columns have a specified class
