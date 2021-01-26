@@ -49,7 +49,7 @@ apply.predicate.to.vector <- function(a.column, predicate){
 #' piped to `verify`. It can also work on a non-`data.frame` list.
 #'
 #' @param ... A arbitrary amount of quoted names to check for
-#' @return TRUE is all names exist, FALSE if not
+#' @return TRUE if all names exist, FALSE if not
 #' @seealso \code{\link{exists}}
 #' @examples
 #'

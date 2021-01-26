@@ -10,7 +10,7 @@ has_all_names(...)
 \item{...}{A arbitrary amount of quoted names to check for}
 }
 \value{
-TRUE is all names exist, FALSE if not
+TRUE if all names exist, FALSE if not
 }
 \description{
 This function checks parent frame environment for existence of names.
