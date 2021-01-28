@@ -1,9 +1,33 @@
+# assertr 2.9 (devel)
+
+* New function `has_only_names` requires that a data.frame or list
+  have only the names requested.
+
+* more graceful handling non-vectorized predicates 
+
 # assertr 2.8
 
+* allows for custom success/error callbacks
+  even if in an assertr chain
 
-* New function `has_only_names` requires that a data.frame or list have only the names requested.
+* ability to store success information
 
-* `assert()`: handle non-vectorized predicates (closes #95)
+* introduction of obligatory rules, which
+  marks data as defective and can use
+  a custom callback
+
+* support for a custom description of a rule
+
+* support for appending warnings
+
+* support for checking if a row contains a
+  duplicated value across columns
+  (`duplicates_across_cols` [a row_redux])
+
+* support for checking if passed data has a
+  particular class (`has_class` [a verify utility])
+
+* support for assertion IDs
 
 # assertr 2.7
 
@@ -15,9 +39,12 @@
 
 # assertr 2.5
 
-* `is_uniq` predicate now accepts multiple vectors and evaluates uniqueness on the combination of them.
+* `is_uniq` predicate now accepts multiple vectors and evaluates
+  uniqueness on the combination of them.
 
-* Breaking change: the `allow.na` argument to `is_uniq` must be named. Code like `is_uniq(x, TRUE)` will no longer work. Instead write `is_uniq(x, allow.na = TRUE)`.
+* Breaking change: the `allow.na` argument to `is_uniq` must be named.
+  Code like `is_uniq(x, TRUE)` will no longer work.
+  Instead write `is_uniq(x, allow.na = TRUE)`.
 
 # assertr 2.4
 
@@ -87,7 +114,8 @@
 
 # assertr 0.4
 
-* added `insist` and `within_n_sds` functions and updated vignette and documentations
+* added `insist` and `within_n_sds` functions and updated vignette
+  and documentations
 
 # assertr 0.2
 
