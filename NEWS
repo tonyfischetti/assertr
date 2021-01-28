@@ -1,3 +1,7 @@
+# assertr 2.8
+
+* `assert()`: handle non-vectorized predicates (closes #95)
+
 # assertr 2.7
 
 * `assert()`: remove dead code (closes #103)
