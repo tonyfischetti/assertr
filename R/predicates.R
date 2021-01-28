@@ -360,6 +360,12 @@ within_n_mads <- function(n, ...){
 #' mtcars %>% assert(is_uniq, qsec)
 #' }
 #'
+#' # to use the version of this function that allows NAs in `assert`,
+#' you can use a lambda/anonymous function like so:
+#'
+#' mtcars %>%
+#'   assert(function(x){is_uniq(x, allow.na=TRUE)}, qsec)
+#'
 #' @export
 is_uniq <- function(..., allow.na=FALSE){
   dots <- list(...)
