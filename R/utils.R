@@ -11,7 +11,8 @@
 # TRUE (and not NULL) if not FALSE
 make.predicate.proper <- function(improper.predicate){
   ret.fun <- function(x){
-    return(length(improper.predicate(x))==0 || improper.predicate(x))
+    ret <- improper.predicate(x)
+    return(length(ret) == 0 || ret)
   }
   if(is.vectorized.predicate(improper.predicate)){
     attr(ret.fun, "assertr_vectorized") <- TRUE

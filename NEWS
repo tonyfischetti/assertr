@@ -1,6 +1,9 @@
 # assertr 2.8
 
+
 * New function `has_only_names` requires that a data.frame or list have only the names requested.
+
+* `assert()`: handle non-vectorized predicates (closes #95)
 
 # assertr 2.7
 

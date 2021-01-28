@@ -27,7 +27,9 @@ Suggests:
     knitr,
     testthat,
     magrittr,
-    rmarkdown
+    rmarkdown,
+    tibble,
+    plyr
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Encoding: UTF-8

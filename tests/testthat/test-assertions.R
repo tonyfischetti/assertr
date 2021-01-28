@@ -1602,3 +1602,15 @@ test_that("description is correctly stored and displayed in results", {
   )
 
 })
+
+test_that("handle predicates applied to the whole data, and not to subframe", {
+  a_tibble <- tibble::tibble(
+    a = c(0, 0),
+    b = c(0,0)
+  ) %>%
+    head( n = 0)
+
+  expect_silent({
+    assert(data = a_tibble, predicate = plyr::empty, dplyr::everything())
+  })
+})
