@@ -155,8 +155,9 @@ with the `assert` and `assert_rows` functions:
 - `within_bounds` - that returns a predicate function that checks if a numeric
 value falls within the bounds supplied, and
 - `in_set` - that returns a predicate function that checks if an element is
-a member of the set supplied.
+a member of the set supplied. (also allows inverse for "not in set")
 - `is_uniq` - that checks to see if each element appears only once
+
 
 and predicate generators designed to be used with the `insist` and `insist_rows`
 functions:
@@ -173,6 +174,16 @@ and `insist_rows`:
 - `maha_dist` - computes the mahalanobis distance of each row (for outlier
 detection). It will coerce categorical variables into numerics if it needs to.
 - `col_concat` - concatenates all rows into strings
+- `duplicated_across_cols` - checking if a row contains a duplicated value
+across columns
+
+and, finally, some other utilities for use with `verify`
+
+- `has_all_names` - check if the data frame or list has all supplied names
+- `has_only_names` - check that a data frame or list have _only_ the names
+requested
+- `has_class` - checks if passed data has a particular class
+
 
 ### More info
 

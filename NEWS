@@ -5,6 +5,8 @@
 
 * more graceful handling non-vectorized predicates 
 
+* some documentation/vignette updates
+
 # assertr 2.8
 
 * allows for custom success/error callbacks

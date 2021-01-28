@@ -140,6 +140,9 @@ dat %>%
   ....
 ```
 
+Other checking functions that are only available to `verify` are
+`has_all_names`, `has_only_names`, and `has_class`.
+
 This is a powerful advantage over `assert`... but `assert` has one more
 advantage of its own that we've heretofore ignored.
 
@@ -675,7 +678,8 @@ without touching the real logic.
 Note: By default, all assertions in the chain use `success_continue` and 
 `error_append` functions.
 It allows you to continue workflow in both cases and aggregate error logs.
-In some cases (i.e. when you don't want to include the error log and just have some error printed),
+In some cases (i.e. when you don't want to include the error log and just
+have some error printed),
 you can require using assertion specific success/error callback in chain.
 
 Just use `skip_chain_opts = TRUE` and specify callback inside assertion:
@@ -852,9 +856,10 @@ Super!
 
 ### advanced: programming with assertion functions
 
-These assertion functions use the [tidyeval](https://rpubs.com/hadley/dplyr-programming) framework.  In the past,
-programming in a tidyverse-like setting was accomplished through
+These assertion functions use the
+[tidyeval](https://rpubs.com/hadley/dplyr-programming) framework. In the
+past, programming in a tidyverse-like setting was accomplished through
 standard evaluation versions of verbs, which used functions postfixed
-with an underscore: `insist_` instead of `insist`, for example.  However,
+with an underscore: `insist_` instead of `insist`, for example. However,
 when tidyeval was made popular with `dplyr` 0.7.0, this usage became deprecated,
 and therefore underscore-postfixed functions are no longer part of `assertr`.
