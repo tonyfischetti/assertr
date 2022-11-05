@@ -1324,27 +1324,18 @@ test_that("all assertions work with .data pronoun without chains", {
   expect_equal(verify(test.df, y <= 2), test.df)
 
   ## assert() ##
-  expect_equal(assert(test.df, within_bounds(-Inf, 2), .data$x), test.df)
+  expect_equal(assert(test.df, within_bounds(-Inf, 2), x), test.df)
   expect_output(
-    expect_error(assert(test.df, within_bounds(2, Inf), .data$x)),
+    expect_error(assert(test.df, within_bounds(2, Inf), x)),
     regexp="Column 'x' violates assertion 'within_bounds(2, Inf)' 2 times",
     fixed=TRUE
   )
-  # Cases where the name doesn't exist:
-  expect_error(assert(test.df, within_bounds(-Inf, 2), .data$y))
-  # Note that assert(test.df, within_bounds(-Inf, 2), y) would not work because
-  # assert relies on dplyr::select. Use !! varname
 
   ## insist() ##
-  expect_equal(insist(test.df, within_n_sds(1), .data$x), test.df)
-  expect_output(insist(test.df, within_n_sds(0.1), .data$x,
+  expect_equal(insist(test.df, within_n_sds(1), x), test.df)
+  expect_output(insist(test.df, within_n_sds(0.1), x,
     error_fun = just.show.error),
     "Column 'x' violates assertion 'within_n_sds(0.1)' 2 times", fixed = TRUE)
-
-  # Cases where the name doesn't exist:
-  expect_error(insist(test.df, within_n_sds(1), .data$y))
-  # Note that insist(test.df, within_n_sds(1), y) would not work because
-  # insist relies on dplyr::select. Use !! y instead.
 })
 
 test_that("all assertions work with .data pronoun in chains", {
@@ -1354,36 +1345,28 @@ test_that("all assertions work with .data pronoun in chains", {
   ## verify() ##
   # Cases where the name exists:
   # Also test the logical versions here to make sure nothing too weird is happening.
-  expect_equal(test.df %>% verify(.data$x <= 2), test.df)
-  expect_true(test.df %>% verify(.data$x <= 2, success_fun = success_logical))
-  expect_output(test.df %>% verify(.data$x > 2, error_fun = just.show.error),
-                "verification [.data$x > 2] failed! (3 failures)", fixed = TRUE)
-  expect_false(test.df %>% verify(.data$x > 2, error_fun = error_logical))
+  expect_equal(test.df %>% verify(x <= 2), test.df)
+  expect_true(test.df %>% verify(x <= 2, success_fun = success_logical))
+  expect_output(test.df %>% verify(x > 2, error_fun = just.show.error),
+                "verification [x > 2] failed! (3 failures)", fixed = TRUE)
+  expect_false(test.df %>% verify(x > 2, error_fun = error_logical))
 
   # Cases where the name doesn't exist:
+  #expect_error(test.df %>% verify(y <= 2, error_fun = just.show.error))
   expect_error(test.df %>% verify(.data$y <= 2, error_fun = just.show.error))
   expect_equal(test.df %>% verify(y <= 2), test.df)
 
   ## assert() ##
-  expect_equal(test.df %>% assert(within_bounds(-Inf, 2), .data$x), test.df)
-  expect_output(test.df %>% assert(within_bounds(2, Inf), .data$x,
+  expect_equal(test.df %>% assert(within_bounds(-Inf, 2), x), test.df)
+  expect_output(test.df %>% assert(within_bounds(2, Inf), x,
     error_fun = just.show.error),
     "Column 'x' violates assertion 'within_bounds(2, Inf)' 2 times", fixed = TRUE)
-  # Cases where the name doesn't exist:
-  expect_error(test.df %>% assert(within_bounds(-Inf, 2), .data$y))
-  # Note that test.df %>% assert(within_bounds(-Inf, 2), y) would not work because
-  # assert relies on dplyr::select.
 
   ## insist() ##
-  expect_equal(test.df %>% insist(within_n_sds(1), .data$x), test.df)
-  expect_output(test.df %>% insist(within_n_sds(0.1), .data$x,
+  expect_equal(test.df %>% insist(within_n_sds(1), x), test.df)
+  expect_output(test.df %>% insist(within_n_sds(0.1), x,
     error_fun = just.show.error),
     "Column 'x' violates assertion 'within_n_sds(0.1)' 2 times", fixed = TRUE)
-
-  # Cases where the name doesn't exist:
-  expect_error(test.df %>% insist(within_n_sds(1), .data$y))
-  # Note that test.df %>% insist(within_n_sds(1), y) would not work because
-  # insist relies on dplyr::select.
 })
 
 
