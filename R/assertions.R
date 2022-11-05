@@ -119,6 +119,12 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       this.vector <- sub.frame[[column]]
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
+  # special case for a single row data.frame
+  if(length(log.mat)==1 && !methods::is(log.mat, "matrix")){
+    tmp <- names(log.mat)
+    log.mat <- matrix(dat=log.mat)
+    colnames(log.mat) <- tmp
+  }
 
   # if all checks pass in current assertion
   if(all(log.mat))
@@ -400,6 +406,13 @@ insist <- function(data, predicate_generator, ...,
                       predicate <- true.predicates[[column]]
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
+
+  # special case for a single row data.frame
+  if(length(log.mat)==1 && !methods::is(log.mat, "matrix")){
+    tmp <- names(log.mat)
+    log.mat <- matrix(dat=log.mat)
+    colnames(log.mat) <- tmp
+  }
 
   # if all checks pass in current assertion
   if(all(log.mat))

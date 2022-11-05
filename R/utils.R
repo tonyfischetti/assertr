@@ -87,16 +87,16 @@ has_all_names <- function(...){
 #'
 #' This function checks parent frame environment for a specific set of names; if
 #' more columns are present than those specified, an error is raised.
-#' 
+#'
 #' This is meant to be used with `assertr`'s `verify` function to check
 #' for the existence of specific column names in a `data.frame` that is
 #' piped to `verify`. It can also work on a non-`data.frame` list.
-#' 
+#'
 #' @inheritParams has_all_names
 #' @family Name verification
 #' @return TRUE is all names exist, FALSE if not
 #' @examples
-#' 
+#'
 #' # The last two columns names are switched in order, but all column names are
 #' # present, so it passes.
 #' verify(
@@ -106,7 +106,7 @@ has_all_names <- function(...){
 #'     "carb", "gear"
 #'   ))
 #' )
-#' 
+#'
 #' # More than one set of character strings can be provided.
 #' verify(
 #'   mtcars,
@@ -115,7 +115,7 @@ has_all_names <- function(...){
 #'     c("carb", "gear")
 #'   )
 #' )
-#' 
+#'
 #' \dontrun{
 #' # The some columns are missing, so it fails.
 #' verify(mtcars, has_only_names("mpg"))
