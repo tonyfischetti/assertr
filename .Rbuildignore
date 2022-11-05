@@ -9,3 +9,4 @@
 ^appveyor.yml$
 cran-comments.md
 ^codemeta\.json$
+^CRAN-SUBMISSION$
