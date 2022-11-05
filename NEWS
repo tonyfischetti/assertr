@@ -1,9 +1,15 @@
-# assertr 2.9 (devel)
+# assertr 3.0
+
+* Finally removed deprecated underscore functions
+
+* Fixed a bug wherein single row data.frames were not handled properly
+
+# assertr 2.9
 
 * New function `has_only_names` requires that a data.frame or list
   have only the names requested.
 
-* more graceful handling non-vectorized predicates 
+* more graceful handling non-vectorized predicates
 
 * some documentation/vignette updates
 
