@@ -21,3 +21,5 @@ packrat/lib*/
 *.exe
 *.out
 *.app
+/doc/
+/Meta/

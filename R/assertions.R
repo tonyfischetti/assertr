@@ -122,7 +122,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
   # special case for a single row data.frame
   if(length(log.mat)==1 && !methods::is(log.mat, "matrix")){
     tmp <- names(log.mat)
-    log.mat <- matrix(dat=log.mat)
+    log.mat <- matrix(data=log.mat)
     colnames(log.mat) <- tmp
   }
 
@@ -410,7 +410,7 @@ insist <- function(data, predicate_generator, ...,
   # special case for a single row data.frame
   if(length(log.mat)==1 && !methods::is(log.mat, "matrix")){
     tmp <- names(log.mat)
-    log.mat <- matrix(dat=log.mat)
+    log.mat <- matrix(data=log.mat)
     colnames(log.mat) <- tmp
   }
 

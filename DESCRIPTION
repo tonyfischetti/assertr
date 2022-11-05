@@ -15,11 +15,11 @@ URL: https://docs.ropensci.org/assertr/ (website)
 BugReports: https://github.com/ropensci/assertr/issues
 License: MIT + file LICENSE
 ByteCompile: TRUE
-LazyData: TRUE
 Depends: R (>= 3.1.0)
 Imports:
     dplyr (>= 0.7.0),
     MASS,
+    methods,
     stats,
     utils,
     rlang (>= 0.3.0)
