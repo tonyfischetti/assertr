@@ -1,28 +1,24 @@
 {
-  "@context": [
-    "https://doi.org/doi:10.5063/schema/codemeta-2.0",
-    "http://schema.org"
-  ],
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "assertr",
-  "description":
-    "Provides functionality to assert conditions\n    that have to be met so that errors in data used in\n    analysis pipelines can fail quickly. Similar to\n    'stopifnot()' but more powerful, friendly, and easier\n    for use in pipelines.",
+  "description": "Provides functionality to assert conditions that have to be met so that errors in data used in analysis pipelines can fail quickly. Similar to 'stopifnot()' but more powerful, friendly, and easier for use in pipelines.",
   "name": "assertr: Assertive Programming for R Analysis Pipelines",
-  "codeRepository": "https://github.com/ropensci/assertr.git",
+  "relatedLink": ["https://docs.ropensci.org/assertr/", "https://CRAN.R-project.org/package=assertr"],
+  "codeRepository": "https://github.com/ropensci/assertr",
   "issueTracker": "https://github.com/ropensci/assertr/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "2.0.2.1",
+  "version": "3.0.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
-    "version": "3.4.2",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 3.4.2 (2017-09-28)",
+  "runtimePlatform": "R version 4.1.1 (2021-08-10)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
-    "name": "Central R Archive Network (CRAN)",
+    "name": "Comprehensive R Archive Network (CRAN)",
     "url": "https://cran.r-project.org"
   },
   "author": [
@@ -33,12 +29,14 @@
       "email": "tony.fischetti@gmail.com"
     }
   ],
-  "maintainer": {
-    "@type": "Person",
-    "givenName": "Tony",
-    "familyName": "Fischetti",
-    "email": "tony.fischetti@gmail.com"
-  },
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Tony",
+      "familyName": "Fischetti",
+      "email": "tony.fischetti@gmail.com"
+    }
+  ],
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
@@ -47,9 +45,10 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
     },
     {
       "@type": "SoftwareApplication",
@@ -58,9 +57,10 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
     },
     {
       "@type": "SoftwareApplication",
@@ -69,72 +69,113 @@
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
-    }
-  ],
-  "softwareRequirements": [
+      },
+      "sameAs": "https://CRAN.R-project.org/package=magrittr"
+    },
     {
       "@type": "SoftwareApplication",
-      "identifier": "dplyr",
-      "name": "dplyr",
-      "version": "0.7.0",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
     },
     {
+      "@type": "SoftwareApplication",
+      "identifier": "tibble",
+      "name": "tibble",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tibble"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "plyr",
+      "name": "plyr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=plyr"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 3.1.0"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "dplyr",
+      "name": "dplyr",
+      "version": ">= 0.7.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=dplyr"
+    },
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "MASS",
       "name": "MASS",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
+      },
+      "sameAs": "https://CRAN.R-project.org/package=MASS"
     },
-    {
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "methods",
+      "name": "methods"
+    },
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "rlang",
       "name": "rlang",
-      "version": "0.1.2",
+      "version": ">= 0.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
-        "name": "Central R Archive Network (CRAN)",
+        "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
-      }
-    }
-  ],
-  "applicationCategory": "ComputingInfrastructure",
-  "isPartOf": "https://ropensci.org",
-  "keywords": [
-    "ropensci",
-    "defensive",
-    "audit",
-    "assert",
-    "assertions",
-    "sanitization",
-    "workflow",
-    "checking"
-  ],
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rlang"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "301.95KB",
+  "releaseNotes": "https://github.com/ropensci/assertr/blob/master/NEWS",
+  "readme": "https://github.com/ropensci/assertr/blob/master/README.md",
   "contIntegration": "https://travis-ci.org/ropensci/assertr",
-  "releaseNotes": "https://github.com/ropensci/assertr.git/blob/master/NEWS",
-  "readme": "https://github.com/ropensci/assertr.git/blob/master/README.md",
-  "fileSize": "95.466KB"
+  "keywords": ["predicate-functions", "analysis-pipeline", "assertions", "assertion-methods", "assertion-library", "r", "rstats", "r-package", "peer-reviewed"]
 }

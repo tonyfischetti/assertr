@@ -1,7 +1,7 @@
 Package: assertr
 Type: Package
 Title: Assertive Programming for R Analysis Pipelines
-Version: 3.0
+Version: 3.0.0
 Authors@R: person("Tony", "Fischetti",
               email="tony.fischetti@gmail.com",
               role = c("aut", "cre"))
