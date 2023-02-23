@@ -701,7 +701,7 @@ verify <- function(data, expr, success_fun=success_continue,
   assertion.id <- generate_id()
   error <- make.assertr.verify.error("verify",
                                      num.violations, deparse(expr),
-                                     (1:length(logical.results))[!logical.results],
+                                     which(!logical.results),
                                      description, assertion.id)
   error_fun(list(error), data=data)
 }
