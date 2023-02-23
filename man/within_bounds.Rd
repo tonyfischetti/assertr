@@ -9,7 +9,8 @@ within_bounds(
   upper.bound,
   include.lower = TRUE,
   include.upper = TRUE,
-  allow.na = TRUE
+  allow.na = TRUE,
+  check.class = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,11 @@ should be inclusive (default TRUE)}
 
 \item{allow.na}{A logical indicating whether NAs (including NaNs)
 should be permitted (default TRUE)}
+
+\item{check.class}{Should the class of the \code{lower.bound},
+\code{upper_bound}, and the input to the returned function be checked
+to be numeric or of the same class?  If \code{FALSE}, the comparison
+may have unexpected results.}
 }
 \value{
 A function that takes numeric value or numeric vactor and returns
