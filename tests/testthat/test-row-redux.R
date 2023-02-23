@@ -1,5 +1,3 @@
-context("assertions about row reduction functions in row-redux.R")
-
 set.seed(1)
 exmpl.data <- data.frame(x=c(8, 9, 6, 5, 9, 5, 6, 7, 8, 9, 6, 5, 5, 6, 7),
                 y=c(82, 91, 61, 49, 40, 49, 57, 74, 78, 90, 61, 49, 51, 62, 68))

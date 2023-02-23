@@ -1,5 +1,3 @@
-context("assertions about assertions in assertion.R")
-
 # just some set up
 a <- 1
 alist <- list(a=c(1,2,3), b=c(4,5,6))
@@ -197,8 +195,11 @@ test_that("verify breaks appropriately", {
   expect_error(verify(mtcars), "argument \"expr\" is missing, with no default")
   expect_error(verify(MTCARS, 2 > 1),
                "object 'MTCARS' not found")
-  expect_warning(verify(mtcars, 1),
-                 "coercing argument of type 'double' to logical")
+  expect_warning(expect_warning(
+    verify(mtcars, 1),
+    "coercing argument of type 'double' to logical"),
+    "The result of evaluating '1' is not a logical vector"
+  )
   expect_error(suppressWarnings(verify(mtcars, "1")),
                "missing value where TRUE/FALSE needed")
   expect_error(verify(mtcars, 1 > 0, "tree"), "could not find function \"success_fun\"")

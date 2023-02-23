@@ -1,13 +1,7 @@
-context("assertions about utils in utils.R")
-
-
-
 # Setup
 just.show.error <- function(err, ...){
   lapply(err, summary)
 }
-
-
 
 ### has_all_names ###
 
@@ -36,7 +30,7 @@ test_that("has_all_names works with verify", {
 
 test_that("has_only_names works with verify", {
   test_data <- data.frame(A=1, B=2)
-  
+
   expect_equal(verify(test_data, has_only_names(c("B", "A"))), test_data)
   # Order doesn't matter
   expect_equal(verify(test_data, has_only_names(c("A", "B"))), test_data)

@@ -1,5 +1,3 @@
-context("assertions about predicates in predicates.R")
-
 set.seed(1)
 test.vect <- rnorm(100, mean=100, sd=20)
 test.vect2 <- c(1, NA, 3)
