@@ -10,3 +10,5 @@
 cran-comments.md
 ^codemeta\.json$
 ^CRAN-SUBMISSION$
+^\.github$
+^codecov\.yml$

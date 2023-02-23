@@ -3,9 +3,12 @@ assertr
 
 ![assertr logo](http://statethatiamin.com/media/assertrlogo.png)
 
-[![Build Status](http://travis-ci.org/ropensci/assertr.svg?branch=master)](https://travis-ci.org/ropensci/assertr)
-[![](http://www.r-pkg.org/badges/version/assertr)](https://cran.r-project.org/package=assertr)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/ropensci/assertr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ropensci/assertr?branch=master)
+[![CRAN status](https://www.r-pkg.org/badges/version/assertr)](https://CRAN.R-project.org/package=assertr)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/assertr)](https://cran.r-project.org/package=assertr)
+<!-- badges: end -->
 
 ### What is it?
 The assertr package supplies a suite of functions designed to verify

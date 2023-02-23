@@ -29,7 +29,8 @@ Suggests:
     magrittr,
     rmarkdown,
     tibble,
-    plyr
+    plyr,
+    covr
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 Encoding: UTF-8
