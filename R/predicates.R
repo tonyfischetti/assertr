@@ -96,14 +96,14 @@ within_bounds <- function(lower.bound, upper.bound,
     stop("bounds must be numeric or have similar classes")
   if(lower.bound >= upper.bound)
     stop("lower bound must be strictly lower than upper bound")
+  lower.operator <- if(!include.lower) `>` else `>=`
+  upper.operator <- if(!include.upper) `<` else `<=`
   fun <- function(x){
     if(is.null(x))       stop("bounds must be checked on non-null element")
     numeric.comparison <- is.numeric(lower.bound) && is.numeric(x)
     compatible.comparison <- class(lower.bound) %in% class(x)
     if(check.class && !(numeric.comparison || compatible.comparison))
       stop("bounds must only be checked on numerics or classes that are similar")
-    lower.operator <- if(!include.lower) `>` else `>=`
-    upper.operator <- if(!include.upper) `<` else `<=`
     if(allow.na){
       return((lower.operator(x, lower.bound) &
                 upper.operator(x, upper.bound)) | is.na(x))
