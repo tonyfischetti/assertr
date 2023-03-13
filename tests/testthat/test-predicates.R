@@ -63,11 +63,16 @@ test_that("predicate appropriately assigns the 'call' attribute", {
 test_that("within_bounds fails appropriately", {
   expect_error(within_bounds(),
                ".lower.bound. is missing")
-  expect_error(within_bounds(1, "tree"), "bounds must be numeric")
+  expect_error(within_bounds(1, "tree"), "bounds must be numeric or have similar classes")
+  expect_silent(within_bounds(1, "tree", check.class=FALSE))
   expect_error(within_bounds(2, 1),
                "lower bound must be strictly lower than upper bound")
   expect_error(within_bounds(2, 2),
                "lower bound must be strictly lower than upper bound")
+  expect_error(
+    within_bounds("tree", "zoo")(2),
+    "bounds must only be checked on numerics or classes that are similar"
+  )
 })
 
 test_that("returned predicate works appropriately on scalars", {
@@ -84,6 +89,28 @@ test_that("returned predicate works appropriately on scalars", {
   expect_equal(within_bounds(0, Inf)(10), TRUE)
   expect_equal(within_bounds(0, Inf)(Inf), TRUE)
   expect_equal(within_bounds(0, Inf, include.upper=FALSE)(Inf), FALSE)
+
+  # Non-numeric classes
+  expect_equal(within_bounds(as.Date("2023-02-01"), as.Date("2023-02-05"))(as.Date("2023-02-03")), TRUE)
+  expect_equal(within_bounds(as.Date("2023-02-01"), as.Date("2023-02-05"))(as.Date("2023-02-06")), FALSE)
+  expect_equal(within_bounds("A", "D")("B"), TRUE)
+  expect_equal(within_bounds("A", "D")("Q"), FALSE)
+  # Classes that can be compared but are not generally similar
+  expect_equal(within_bounds(as.Date("2023-02-01"), as.numeric(as.Date("2023-02-05")), check.class=FALSE)(as.Date("2023-02-03")), TRUE)
+  expect_equal(within_bounds(as.Date("2023-02-01"), as.numeric(as.Date("2023-02-05")), check.class=FALSE)(as.Date("2023-02-06")), FALSE)
+  # Classes that shouldn't be compared but can be compared, if forced
+  expect_equal(
+    within_bounds(1, "tree", check.class=FALSE)(2),
+    TRUE
+  )
+  expect_equal(
+    within_bounds("tree", "zoo", check.class=FALSE)(2),
+    FALSE
+  )
+  expect_equal(
+    suppressWarnings(within_bounds("tree", "zoo", check.class=FALSE)(factor("A"))),
+    NA
+  )
 })
 
 test_that("returned predicate works appropriately on vectors", {

@@ -50,6 +50,10 @@ attr(not_na, "call") <- "not_na"
 #'        should be inclusive (default TRUE)
 #' @param allow.na A logical indicating whether NAs (including NaNs)
 #'        should be permitted (default TRUE)
+#' @param check.class Should the class of the \code{lower.bound},
+#'        \code{upper_bound}, and the input to the returned function be checked
+#'        to be numeric or of the same class?  If \code{FALSE}, the comparison
+#'        may have unexpected results.
 #'
 #' @return A function that takes numeric value or numeric vactor and returns
 #'         TRUE if the value(s) is/are within the bounds defined by the
@@ -84,17 +88,22 @@ attr(not_na, "call") <- "not_na"
 #' @export
 within_bounds <- function(lower.bound, upper.bound,
                           include.lower=TRUE, include.upper=TRUE,
-                          allow.na=TRUE){
+                          allow.na=TRUE, check.class=TRUE){
   the_call <- deparse(sys.call())
-  if(!(is.numeric(lower.bound) && is.numeric(upper.bound)))
-    stop("bounds must be numeric")
+  numeric.bounds <- is.numeric(lower.bound) && is.numeric(upper.bound)
+  compatible.bounds <- class(lower.bound) %in% class(upper.bound)
+  if(check.class && !(numeric.bounds || compatible.bounds))
+    stop("bounds must be numeric or have similar classes")
   if(lower.bound >= upper.bound)
     stop("lower bound must be strictly lower than upper bound")
+  lower.operator <- if(!include.lower) `>` else `>=`
+  upper.operator <- if(!include.upper) `<` else `<=`
   fun <- function(x){
     if(is.null(x))       stop("bounds must be checked on non-null element")
-    if(!is.numeric(x))   stop("bounds must only be checked on numerics")
-    lower.operator <- if(!include.lower) `>` else `>=`
-    upper.operator <- if(!include.upper) `<` else `<=`
+    numeric.comparison <- is.numeric(lower.bound) && is.numeric(x)
+    compatible.comparison <- class(lower.bound) %in% class(x)
+    if(check.class && !(numeric.comparison || compatible.comparison))
+      stop("bounds must only be checked on numerics or classes that are similar")
     if(allow.na){
       return((lower.operator(x, lower.bound) &
                 upper.operator(x, upper.bound)) | is.na(x))
