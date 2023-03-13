@@ -1,5 +1,3 @@
-context("success_fun and error_fun in errors.R")
-
 success_result <- function(verb, the_call, columns, row_redux_call, description) {
   row_redux_message <- ""
   if (!is.na(row_redux_call))

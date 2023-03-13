@@ -25,11 +25,13 @@ Imports:
     rlang (>= 0.3.0)
 Suggests:
     knitr,
-    testthat,
+    testthat (>= 3.0.0),
     magrittr,
     rmarkdown,
     tibble,
-    plyr
+    plyr,
+    covr
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
+Config/testthat/edition: 3
