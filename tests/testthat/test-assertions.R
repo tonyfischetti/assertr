@@ -351,6 +351,17 @@ test_that("skip_chain_opts doesn't affect functionality outside chain for assert
                 "Column 'gear' violates assertion 'within_bounds\\(3.5, 4.5\\)' 20 times.*")
 })
 
+test_that("assert works with single row data.frames", {
+  single_row_data <- head(mtcars, 1)
+
+  expect_equal(assert(single_row_data, within_bounds(10,30), disp, error_fun = error_logical), FALSE)
+  expect_output(assert(single_row_data, within_bounds(10,30), disp, error_fun = just.show.error),
+               "Column 'disp' violates assertion 'within_bounds\\(10, 30\\)' 1 time.*")
+  expect_equal(assert(single_row_data, within_bounds(10,30), disp, mpg, error_fun = error_logical), FALSE)
+  expect_output(assert(single_row_data, within_bounds(10,30), disp, mpg, error_fun = just.show.error),
+               "Column 'disp' violates assertion 'within_bounds\\(10, 30\\)' 1 time.*")
+})
+
 ######################################
 
 

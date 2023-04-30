@@ -120,9 +120,9 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
                       return(apply.predicate.to.vector(this.vector,
                                                        predicate))})
   # special case for a single row data.frame
-  if(length(log.mat)==1 && !methods::is(log.mat, "matrix")){
+  if(!methods::is(log.mat, "matrix")){
     tmp <- names(log.mat)
-    log.mat <- matrix(data=log.mat)
+    log.mat <- matrix(data=log.mat, nrow=1)
     colnames(log.mat) <- tmp
   }
 
