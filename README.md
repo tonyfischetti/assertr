@@ -1,7 +1,7 @@
 assertr
 ===
 
-![assertr logo](http://statethatiamin.com/media/assertrlogo.png)
+![assertr logo](https://thepolygram.com/assertrlogo.png)
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml)
