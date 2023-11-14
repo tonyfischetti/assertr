@@ -29,7 +29,6 @@ Suggests:
     magrittr,
     rmarkdown,
     tibble,
-    plyr,
     covr
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
