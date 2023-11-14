@@ -1610,6 +1610,6 @@ test_that("handle predicates applied to the whole data, and not to subframe", {
     head( n = 0)
 
   expect_silent({
-    assert(data = a_tibble, predicate = plyr::empty, dplyr::everything())
+    assert(data = a_tibble, predicate = function(x) nrow(x) == 0L, dplyr::everything())
   })
 })
