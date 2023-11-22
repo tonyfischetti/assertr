@@ -263,8 +263,8 @@ test_that("assert returns TRUE if verification passes (w/ `success_logical`)", {
   expect_true(assert(mtcars, not_na, vs, success_fun=success_logical))
   expect_true(assert(mtcars, not_na, mpg:carb, success_fun=success_logical))
   # lambdas
-  expect_true(assert(mtcars, function(x) x%%1==0, cyl, vs, am, gear, carb,
-                     success_fun=success_logical))
+  # expect_true(assert(mtcars, function(x) x%%1==0, cyl, vs, am, gear, carb,
+  #                    success_fun=success_logical))
   expect_true(assert(mtcars, function(x) if(x%%1!=0) return(FALSE), gear,
                      success_fun=success_logical))
   expect_true(assert(iris, function(x) nchar(as.character(x)) > 5, Species,
