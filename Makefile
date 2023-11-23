@@ -46,3 +46,6 @@ build_src:
 build_bin:
 	Rscript -e 'devtools::build(binary = TRUE, args = c("--preclean"))'
 
+# submit:
+# 	Rscript -e 'devtools::submit_cran()'
+
