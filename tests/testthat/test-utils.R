@@ -66,4 +66,7 @@ test_that("has_class works with verify", {
   wt_var <- "wt"
   expect_equal(verify(mtcars, has_class(mpg_var, class = "numeric")), mtcars)
   expect_equal(mtcars %>% verify(has_class(mpg_var, wt_var, class = "numeric")), mtcars)
+
+  time_df = data.frame(time_var = Sys.time())
+  expect_equal(time_df %>% verify(has_class("time_var", class = c("POSIXct", "POSIXt"))), time_df)
 })

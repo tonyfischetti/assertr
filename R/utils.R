@@ -166,7 +166,7 @@ has_class <- function(..., class){
   check_this <- list(...)
   parent <- parent.frame()
   given_classes <- lapply(check_this, function(name) class(parent$.top_env[[name]]))
-  all(given_classes %in% class)
+  all(unlist(given_classes) %in% class)
 }
 
 
