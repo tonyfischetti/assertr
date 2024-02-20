@@ -8,6 +8,7 @@ assertr
 [![Codecov test coverage](https://codecov.io/gh/ropensci/assertr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ropensci/assertr?branch=master)
 [![CRAN status](https://www.r-pkg.org/badges/version/assertr)](https://CRAN.R-project.org/package=assertr)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/assertr)](https://cran.r-project.org/package=assertr)
+[![rOpenSci software peer-review](https://badges.ropensci.org/23_status.svg)](https://github.com/ropensci/software-review/issues/23)
 <!-- badges: end -->
 
 ### What is it?
