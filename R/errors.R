@@ -148,6 +148,10 @@ print.assertr_defect <- function(x, ...){
 #'
 #' @export
 summary.assertr_assert_error <- function(object, ...){
+  if (!is.na(object$description)) {
+    cat(object$description)
+    cat("\n")
+  }
   cat(object$message)
   cat("\n")
   numrows <- nrow(object$error_df)

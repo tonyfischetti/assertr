@@ -1,5 +1,7 @@
 # assertr development version
 
+* Assert errors now print the description in the error summary (PR #132)
+
 * Added the ability to check non-numeric classes with `within_bounds()`
   (fix #89)
 
