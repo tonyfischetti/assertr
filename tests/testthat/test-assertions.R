@@ -498,6 +498,20 @@ test_that("assert_rows raises *custom error* if verification fails", {
                "unspecified error")
 })
 
+test_that("assert_rows and insist_rows give one column label per assertion", {
+  # 12 rows violate; the two columns used to get one label each, in rotation
+  errs <- assert_rows(mtcars, rowSums, within_bounds(1,2), vs, am, error_fun = error_df_return)
+  expect_equal(unique(errs$column), "vs, am")
+  errs <- assert_rows(mtcars, rowSums, within_bounds(1,2), vs:am, error_fun = error_df_return)
+  expect_equal(unique(errs$column), "vs:am")
+  errs <- insist_rows(mtcars, maha_dist, within_n_mads(1), mpg, cyl, hp, error_fun = error_df_return)
+  expect_equal(unique(errs$column), "mpg, cyl, hp")
+  # 7 rows violate, which two labels could not be recycled over (#83)
+  errs <- assert_rows(mtcars, rowSums, within_bounds(0,1), vs, am, error_fun = error_df_return)
+  expect_equal(nrow(errs), 7)
+  expect_equal(unique(errs$column), "vs, am")
+})
+
 test_that("assert_rows breaks appropriately", {
   expect_error(assert_rows(in_set(0,1), mtcars$vs),
                "argument \"predicate\" is missing, with no default")
