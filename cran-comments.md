@@ -6,11 +6,11 @@ small number of deliberate changes in behaviour, all listed in NEWS.
 * local macOS 26.6 (arm64) install, R 4.5.2
 * GitHub Actions: macos-latest (release), windows-latest (release),
   ubuntu-latest (devel and release)
-* win-builder (devel, release, and old_release)  [TODO: not run yet]
+* win-builder (devel, release, and old_release)
 
 ## R CMD check results
 
-There were no ERRORs, WARNINGs, or NOTEs  [TODO: confirm on the final commit]
+There were no ERRORs, WARNINGs, or NOTEs
 
 ## Reverse dependencies
 
