@@ -40,6 +40,8 @@ apply.predicate.to.vector <- function(a.column, predicate){
     res <- predicate(a.column)
   else
     res <- vapply(a.column, predicate, logical(1))
+  # a predicate that cannot say TRUE has not been satisfied
+  res[is.na(res)] <- FALSE
   return(res)
 }
 

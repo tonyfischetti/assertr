@@ -399,6 +399,28 @@ test_that("assert and assert_rows stop when a predicate returns a zero-length va
                fixed = TRUE)
 })
 
+test_that("an NA from a predicate counts as a violation", {
+  # test.df2$z is c(0, NA, -1); the row sums of test.df2 are c(2, NA, 2)
+  gen <- function(a.vector) function(x) x > -5
+  row.gen <- function(a.vector) function(x) x > 0
+
+  expect_equal(assert(test.df2, function(x) x > -5, z, error_fun = error_logical), FALSE)
+  expect_output(assert(test.df2, function(x) x > -5, z, error_fun = just.show.error),
+                "Column 'z' violates assertion 'function(x) x > -5' 1 time", fixed = TRUE)
+  expect_output(assert(test.df2, function(x) x >= 0, z, error_fun = just.show.error),
+                "Column 'z' violates assertion 'function(x) x >= 0' 2 times", fixed = TRUE)
+  expect_output(assert(test.df2, is_uniq, z, error_fun = just.show.error),
+                "Column 'z' violates assertion 'is_uniq' 1 time", fixed = TRUE)
+  expect_output(assert_rows(test.df2, rowSums, function(x) x > 0, x:z, error_fun = just.show.error),
+                "Data frame row reduction 'rowSums' violates predicate 'function(x) x > 0' 1 time", fixed = TRUE)
+  expect_output(insist(test.df2, gen, z, error_fun = just.show.error),
+                "Column 'z' violates assertion 'gen' 1 time", fixed = TRUE)
+  expect_output(insist_rows(test.df2, rowSums, row.gen, x:z, error_fun = just.show.error),
+                "Data frame row reduction 'rowSums' violates predicate 'row.gen' 1 time", fixed = TRUE)
+  # predicates that handle NA themselves are unaffected
+  expect_equal(assert(test.df2, within_bounds(-5, 5), z), test.df2)
+})
+
 ######################################
 
 
