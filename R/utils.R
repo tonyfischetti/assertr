@@ -25,6 +25,13 @@ make.predicate.proper <- function(improper.predicate, name.of.predicate){
 # marvel at this function's dedication to the FP paradigm!
 
 
+# deparse() splits long calls over several strings; error and
+# success reports need the text of a call as a single string
+deparse.to.string <- function(expr){
+  paste(deparse(expr), collapse=" ")
+}
+
+
 is.vectorized.predicate <- function(predicate){
   if(!is.null(attr(predicate, "assertr_vectorized")) &&
      attr(predicate, "assertr_vectorized"))

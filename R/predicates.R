@@ -89,7 +89,7 @@ attr(not_na, "call") <- "not_na"
 within_bounds <- function(lower.bound, upper.bound,
                           include.lower=TRUE, include.upper=TRUE,
                           allow.na=TRUE, check.class=TRUE){
-  the_call <- deparse(sys.call())
+  the_call <- deparse.to.string(sys.call())
   numeric.bounds <- is.numeric(lower.bound) && is.numeric(upper.bound)
   compatible.bounds <- class(lower.bound) %in% class(upper.bound)
   if(check.class && !(numeric.bounds || compatible.bounds))
@@ -170,7 +170,7 @@ within_bounds <- function(lower.bound, upper.bound,
 #'
 #' @export
 in_set <- function(..., allow.na=TRUE, inverse=FALSE){
-  the_call <- deparse(sys.call())
+  the_call <- deparse.to.string(sys.call())
   set <- c(...)
   if(!length(set)) stop("can not test for membership in empty set")
   fun <- function(x){
@@ -243,7 +243,7 @@ in_set <- function(..., allow.na=TRUE, inverse=FALSE){
 #'
 #' @export
 within_n_sds <- function(n, ...){
-  the_call <- deparse(sys.call())
+  the_call <- deparse.to.string(sys.call())
   if(!is.numeric(n) || length(n)!=1 || n<=0){
     stop("'n' must be a positive number")
   }
@@ -317,7 +317,7 @@ within_n_sds <- function(n, ...){
 #'
 #' @export
 within_n_mads <- function(n, ...){
-  the_call <- deparse(sys.call())
+  the_call <- deparse.to.string(sys.call())
   if(!is.numeric(n) || length(n)!=1 || n<=0){
     stop("'n' must be a positive number")
   }

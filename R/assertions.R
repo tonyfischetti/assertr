@@ -654,18 +654,18 @@ verify <- function(data, expr, success_fun=success_continue,
   expr <- rlang::enexpr(expr)
 
   if(isTRUE(attr(data, "assertr_data_defective")))
-    return(defect_fun(attr(data, "assertr_errors"), data, "verify", deparse(expr), NA, NA, description))
+    return(defect_fun(attr(data, "assertr_errors"), data, "verify", deparse.to.string(expr), NA, NA, description))
   # Use eval_tidy here to get the .data pronoun and all the eval_tidy benefits
   logical.results <- rlang::eval_tidy(expr, data, parent.frame())
   # NAs are very likely errors, and cause problems in the all() below.
   logical.results <- ifelse(is.na(logical.results), FALSE, logical.results)
 
   if (!is.logical(logical.results)) {
-    warning("The result of evaluating '", deparse(expr),
+    warning("The result of evaluating '", deparse.to.string(expr),
       "' is not a logical vector")
   }
   if (length(logical.results) == 0) {
-    warning("The result of evaluating '", deparse(expr),
+    warning("The result of evaluating '", deparse.to.string(expr),
       "' has length zero")
   }
 
@@ -682,7 +682,7 @@ verify <- function(data, expr, success_fun=success_continue,
 
   # if all checks pass in current assertion
   if(all(logical.results))
-    return(success_fun(data, "verify", deparse(expr), NA, NA, description))
+    return(success_fun(data, "verify", deparse.to.string(expr), NA, NA, description))
 
   # if errors occured and verification was obligatory
   if(obligatory)
@@ -691,7 +691,7 @@ verify <- function(data, expr, success_fun=success_continue,
   num.violations <- sum(!logical.results)
   assertion.id <- generate_id()
   error <- make.assertr.verify.error("verify",
-                                     num.violations, deparse(expr),
+                                     num.violations, deparse.to.string(expr),
                                      which(!logical.results),
                                      description, assertion.id)
   error_fun(list(error), data=data)

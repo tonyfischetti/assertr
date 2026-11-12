@@ -421,6 +421,31 @@ test_that("an NA from a predicate counts as a violation", {
   expect_equal(assert(test.df2, within_bounds(-5, 5), z), test.df2)
 })
 
+test_that("long predicate calls and verify expressions are reported as one string (#88)", {
+  long.set <- in_set("alpha-alpha-alpha", "bravo-bravo-bravo", "charlie-charlie",
+                     "delta-delta-delta", "echo-echo-echo-echo", "foxtrot-foxtrot")
+  long.bounds <- within_bounds(lower.bound=0, upper.bound=1, include.lower=TRUE,
+                               include.upper=TRUE, allow.na=TRUE)
+  expect_equal(length(attr(long.set, "call")), 1)
+  expect_equal(length(attr(long.bounds, "call")), 1)
+  expect_equal(length(attr(within_n_sds(3, include.lower=TRUE, include.upper=TRUE, allow.na=TRUE, check.class=TRUE), "call")), 1)
+  expect_equal(length(attr(within_n_mads(3, include.lower=TRUE, include.upper=TRUE, allow.na=TRUE, check.class=TRUE), "call")), 1)
+
+  # two violations used to be labelled with one half of the call each
+  two.bad <- data.frame(s=c("alpha-alpha-alpha", "x", "y"), stringsAsFactors=FALSE)
+  errs <- assert(two.bad, long.set, s, error_fun = error_df_return)
+  expect_equal(length(unique(errs$predicate)), 1)
+
+  errs <- verify(mtcars, mpg > 33 & cyl %in% c(4, 6, 8) & disp > 100 & hp > 50 & drat > 1 & wt > 1 & qsec > 10,
+                 error_fun = error_return)
+  expect_equal(length(errs[[1]]$message), 1)
+
+  # three violations could not be matched to the two halves at all
+  three.bad <- data.frame(s=c("alpha-alpha-alpha", "x", "y", "z"), stringsAsFactors=FALSE)
+  errs <- assert(three.bad, long.set, s, error_fun = error_df_return)
+  expect_equal(nrow(errs), 3)
+})
+
 ######################################
 
 
