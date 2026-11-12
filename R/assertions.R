@@ -651,6 +651,12 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
 #' @details For examples of possible choices for the \code{success_fun} and
 #' \code{error_fun} parameters, run \code{help("success_and_error_functions")}
 #'
+#' Inside \code{expr}, \code{.} stands for \code{data}, whichever pipe
+#' is used, so the data as a whole can be checked with expressions like
+#' \code{nrow(.) > 10}. The \code{.data} pronoun is for looking up
+#' columns and can't be used this way: \code{nrow(.data)} has length
+#' zero, so nothing would be checked.
+#'
 #' @return By default, the \code{data} is returned if predicate assertion
 #'         is TRUE and and error is thrown if not. If a non-default
 #'         \code{success_fun} or \code{error_fun} is used, the return
@@ -696,7 +702,9 @@ verify <- function(data, expr, success_fun=success_continue,
   if(isTRUE(attr(data, "assertr_data_defective")))
     return(defect_fun(attr(data, "assertr_errors"), data, "verify", deparse.to.string(expr), NA, NA, description))
   # Use eval_tidy here to get the .data pronoun and all the eval_tidy benefits
-  logical.results <- rlang::eval_tidy(expr, data, parent.frame())
+  # `.` stands for the data, as it does in a magrittr pipeline, so that
+  # expressions like nrow(.) also work with the native pipe
+  logical.results <- rlang::eval_tidy(expr, data, rlang::env(parent.frame(), . = data))
   # NAs are very likely errors, and cause problems in the all() below.
   logical.results <- ifelse(is.na(logical.results), FALSE, logical.results)
 

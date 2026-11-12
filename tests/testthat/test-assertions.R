@@ -258,6 +258,32 @@ test_that("verify says when a zero-length result means nothing was checked", {
   expect_equal(verify(mtcars[0, ], mpg > 10), mtcars[0, ])
 })
 
+test_that("verify lets `.` stand for the data, with or without a magrittr pipe", {
+  # `mtcars |> verify(nrow(.) > 10)` is the same call as `verify(mtcars, nrow(.) > 10)`:
+  # the native pipe does not define `.`, so it is written that way here (which
+  # also keeps this file readable by versions of R that have no native pipe)
+  dotted <- data.frame(a=1:3)
+  dotted[["."]] <- c(10, 20, 30)
+
+  expect_equal(mtcars %>% verify(nrow(.) > 10), mtcars)
+  expect_equal(verify(mtcars, .data$mpg > 0), mtcars)
+  # a column that is itself called `.` comes first
+  expect_true(verify(dotted, . > 5, success_fun=success_logical))
+
+  expect_equal(verify(mtcars, nrow(.) > 10), mtcars)
+  expect_equal(verify(mtcars, nrow(.) > 100, error_fun=error_logical), FALSE)
+  expect_output(verify(mtcars, nrow(.) > 100, error_fun=just.show.error),
+                "verification [nrow(.) > 100] failed! (1 failure)", fixed = TRUE)
+  # it is the data being verified, also inside another pipeline that has its own `.`
+  expect_equal(suppressWarnings(list(1) %>% { verify(mtcars, nrow(.) > 100, error_fun=error_logical) }), FALSE)
+  # in a function, on a list, and next to variables from the calling code
+  rows.of <- function(some.data) verify(some.data, nrow(.) == 32)
+  expect_equal(rows.of(mtcars), mtcars)
+  expect_true(verify(list(a=1:3), length(.) == 1, success_fun=success_logical))
+  at.least <- 5
+  expect_equal(verify(mtcars, nrow(.) > at.least), mtcars)
+})
+
 ######################################
 
 

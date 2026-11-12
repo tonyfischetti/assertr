@@ -55,6 +55,12 @@ early
 \details{
 For examples of possible choices for the \code{success_fun} and
 \code{error_fun} parameters, run \code{help("success_and_error_functions")}
+
+Inside \code{expr}, \code{.} stands for \code{data}, whichever pipe
+is used, so the data as a whole can be checked with expressions like
+\code{nrow(.) > 10}. The \code{.data} pronoun is for looking up
+columns and can't be used this way: \code{nrow(.data)} has length
+zero, so nothing would be checked.
 }
 \note{
 See \code{vignette("assertr")} for how to use this in context

@@ -140,6 +140,9 @@ dat %>%
   ....
 ```
 
+Inside `verify`, `.` stands for the data being verified, so this works with
+the native pipe (`|>`) as well as with `%>%`.
+
 Other checking functions that are only available to `verify` are
 `has_all_names`, `has_only_names`, and `has_class`.
 
