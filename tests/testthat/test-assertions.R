@@ -239,6 +239,25 @@ test_that("skip_chain_opts doesn't affect functionality outside chain for verify
                 "verification \\[drat > 3\\] failed! \\(4 failures\\)")
 })
 
+test_that("verify says when a zero-length result means nothing was checked", {
+  # a misspelled column, an empty subset, and a list with an empty element
+  expect_warning(verify(mtcars, mtcars$zzz > 0),
+                 "The result of evaluating 'mtcars$zzz > 0' has length zero, so nothing was checked",
+                 fixed = TRUE)
+  expect_warning(verify(mtcars, mpg[mpg > 100] > 0),
+                 "The result of evaluating 'mpg[mpg > 100] > 0' has length zero, so nothing was checked",
+                 fixed = TRUE)
+  expect_warning(verify(list(a=numeric(0)), a > 0),
+                 "The result of evaluating 'a > 0' has length zero, so nothing was checked",
+                 fixed = TRUE)
+  # the data still comes back
+  expect_equal(suppressWarnings(verify(mtcars, mtcars$zzz > 0)), mtcars)
+  # a data.frame with no rows has nothing to check, which is not worth a warning
+  expect_silent(mtcars %>% dplyr::filter(cyl == 5) %>% verify(mpg > 10))
+  expect_silent(verify(mtcars[0, ], is_uniq(mpg)))
+  expect_equal(verify(mtcars[0, ], mpg > 10), mtcars[0, ])
+})
+
 ######################################
 
 

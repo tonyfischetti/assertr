@@ -692,9 +692,10 @@ verify <- function(data, expr, success_fun=success_continue,
     warning("The result of evaluating '", deparse.to.string(expr),
       "' is not a logical vector")
   }
-  if (length(logical.results) == 0) {
+  # a data.frame with no rows has nothing to check, which is not worth a warning
+  if (length(logical.results) == 0 && !(is.data.frame(data) && nrow(data) == 0)) {
     warning("The result of evaluating '", deparse.to.string(expr),
-      "' has length zero")
+      "' has length zero, so nothing was checked")
   }
 
   success_fun_override <- attr(data, "assertr_in_chain_success_fun_override")
