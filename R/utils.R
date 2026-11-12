@@ -181,7 +181,7 @@ has_class <- function(..., class){
 }
 
 
-#' Generates random ID string
+#' Generates ID string for an assertion
 #'
 #' This is used to generate id for each assertion error.
 #'
@@ -189,9 +189,12 @@ has_class <- function(..., class){
 #' is stored as a separate element. We provide the ID to allow
 #' detecting which errors come from the same assertion.
 #'
-generate_id <- function() {
-  paste0(
-    paste0(sample(c(LETTERS, letters, 0:9), 5, TRUE), collapse = ""),
-    round(as.numeric(Sys.time())*1000)
-  )
-}
+generate_id <- local({
+  # assertions are numbered as they fail; drawing random characters
+  # instead would change the state of the user's random number generator
+  counter <- 0
+  function() {
+    counter <<- counter + 1
+    paste0(counter, "-", round(as.numeric(Sys.time())*1000))
+  }
+})

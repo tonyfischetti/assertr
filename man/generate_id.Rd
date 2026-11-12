@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{generate_id}
 \alias{generate_id}
-\title{Generates random ID string}
+\title{Generates ID string for an assertion}
 \usage{
 generate_id()
 }

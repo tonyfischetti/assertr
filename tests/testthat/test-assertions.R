@@ -1523,6 +1523,43 @@ test_that("warning_append marks every error it attaches as a warning", {
                         chain_end(error_fun=error_append)),
                c(TRUE, TRUE))
 })
+
+test_that("a failing assertion leaves the random number generator as it was", {
+  two.bad <- data.frame(a=c(1, 20), b=c(1, 30))
+  within.limits <- function(a.vector) within_bounds(0, 10)
+  invisible(runif(1))    # so that the generator has a state to look at
+  rng.state <- function() get(".Random.seed", envir=globalenv())
+  # `code` is only run once the state before it has been noted
+  rng.moved <- function(code){ before <- rng.state(); code; !identical(rng.state(), before) }
+
+  expect_false(rng.moved(assert(two.bad, within_bounds(0,100), a, b)))
+  expect_false(rng.moved(verify(two.bad, a < 10, error_fun=error_append)))
+  expect_false(rng.moved(assert(two.bad, within_bounds(0,10), a, b, error_fun=error_append)))
+  expect_false(rng.moved(insist(two.bad, within.limits, a, b, error_fun=error_append)))
+  expect_false(rng.moved(assert_rows(two.bad, rowSums, within_bounds(0,10), a, b, error_fun=error_append)))
+  expect_false(rng.moved(insist_rows(two.bad, rowSums, within.limits, a, b, error_fun=error_append)))
+})
+
+test_that("errors from one assertion share an id, and each assertion has its own", {
+  two.bad <- data.frame(a=c(1, 20), b=c(1, 30))
+  ids <- function(data) vapply(attr(data, "assertr_errors"), function(x) x$assertion.id, character(1))
+  checked <- two.bad %>%
+    assert(within_bounds(0,10), a, b, error_fun=error_append) %>%
+    verify(a < 10, error_fun=error_append) %>%
+    verify(b < 10, error_fun=error_append)
+  expect_equal(length(ids(checked)), 4)
+  expect_equal(ids(checked)[1], ids(checked)[2])
+  expect_equal(length(unique(ids(checked))), 3)
+  # ids do not depend on the random number generator: they differ even when
+  # it is put back in the same state before each assertion
+  invisible(runif(1))
+  seed <- get(".Random.seed", envir=globalenv())
+  same.state.ids <- vapply(1:20, function(i){
+    assign(".Random.seed", seed, envir=globalenv())
+    ids(verify(two.bad, a < 10, error_fun=error_append))
+  }, character(1))
+  expect_equal(length(unique(same.state.ids)), 20)
+})
 ###################################
 
 
