@@ -1,7 +1,7 @@
 Package: assertr
 Type: Package
 Title: Assertive Programming for R Analysis Pipelines
-Version: 3.0.1
+Version: 3.1.0
 Authors@R: person("Tony", "Fischetti",
               email="tony.fischetti@gmail.com",
               role = c("aut", "cre"))
@@ -11,11 +11,11 @@ Description: Provides functionality to assert conditions
     'stopifnot()' but more powerful, friendly, and easier
     for use in pipelines.
 URL: https://docs.ropensci.org/assertr/,
-    https://github.com/ropensci/assertr
-BugReports: https://github.com/ropensci/assertr/issues
+    https://github.com/tonyfischetti/assertr
+BugReports: https://github.com/tonyfischetti/assertr/issues
 License: MIT + file LICENSE
 ByteCompile: TRUE
-Depends: R (>= 3.1.0)
+Depends: R (>= 4.0.0)
 Imports:
     dplyr (>= 0.7.0),
     MASS,

@@ -7,7 +7,7 @@
 has_only_names(...)
 }
 \arguments{
-\item{...}{A arbitrary amount of quoted names to check for.
+\item{...}{An arbitrary amount of quoted names to check for.
 Character vectors of names are accepted too.}
 }
 \value{

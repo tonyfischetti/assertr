@@ -65,8 +65,8 @@ mtcars \%>\%
 Useful links:
 \itemize{
   \item \url{https://docs.ropensci.org/assertr/}
-  \item \url{https://github.com/ropensci/assertr}
-  \item Report bugs at \url{https://github.com/ropensci/assertr/issues}
+  \item \url{https://github.com/tonyfischetti/assertr}
+  \item Report bugs at \url{https://github.com/tonyfischetti/assertr/issues}
 }
 
 }

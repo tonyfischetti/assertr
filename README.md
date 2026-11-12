@@ -4,8 +4,8 @@ assertr
 ![assertr logo](https://thepolygram.com/assertrlogo.png)
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/ropensci/assertr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ropensci/assertr?branch=master)
+[![R-CMD-check](https://github.com/tonyfischetti/assertr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tonyfischetti/assertr/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/tonyfischetti/assertr/branch/master/graph/badge.svg)](https://app.codecov.io/gh/tonyfischetti/assertr?branch=master)
 [![CRAN status](https://www.r-pkg.org/badges/version/assertr)](https://CRAN.R-project.org/package=assertr)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/assertr)](https://cran.r-project.org/package=assertr)
 [![rOpenSci software peer-review](https://badges.ropensci.org/23_status.svg)](https://github.com/ropensci/software-review/issues/23)
@@ -29,7 +29,7 @@ You can install the latest version on CRAN like this
 or you can install the bleeding-edge development version like this:
 ```r
     install.packages("devtools")
-    devtools::install_github("ropensci/assertr")
+    devtools::install_github("tonyfischetti/assertr")
 ```
 ### What does it look like?
 This package offers five assertion functions, `assert`, `verify`,
@@ -89,14 +89,14 @@ a bunch of failing assertions together.
     +   chain_end
     There are 7 errors across 4 verbs:
     -
-             verb redux_fn           predicate     column index value
-    1      assert     <NA>  in_set(1, 2, 3, 4)       carb    30   6.0
-    2      assert     <NA>  in_set(1, 2, 3, 4)       carb    31   8.0
-    3 assert_rows rowMeans within_bounds(0, 5) ~gear:carb    30   5.5
-    4 assert_rows rowMeans within_bounds(0, 5) ~gear:carb    31   6.5
-    5      verify     <NA>       nrow(.) == 10       <NA>     1    NA
-    6      verify     <NA>            mpg < 32       <NA>    18    NA
-    7      verify     <NA>            mpg < 32       <NA>    20    NA
+             verb redux_fn           predicate    column index value
+    1      assert     <NA>  in_set(1, 2, 3, 4)      carb    30   6.0
+    2      assert     <NA>  in_set(1, 2, 3, 4)      carb    31   8.0
+    3 assert_rows rowMeans within_bounds(0, 5) gear:carb    30   5.5
+    4 assert_rows rowMeans within_bounds(0, 5) gear:carb    31   6.5
+    5      verify     <NA>       nrow(.) == 10      <NA>     1    NA
+    6      verify     <NA>            mpg < 32      <NA>    18    NA
+    7      verify     <NA>            mpg < 32      <NA>    20    NA
 
     Error: assertr stopped execution
 ```

@@ -19,9 +19,6 @@ check:
 check_doc:
 	Rscript -e 'devtools::check_man()'
 
-check_rhub:
-	Rscript -e 'devtools::check_rhub()'
-
 check_win_devel:
 	Rscript -e 'devtools::check_win_devel()'
 
@@ -39,6 +36,9 @@ build_manual:
 
 document:
 	Rscript -e 'devtools::document()'
+
+codemeta:
+	Rscript -e 'codemetar::write_codemeta()'
 
 build_src:
 	Rscript -e 'devtools::build()'

@@ -1,5 +1,76 @@
 # assertr development version
 
+
+
+# assertr 3.1
+
+* inside `verify()`, `.` now stands for the data under any pipe, so
+  `nrow(.)` works with `|>`
+
+* the README now shows how to write a custom predicate (#62)
+
+* `assert()` now applies a custom predicate to every element; on a
+   single column it could pass without checking them
+
+* a predicate that returns a zero-length value is now an error
+
+* an `NA` returned by a predicate now counts as a violation
+
+* `in_set(inverse = TRUE)` now respects `allow.na` (#133)
+
+* `assert_rows()` and `insist_rows()` reports now give one column
+  label per assertion (#83)
+
+* long predicate calls and `verify()` expressions are reported as one
+  string (#88)
+
+* `chain_end()` no longer leaves chain state on the data (#115)
+
+* assertions now warn when the column selection matches no columns
+(#113)
+
+* the "requires columns to be selected" errors now say what to do,
+  instead
+
+* `verify()` no longer warns about a zero-length result on data
+  frames with no rows
+
+* `col_concat()` no longer rounds or pads numbers next to non-numeric
+  columns
+
+* BREAKING: the default separator of `col_concat()` is now ", "
+
+* `duplicates_across_cols()` no longer reports false duplicates in
+  mixed data frames, or errors on one row or no rows
+
+* `num_row_NAs()` no longer counts `NaN` as `NA` in mixed data frames
+
+* `insist()` on a single row now reports which columns failed
+
+* `insist()`, `assert_rows()` and `insist_rows()` now pass on data
+  frames with no rows
+
+* `error_report()` and `warn_report()` count an assertion on several
+  columns as one verb
+
+* `warning_append()` now marks every error it attaches
+
+* a failing assertion no longer changes the state of R's random
+  number generator
+
+* `has_only_names()` no longer passes when a name is given twice and
+  a column is left out
+
+* `has_all_names()` and `has_class()` now accept character vectors of
+  names
+
+* `has_class()` now works on columns with more than one class
+
+* `within_bounds()` now works with date-time and ordered-factor bounds
+
+* `within_n_sds()` and `within_n_mads()` now accept numeric vectors
+  with attributes, such as labels
+
 * `assert()` no longer errors on data frames with 0 rows (the
   underlying cause of #95)
 

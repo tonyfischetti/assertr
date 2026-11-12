@@ -60,7 +60,7 @@ apply.predicate.to.vector <- function(a.column, predicate){
 #' for the existence of specific column names in a `data.frame` that is
 #' piped to `verify`. It can also work on a non-`data.frame` list.
 #'
-#' @param ... A arbitrary amount of quoted names to check for.
+#' @param ... An arbitrary amount of quoted names to check for.
 #'            Character vectors of names are accepted too.
 #' @return TRUE if all names exist, FALSE if not
 #' @family Name verification
@@ -201,6 +201,6 @@ generate_id <- local({
   counter <- 0
   function() {
     counter <<- counter + 1
-    paste0(counter, "-", round(as.numeric(Sys.time())*1000))
+    paste0("a", counter, "t", round(as.numeric(Sys.time())*1000))
   }
 })

@@ -1576,6 +1576,9 @@ test_that("errors from one assertion share an id, and each assertion has its own
   expect_equal(length(ids(checked)), 4)
   expect_equal(ids(checked)[1], ids(checked)[2])
   expect_equal(length(unique(ids(checked))), 3)
+  # ids start with a letter and have only letters and digits, so that they
+  # can be used as identifiers elsewhere (as the id of an HTML element, say)
+  expect_true(all(grepl("^[A-Za-z][A-Za-z0-9]*$", ids(checked))))
   # ids do not depend on the random number generator: they differ even when
   # it is put back in the same state before each assertion
   invisible(runif(1))

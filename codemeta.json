@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/ropensci/assertr",
   "issueTracker": "https://github.com/ropensci/assertr/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.1.1 (2021-08-10)",
+  "runtimePlatform": "R version 4.5.2 (2025-10-31)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -54,6 +54,7 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
+      "version": ">= 3.0.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -97,6 +98,18 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "covr",
+      "name": "covr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=covr"
     }
   ],
   "softwareRequirements": {
@@ -104,7 +117,7 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 3.1.0"
+      "version": ">= 4.0.0"
     },
     "2": {
       "@type": "SoftwareApplication",
@@ -161,9 +174,14 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "301.95KB",
-  "releaseNotes": "https://github.com/ropensci/assertr/blob/master/NEWS",
-  "readme": "https://github.com/ropensci/assertr/blob/master/README.md",
-  "contIntegration": "https://travis-ci.org/ropensci/assertr",
+  "fileSize": "357.297KB",
+  "releaseNotes": "https://github.com/ropensci/assertr/blob/main/NEWS",
+  "readme": "https://github.com/tonyfischetti/assertr/blob/master/README.md",
+  "contIntegration": ["https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/ropensci/assertr?branch=master"],
+  "review": {
+    "@type": "Review",
+    "url": "https://github.com/ropensci/software-review/issues/23",
+    "provider": "https://ropensci.org"
+  },
   "keywords": ["predicate-functions", "analysis-pipeline", "assertions", "assertion-methods", "assertion-library", "r", "rstats", "r-package", "peer-reviewed"]
 }
