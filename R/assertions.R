@@ -92,7 +92,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
     predicate <- make.predicate.proper(predicate, name.of.predicate)
 
   if(length(keeper.vars)==0)
-    stop("assert requires columns to be selected. Check number of arguments", call.=FALSE)
+    stop("assert requires columns to be selected. Check number of arguments. To check a condition on the whole data frame, use verify", call.=FALSE)
 
   if(isTRUE(attr(data, "assertr_data_defective")))
     return(defect_fun(
@@ -253,7 +253,7 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
     predicate <- make.predicate.proper(predicate, name.of.predicate)
 
   if(length(keeper.vars)==0)
-    stop("assert_rows requires columns to be selected. Check number of argumentsSelect all columns with everything()", call.=FALSE)
+    stop("assert_rows requires columns to be selected. Check number of arguments. Select all columns with everything()", call.=FALSE)
 
   if(isTRUE(attr(data, "assertr_data_defective")))
     return(defect_fun(
@@ -558,7 +558,7 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
   }
 
   if(length(keeper.vars)==0)
-    stop("insist_rows requires columns to be selected. Check number of arguments", call.=FALSE)
+    stop("insist_rows requires columns to be selected. Check number of arguments. Select all columns with everything()", call.=FALSE)
 
   if(isTRUE(attr(data, "assertr_data_defective")))
     return(defect_fun(

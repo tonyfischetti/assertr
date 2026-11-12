@@ -1770,3 +1770,18 @@ test_that("assertions warn when the column selection matches no columns (#113)",
                  fixed = TRUE)
   expect_equal(suppressWarnings(insist_rows(mtcars, num_row_NAs, within_n_sds(3), dplyr::starts_with("zzz"))), mtcars)
 })
+
+test_that("errors for a missing column selection say what to do instead", {
+  expect_error(insist(mtcars, within_n_sds(3)),
+               "insist requires columns to be selected. Check number of arguments",
+               fixed = TRUE)
+  expect_error(assert(mtcars, not_na),
+               "assert requires columns to be selected. Check number of arguments. To check a condition on the whole data frame, use verify",
+               fixed = TRUE)
+  expect_error(assert_rows(mtcars, num_row_NAs, within_bounds(0,1)),
+               "assert_rows requires columns to be selected. Check number of arguments. Select all columns with everything()",
+               fixed = TRUE)
+  expect_error(insist_rows(mtcars, maha_dist, within_n_mads(3)),
+               "insist_rows requires columns to be selected. Check number of arguments. Select all columns with everything()",
+               fixed = TRUE)
+})
