@@ -636,6 +636,12 @@ chain_end <- function(data, success_fun=success_continue,
   attr(data, "assertr_in_chain_error_fun_override") <- NULL
   attr(data, "assertr_errors") <- NULL
   if(is.null(list_of_errors))
-    return(success_fun(data))
-  error_fun(list_of_errors, data=data)
+    ret <- withVisible(success_fun(data))
+  else
+    ret <- withVisible(error_fun(list_of_errors, data=data))
+  # the chain is over: drop the state that would change how later
+  # assertions on the returned object behave
+  attr(ret$value, "assertr_in_chain_success_fun_override") <- NULL
+  attr(ret$value, "assertr_data_defective") <- NULL
+  if(ret$visible) ret$value else invisible(ret$value)
 }

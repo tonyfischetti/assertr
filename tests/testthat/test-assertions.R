@@ -1411,6 +1411,35 @@ test_that("verify works with chaining", {
   }
   expect_output(expect_message(code_to_test(), "Assertion failed"), "There is 1 error")
 })
+
+test_that("chain_end leaves no chain state on the data (#115)", {
+  df <- data.frame(X1=letters, X2=seq(1,26), stringsAsFactors=FALSE)
+  hand.back <- function(errors, data=NULL, ...) data
+
+  # the example from the issue
+  chained <- df %>%
+    chain_start %>%
+    assert(is_uniq, X1, X2) %>%
+    assert(is.character, X1) %>%
+    assert(is.numeric, X2) %>%
+    chain_end
+  expect_equal(chained, df)
+  # a success_fun given to a later assertion is used again
+  expect_true(verify(chained, X2 > 0, success_fun=success_logical))
+
+  # after a chain whose errors were handed back with the data
+  warned <- df %>% chain_start %>% assert(within_bounds(0,5), X2) %>% chain_end(error_fun=hand.back)
+  expect_equal(warned, df)
+
+  # a failed obligatory rule no longer makes later assertions get skipped
+  flagged <- df %>% chain_start %>% verify(X2 > 100, obligatory=TRUE) %>% chain_end(error_fun=hand.back)
+  expect_equal(flagged, df)
+  expect_equal(verify(flagged, X2 > 100, error_fun=error_logical), FALSE)
+
+  # errors that the caller asked to keep are still attached
+  kept <- df %>% chain_start %>% assert(within_bounds(0,5), X2) %>% chain_end(error_fun=error_append)
+  expect_equal(length(attr(kept, "assertr_errors")), 1)
+})
 ###################################
 
 
