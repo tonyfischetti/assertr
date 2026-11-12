@@ -91,7 +91,7 @@ within_bounds <- function(lower.bound, upper.bound,
                           allow.na=TRUE, check.class=TRUE){
   the_call <- deparse.to.string(sys.call())
   numeric.bounds <- is.numeric(lower.bound) && is.numeric(upper.bound)
-  compatible.bounds <- class(lower.bound) %in% class(upper.bound)
+  compatible.bounds <- all(class(lower.bound) %in% class(upper.bound))
   if(check.class && !(numeric.bounds || compatible.bounds))
     stop("bounds must be numeric or have similar classes")
   if(lower.bound >= upper.bound)
@@ -101,7 +101,7 @@ within_bounds <- function(lower.bound, upper.bound,
   fun <- function(x){
     if(is.null(x))       stop("bounds must be checked on non-null element")
     numeric.comparison <- is.numeric(lower.bound) && is.numeric(x)
-    compatible.comparison <- class(lower.bound) %in% class(x)
+    compatible.comparison <- all(class(lower.bound) %in% class(x))
     if(check.class && !(numeric.comparison || compatible.comparison))
       stop("bounds must only be checked on numerics or classes that are similar")
     if(allow.na){

@@ -138,6 +138,35 @@ test_that("returned predicate fails appropriately", {
                "bounds must be checked on non-null element")
 })
 
+test_that("within_bounds works with bounds that have more than one class", {
+  # date-times have the classes "POSIXct" and "POSIXt"
+  start <- as.POSIXct("2020-01-01", tz="UTC")
+  end <- as.POSIXct("2020-12-31", tz="UTC")
+  times <- as.POSIXct(c("2020-03-01 12:00:00", "2021-06-01 00:00:00", NA), tz="UTC")
+  time.data <- data.frame(when=times[1:2])
+  # ordered factors have the classes "ordered" and "factor"
+  sizes <- function(x) factor(x, levels=c("s", "m", "l", "xl"), ordered=TRUE)
+
+  expect_equal(within_bounds(start, end, check.class=FALSE)(times), c(TRUE, FALSE, TRUE))
+  expect_error(within_bounds(as.Date("2020-01-01"), end), "bounds must be numeric or have similar classes")
+
+  expect_equal(within_bounds(start, end)(times), c(TRUE, FALSE, TRUE))
+  expect_equal(within_bounds(start, end, allow.na=FALSE)(times), c(TRUE, FALSE, FALSE))
+  expect_equal(within_bounds(start, end, include.lower=FALSE)(start), FALSE)
+  expect_equal(assert(time.data, within_bounds(start, as.POSIXct("2021-12-31", tz="UTC")), when), time.data)
+  expect_equal(assert(time.data, within_bounds(start, end), when, error_fun=error_logical), FALSE)
+  expect_equal(attr(within_bounds(start, end), "call"), "within_bounds(start, end)")
+  expect_equal(within_bounds(sizes("s"), sizes("l"))(sizes(c("s", "m", "xl"))), c(TRUE, TRUE, FALSE))
+
+  # the bounds and the data must have all of their classes in common
+  expect_error(within_bounds(start, end)(as.Date("2020-03-01")),
+               "bounds must only be checked on numerics or classes that are similar")
+  expect_error(within_bounds(sizes("s"), sizes("l"))(factor(c("s", "m"), levels=c("s", "m", "l", "xl"))),
+               "bounds must only be checked on numerics or classes that are similar")
+  expect_error(within_bounds(start, as.POSIXlt("2020-12-31", tz="UTC")),
+               "bounds must be numeric or have similar classes")
+})
+
 test_that("returned predicate is tagged for assert function to vectorize", {
   expect_true(attr(within_bounds(1,2), "assertr_vectorized"))
 })
