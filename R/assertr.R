@@ -1,4 +1,4 @@
-#' assertr: Assertive programming for R analysis pipeline.
+#' assertr: Assertive programming for R analysis pipeline
 #'
 #' The assertr package supplies a suite of functions designed to verify
 #' assumptions about data early in an analysis pipeline.
@@ -54,6 +54,4 @@
 #'   summarise(avg.mpg=mean(mpg))
 #'
 #'
-#' @docType package
-#' @name assertr
-NULL
+"_PACKAGE"

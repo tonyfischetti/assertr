@@ -48,7 +48,7 @@ verify(mtcars, has_only_names("mpg"))
 }
 }
 \seealso{
-Other Name verification: 
-\code{\link{has_all_names}()}
+Other Name verification:
+\code{\link[=has_all_names]{has_all_names()}}
 }
 \concept{Name verification}
