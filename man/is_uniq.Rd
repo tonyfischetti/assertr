@@ -43,11 +43,13 @@ library(magrittr)
 mtcars \%>\% assert(is_uniq, qsec)
 }
 
-# to use the version of this function that allows NAs in `assert`,
-# you can use a lambda/anonymous function like so:
+# to allow NAs, use `verify`, which hands `is_uniq` the whole column
+# (a lambda/anonymous function inside `assert` only ever sees one
+# element at a time, so it would never find a duplicate):
 
-mtcars \%>\%
-  assert(function(x){is_uniq(x, allow.na=TRUE)}, qsec)
+df <- data.frame(id = c(1, 2, NA, 4))
+df \%>\%
+  verify(is_uniq(id, allow.na=TRUE))
 
 }
 \seealso{
