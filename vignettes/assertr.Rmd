@@ -194,7 +194,7 @@ predicate should return FALSE. Let's say that a dataset has an ID column
 predicate like this:
 
 ```{r}
-not.empty.p <- function(x) if(x=="") return(FALSE)
+not.empty.p <- function(x) if(is.na(x) || x=="") return(FALSE)
 ```
 
 and apply it like this:
@@ -221,6 +221,10 @@ read.csv("another-dataset.csv") %>%
   assert(function(x) nchar(x)==7, ID) %>%
   ...
 ```
+
+Keep in mind that a predicate is called once for each element of a column, so
+it can't answer questions about the column as a whole (use `verify` for
+those). If it returns `NA` for an element, that element counts as a violation.
 
 Neat-o!
 

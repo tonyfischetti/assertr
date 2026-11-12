@@ -189,6 +189,25 @@ requested
 - `has_class` - checks if passed data has a particular class
 
 
+### Writing your own predicates
+
+A predicate is any function that takes a single value and returns `TRUE`
+or `FALSE`. `assert` calls it once for every element of the columns
+selected, so you can use your own functions, named or not, just like the
+built-in ones:
+
+```r
+    is.even <- function(x) x %% 2 == 0
+
+    mtcars %>%
+      assert(is.even, cyl) %>%
+      assert(function(x) x >= 3, gear)
+```
+
+If a predicate returns `NA` for an element, that element counts as a
+violation.
+
+
 ### More info
 
 For more info, check out the `assertr` vignette
