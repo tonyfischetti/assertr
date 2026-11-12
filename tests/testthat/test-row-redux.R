@@ -154,3 +154,66 @@ test_that("col_concat breaks correctly", {
                "\"data\" must be a data.frame \\(or matrix\\)")
 })
 ###########################################
+
+
+
+############### duplicates_across_cols ###############
+test_that("duplicates_across_cols works correctly", {
+  dup.data <- data.frame(v1=c(1, 1, 2, 3), v2=c(4, 5, 5, 6))
+  expect_equal(duplicates_across_cols(dup.data), c(TRUE, TRUE, TRUE, FALSE))
+  expect_equal(duplicates_across_cols(dup.data[, "v1", drop=FALSE]), c(TRUE, TRUE, FALSE, FALSE))
+  expect_equal(duplicates_across_cols(as.matrix(dup.data)), c(TRUE, TRUE, TRUE, FALSE))
+  expect_equal(duplicates_across_cols(tibble::as_tibble(dup.data)), c(TRUE, TRUE, TRUE, FALSE))
+  # every row that shares a value is flagged, not only the repeats
+  expect_equal(duplicates_across_cols(data.frame(a=c(7, 7, 7, 8), b=c(1, 2, 3, 4))), c(TRUE, TRUE, TRUE, FALSE))
+  # a value that appears in two different columns is not a duplicate
+  expect_equal(duplicates_across_cols(data.frame(a=c(1, 2), b=c(2, 1))), c(FALSE, FALSE))
+  # no duplicates in any column
+  expect_equal(duplicates_across_cols(exmpl.data[1:3,]), c(FALSE, FALSE, FALSE))
+  # character and factor columns
+  key.data <- data.frame(id=1:5, sub_id=letters[1:5], age=c(10, 20, 20, 15, 30), stringsAsFactors=FALSE)
+  expect_equal(duplicates_across_cols(key.data), c(FALSE, TRUE, TRUE, FALSE, FALSE))
+  expect_equal(duplicates_across_cols(key.data[, c("id", "sub_id")]), rep(FALSE, 5))
+  expect_equal(duplicates_across_cols(data.frame(f=factor(c("u", "u", "v")), n=c(1, 2, 3))), c(TRUE, TRUE, FALSE))
+  # row names are not carried over to the result
+  expect_equal(duplicates_across_cols(mtcars[1:3, c("mpg", "hp")]), c(TRUE, TRUE, FALSE))
+})
+
+test_that("duplicates_across_cols works correctly with NAs", {
+  na.data <- data.frame(a=c(1, NA, 3), b=c("x", "y", "z"), stringsAsFactors=FALSE)
+  # by default a row with an NA cannot be called free of duplicates
+  expect_equal(duplicates_across_cols(na.data), c(FALSE, NA, FALSE))
+  expect_equal(duplicates_across_cols(na.data, allow.na=TRUE), c(FALSE, FALSE, FALSE))
+  # a duplicate in another column still flags the row
+  na.data$b <- c("x", "x", "z")
+  expect_equal(duplicates_across_cols(na.data), c(TRUE, TRUE, FALSE))
+  # two NAs in a column are duplicates of each other when NAs are allowed
+  expect_equal(duplicates_across_cols(data.frame(a=c(NA, NA, 3), b=c(4, 5, 6)), allow.na=TRUE), c(TRUE, TRUE, FALSE))
+  expect_equal(duplicates_across_cols(data.frame(a=c(NA, NA, 3), b=c(4, 5, 6))), c(NA, NA, FALSE))
+})
+
+test_that("duplicates_across_cols works inside assert_rows", {
+  key.data <- data.frame(id=1:5, sub_id=letters[1:5], age=c(10, 20, 20, 15, 30), stringsAsFactors=FALSE)
+  expect_equal(assert_rows(key.data, duplicates_across_cols, in_set(FALSE), id, sub_id), key.data)
+  expect_equal(assert_rows(key.data, duplicates_across_cols, in_set(FALSE), id, sub_id, age, error_fun=error_logical), FALSE)
+})
+
+test_that("duplicates_across_cols checks each column as it is", {
+  close.data <- data.frame(x=c(0.12345678, 0.12345679), g=c("a", "b"), stringsAsFactors=FALSE)
+  # numbers next to a non-numeric column are not rounded before they are compared
+  expect_equal(duplicates_across_cols(close.data), c(FALSE, FALSE))
+  expect_equal(duplicates_across_cols(data.frame(n=c(1, 1.0000001), g=c("a", "b"))), c(FALSE, FALSE))
+  expect_equal(assert_rows(close.data, duplicates_across_cols, in_set(FALSE), x, g, error_fun=error_logical), close.data)
+  # a single row, or no rows, is not an error
+  expect_equal(duplicates_across_cols(exmpl.data[1,]), FALSE)
+  expect_equal(duplicates_across_cols(exmpl.data[0,]), logical(0))
+  expect_equal(assert_rows(exmpl.data[1,], duplicates_across_cols, in_set(FALSE), x, y), exmpl.data[1,])
+  expect_equal(assert_rows(exmpl.data[0,], duplicates_across_cols, in_set(FALSE), x, y), exmpl.data[0,])
+})
+
+test_that("duplicates_across_cols breaks correctly", {
+  expect_error(duplicates_across_cols(), "argument \"data\" is missing, with no default")
+  expect_error(duplicates_across_cols(exmpl.data[1,1]),
+               "\"data\" must be a data.frame \\(or matrix\\)")
+})
+###########################################

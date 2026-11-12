@@ -203,7 +203,10 @@ attr(col_concat, "call") <- "col_concat"
 duplicates_across_cols <- function(data, allow.na = FALSE) {
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
-  data <- apply(data, 2, function(x) !is_uniq(x, allow.na = allow.na))
+  # each column is checked as it is: apply() would turn the data into a
+  # matrix first, which rounds numbers next to non-numeric columns, and
+  # its result is not a matrix when there is only one row
+  data <- do.call(cbind, lapply(as.data.frame(data), function(x) !is_uniq(x, allow.na = allow.na)))
   apply(data, 1, any)
 }
 attr(duplicates_across_cols, "call") <- "duplicates_across_cols"
