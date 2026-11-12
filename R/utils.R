@@ -9,9 +9,11 @@
 # of predicates that only define a false condition. we
 # need to wrap the predicate to ensure that it returns
 # TRUE (and not NULL) if not FALSE
-make.predicate.proper <- function(improper.predicate){
+make.predicate.proper <- function(improper.predicate, name.of.predicate){
   ret.fun <- function(x){
     ret <- improper.predicate(x)
+    if(!is.null(ret) && length(ret)==0)
+      stop("predicate '", name.of.predicate, "' returned a zero-length value; it must return TRUE or FALSE (or nothing) for each element", call.=FALSE)
     return(length(ret) == 0 || ret)
   }
   if(is.vectorized.predicate(improper.predicate)){

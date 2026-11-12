@@ -384,15 +384,19 @@ test_that("assert and assert_rows stop when a predicate returns a zero-length va
 
   # a misspelled list element is NULL, so the comparison has length zero
   expect_error(assert(mtcars, function(x) x <= limits$max_mgp, mpg),
-               "predicate returned a zero-length value")
+               "predicate 'function(x) x <= limits$max_mgp' returned a zero-length value",
+               fixed = TRUE)
   # grep (unlike grepl) returns integer(0) when there is no match
   expect_error(assert(iris, function(x) grep("virginica", x), Species),
-               "predicate returned a zero-length value")
+               "predicate 'function(x) grep(\"virginica\", x)' returned a zero-length value",
+               fixed = TRUE)
   expect_error(assert_rows(mtcars, rowSums, function(x) x <= limits$max_mgp, vs, am),
-               "predicate returned a zero-length value")
+               "predicate 'function(x) x <= limits$max_mgp' returned a zero-length value",
+               fixed = TRUE)
   # dropping NAs inside the predicate leaves nothing to test for an NA element
   expect_error(assert(test.df2, function(x) x[!is.na(x)] > -2, z),
-               "predicate returned a zero-length value")
+               "predicate 'function(x) x[!is.na(x)] > -2' returned a zero-length value",
+               fixed = TRUE)
 })
 
 ######################################

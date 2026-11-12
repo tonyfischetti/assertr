@@ -89,7 +89,7 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 
 
   if(!is.vectorized.predicate(predicate))
-    predicate <- make.predicate.proper(predicate)
+    predicate <- make.predicate.proper(predicate, name.of.predicate)
 
   if(length(keeper.vars)==0)
     stop("assert requires columns to be selected. Check number of arguments", call.=FALSE)
@@ -243,7 +243,7 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
   }
 
   if(!is.vectorized.predicate(predicate))
-    predicate <- make.predicate.proper(predicate)
+    predicate <- make.predicate.proper(predicate, name.of.predicate)
 
   if(length(keeper.vars)==0)
     stop("assert_rows requires columns to be selected. Check number of argumentsSelect all columns with everything()", call.=FALSE)
