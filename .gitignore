@@ -23,3 +23,6 @@ packrat/lib*/
 *.app
 /doc/
 /Meta/
+
+*.secret
+*.garb

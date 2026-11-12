@@ -1,17 +1,5 @@
 # assertr development version
 
-* `assert()` and `assert_rows()` now correctly stops with an error
-  when a custom predicate returns a zero-length value (eg `logical(0)`)
-  for an element. This used to count as a pass, so a predicate comparing
-  against a misspelled (`NULL`) list element could never fail. A
-  predicate that returns nothing (`NULL`) still passes
-
-* `assert()` no longer calls the predicate on the whole data frame
-  before checking each element. A custom predicate on a single column
-  (eg `function(x) grepl("@", x)`) could pass without any element
-  actually being checked. Predicates that expect a whole data frame are not
-  supported in `assert()`
-
 * `assert()` no longer errors on data frames with 0 rows (the
   underlying cause of #95)
 
