@@ -1742,3 +1742,31 @@ test_that("assert passes on zero-row data frames (#95)", {
   expect_equal(assert(a_tibble, not_na, a, b), a_tibble)
   expect_equal(assert(a_tibble, within_bounds(0,1), a), a_tibble)
 })
+
+test_that("assertions warn when the column selection matches no columns (#113)", {
+  # these used to pass without a word
+  expect_warning(assert(mtcars, function(x) FALSE, dplyr::starts_with("zzz")),
+                 "assert: the selection 'dplyr::starts_with(\"zzz\")' matched no columns, so nothing was checked",
+                 fixed = TRUE)
+  expect_warning(insist(mtcars, within_n_sds(1), dplyr::starts_with("zzz")),
+                 "insist: the selection 'dplyr::starts_with(\"zzz\")' matched no columns, so nothing was checked",
+                 fixed = TRUE)
+  expect_warning(assert_rows(mtcars, num_row_NAs, within_bounds(0,1), dplyr::starts_with("zzz")),
+                 "assert_rows: the selection 'dplyr::starts_with(\"zzz\")' matched no columns, so nothing was checked",
+                 fixed = TRUE)
+  # the data still comes back, and a success_fun is still used
+  expect_equal(suppressWarnings(assert(mtcars, function(x) FALSE, dplyr::starts_with("zzz"))), mtcars)
+  expect_equal(suppressWarnings(insist(mtcars, within_n_sds(1), dplyr::starts_with("zzz"))), mtcars)
+  expect_true(suppressWarnings(assert(mtcars, not_na, dplyr::starts_with("zzz"), success_fun=success_logical)))
+  # no warning when columns are selected, whether or not there are rows
+  expect_silent(assert(mtcars, not_na, dplyr::starts_with("m")))
+  expect_silent(assert(mtcars[0, ], not_na, mpg))
+  # the row reduction function is not called when there are no columns to reduce
+  expect_equal(suppressWarnings(assert_rows(mtcars, col_concat, is_uniq, dplyr::starts_with("zzz"), error_fun=error_logical)),
+               mtcars)
+  expect_equal(suppressWarnings(assert_rows(mtcars, maha_dist, within_bounds(0,1), dplyr::starts_with("zzz"))), mtcars)
+  expect_warning(insist_rows(mtcars, maha_dist, within_n_mads(3), dplyr::starts_with("zzz")),
+                 "insist_rows: the selection 'dplyr::starts_with(\"zzz\")' matched no columns, so nothing was checked",
+                 fixed = TRUE)
+  expect_equal(suppressWarnings(insist_rows(mtcars, num_row_NAs, within_n_sds(3), dplyr::starts_with("zzz"))), mtcars)
+})

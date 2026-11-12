@@ -101,6 +101,13 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
+  # a selection that matches no columns leaves nothing to check
+  if(ncol(sub.frame)==0){
+    warning("assert: the selection '", paste(as.character(dplyr::enexprs(...)), collapse=", "),
+            "' matched no columns, so nothing was checked", call.=FALSE)
+    return(success_fun(data, "assert", name.of.predicate, colnames(sub.frame), NA, description))
+  }
+
   # a data.frame with no rows has no elements that could violate the predicate
   if(nrow(sub.frame)==0)
     return(success_fun(data, "assert", name.of.predicate, colnames(sub.frame), NA, description))
@@ -255,6 +262,13 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
+  # a selection that matches no columns leaves nothing to check
+  if(ncol(sub.frame)==0){
+    warning("assert_rows: the selection '", paste(as.character(dplyr::enexprs(...)), collapse=", "),
+            "' matched no columns, so nothing was checked", call.=FALSE)
+    return(success_fun(data, "assert_rows", name.of.predicate, colnames(sub.frame), name.of.row.redux.fn, description))
+  }
+
   redux <- row_reduction_fn(sub.frame)
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
@@ -386,6 +400,13 @@ insist <- function(data, predicate_generator, ...,
     )
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
+
+  # a selection that matches no columns leaves nothing to check
+  if(ncol(sub.frame)==0){
+    warning("insist: the selection '", paste(as.character(dplyr::enexprs(...)), collapse=", "),
+            "' matched no columns, so nothing was checked", call.=FALSE)
+    return(success_fun(data, "insist", name.of.predicate.generator, colnames(sub.frame), NA, description))
+  }
 
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),
@@ -546,6 +567,13 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
     )
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
+
+  # a selection that matches no columns leaves nothing to check
+  if(ncol(sub.frame)==0){
+    warning("insist_rows: the selection '", paste(as.character(dplyr::enexprs(...)), collapse=", "),
+            "' matched no columns, so nothing was checked", call.=FALSE)
+    return(success_fun(data, "insist_rows", name.of.predicate.generator, colnames(sub.frame), name.of.row.redux.fn, description))
+  }
 
   redux <- row_reduction_fn(sub.frame)
 
