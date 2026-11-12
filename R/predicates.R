@@ -248,7 +248,7 @@ within_n_sds <- function(n, ...){
     stop("'n' must be a positive number")
   }
   fun <- function(a.vector){
-    if(!is.vector(a.vector) || !is.numeric(a.vector))
+    if(!is.numeric(a.vector) || !is.null(dim(a.vector)))
       stop("argument must be a numeric vector")
     mu <- mean(a.vector, na.rm=TRUE)
     stdev <- stats::sd(a.vector, na.rm=TRUE)
@@ -322,7 +322,7 @@ within_n_mads <- function(n, ...){
     stop("'n' must be a positive number")
   }
   fun <- function(a.vector){
-    if(!is.vector(a.vector) || !is.numeric(a.vector))
+    if(!is.numeric(a.vector) || !is.null(dim(a.vector)))
       stop("argument must be a numeric vector")
     dmad <- stats::mad(a.vector, na.rm=TRUE)
     dmed <- stats::median(a.vector, na.rm=TRUE)

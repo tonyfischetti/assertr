@@ -275,6 +275,26 @@ test_that("predicate appropriately assigns the 'call' attribute", {
   expect_equal(attr(within_n_mads(test.vect[2]*test.vect[1]), "call"),
                "within_n_mads(test.vect[2] * test.vect[1])")
 })
+
+test_that("within_n_sds and within_n_mads accept numeric vectors that carry attributes", {
+  plain <- c(10, 11, 12, 13, 14, 15, 16, 17, 18, 100)
+  labelled <- plain
+  attr(labelled, "label") <- "Weight (kg)"
+  labelled.data <- data.frame(plain=plain)
+  labelled.data$weight <- labelled
+
+  # numbers that are not a vector are still turned away
+  expect_error(within_n_sds(2)(matrix(plain, nrow=5)), "argument must be a numeric vector")
+  expect_error(within_n_mads(2)(matrix(plain, nrow=5)), "argument must be a numeric vector")
+  expect_equal(insist(labelled.data, within_n_mads(3), plain, error_fun=error_logical), FALSE)
+
+  # a label on the vector does not change which values are within the bounds
+  expect_equal(within_n_sds(2)(labelled)(plain), within_n_sds(2)(plain)(plain))
+  expect_equal(within_n_mads(2)(labelled)(plain), within_n_mads(2)(plain)(plain))
+  # so insist can be used on a column that has one
+  expect_equal(insist(labelled.data, within_n_sds(3), weight), labelled.data)
+  expect_equal(insist(labelled.data, within_n_mads(3), weight, error_fun=error_logical), FALSE)
+})
 ############################################
 
 
