@@ -177,7 +177,9 @@ in_set <- function(..., allow.na=TRUE, inverse=FALSE){
     if(is.null(x))       stop("nothing to check set membership to")
 
     raw_result <- x %in% set
-    if(allow.na){
+    # the result is flipped below when `inverse` is set, so NAs are
+    # marked as members when that leaves them allowed afterwards
+    if(allow.na != inverse){
       these_are_NAs <- is.na(x)
       raw_result[these_are_NAs] <- TRUE
     }

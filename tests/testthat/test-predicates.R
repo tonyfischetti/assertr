@@ -277,6 +277,14 @@ test_that("returned predicate works appropriately", {
   expect_equal(in_set(1:10, allow.na = FALSE)(c(1:10, NA)), c(rep(TRUE, 10), FALSE))
 })
 
+test_that("in_set with inverse respects allow.na", {
+  expect_equal(in_set(3, 4, inverse=TRUE)(c(4, pi, NA)), c(FALSE, TRUE, TRUE))
+  expect_equal(in_set(3, 4, inverse=TRUE, allow.na=FALSE)(c(4, pi, NA)), c(FALSE, TRUE, FALSE))
+  # an NA listed in the set itself still decides the answer
+  expect_equal(in_set(3, NA, inverse=TRUE)(c(3, pi, NA)), c(FALSE, TRUE, FALSE))
+  expect_equal(in_set(3, NA, allow.na=FALSE)(c(3, pi, NA)), c(TRUE, FALSE, TRUE))
+})
+
 test_that("returned predicate fails appropriately", {
   expect_error(in_set(0,1)(),
                ".x. is missing")
