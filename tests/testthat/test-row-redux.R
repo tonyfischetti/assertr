@@ -124,7 +124,18 @@ test_that("col_concat works correctly", {
   expect_equal(unname(col_concat(head(exmpl.data))), c("882", "991", "661", "549", "940", "549"))
   expect_equal(unname(col_concat(head(exmpl.data), sep="<>")), c("8<>82", "9<>91", "6<>61", "5<>49", "9<>40", "5<>49"))
   expect_equal(unname(col_concat(tail(nexmpl.data))), c("990", "661", "5NA", "551", "662", "768"))
-  expect_equal(unname(col_concat(head(iris, n=2))), c("5.13.51.40.2setosa", "4.93.01.40.2setosa"))
+  expect_equal(unname(col_concat(head(iris, n=2))), c("5.13.51.40.2setosa", "4.931.40.2setosa"))
+})
+
+test_that("col_concat does not round or pad numbers next to non-numeric columns", {
+  close.data <- data.frame(x=c(0.12345678, 0.12345679), g=c("a", "a"), stringsAsFactors=FALSE)
+  expect_equal(unname(col_concat(close.data)), c("0.12345678a", "0.12345679a"))
+  wide.data <- data.frame(n=c(1, 10, 100), g=c("a", "b", "c"), stringsAsFactors=FALSE)
+  expect_equal(unname(col_concat(wide.data)), c("1a", "10b", "100c"))
+  # a row gives the same string whatever other rows come with it
+  expect_equal(unname(col_concat(head(iris, n=2)))[2], unname(col_concat(iris[2,])))
+  # so rows that differ are not reported as duplicates
+  expect_equal(assert_rows(close.data, col_concat, is_uniq, x, g, error_fun=error_logical), close.data)
 })
 
 test_that("col_concat breaks correctly", {

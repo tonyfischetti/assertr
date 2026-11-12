@@ -153,6 +153,10 @@ col_concat <- function(data, sep=""){
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
 
+  # apply() turns a data.frame into a matrix, and numbers get rounded to 7
+  # significant digits on the way if any other column is not numeric
+  if(is.data.frame(data))
+    data[] <- lapply(data, as.character)
   apply(data, 1, paste0, collapse=sep)
 }
 attr(col_concat, "call") <- "col_concat"
