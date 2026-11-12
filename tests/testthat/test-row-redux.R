@@ -120,18 +120,28 @@ unname <- function(this){
 # test NaN
 test_that("col_concat works correctly", {
 
-  expect_equal(unname(col_concat(exmpl.data[1,])), "882")
-  expect_equal(unname(col_concat(head(exmpl.data))), c("882", "991", "661", "549", "940", "549"))
+  expect_equal(unname(col_concat(exmpl.data[1,])), "8, 82")
+  expect_equal(unname(col_concat(head(exmpl.data))), c("8, 82", "9, 91", "6, 61", "5, 49", "9, 40", "5, 49"))
   expect_equal(unname(col_concat(head(exmpl.data), sep="<>")), c("8<>82", "9<>91", "6<>61", "5<>49", "9<>40", "5<>49"))
-  expect_equal(unname(col_concat(tail(nexmpl.data))), c("990", "661", "5NA", "551", "662", "768"))
-  expect_equal(unname(col_concat(head(iris, n=2))), c("5.13.51.40.2setosa", "4.931.40.2setosa"))
+  expect_equal(unname(col_concat(head(exmpl.data), sep="")), c("882", "991", "661", "549", "940", "549"))
+  expect_equal(unname(col_concat(tail(nexmpl.data))), c("9, 90", "6, 61", "5, NA", "5, 51", "6, 62", "7, 68"))
+  expect_equal(unname(col_concat(head(iris, n=2))), c("5.1, 3.5, 1.4, 0.2, setosa", "4.9, 3, 1.4, 0.2, setosa"))
+})
+
+test_that("col_concat separates the columns by default, so rows that differ stay different", {
+  key.data <- data.frame(id=c(1, 11, 2), sub=c(11, 1, 5))
+  expect_equal(unname(col_concat(key.data)), c("1, 11", "11, 1", "2, 5"))
+  expect_equal(assert_rows(key.data, col_concat, is_uniq, id, sub, error_fun=error_logical), key.data)
+  # real joint duplicates are still found
+  key.data[2,] <- key.data[1,]
+  expect_equal(assert_rows(key.data, col_concat, is_uniq, id, sub, error_fun=error_logical), FALSE)
 })
 
 test_that("col_concat does not round or pad numbers next to non-numeric columns", {
   close.data <- data.frame(x=c(0.12345678, 0.12345679), g=c("a", "a"), stringsAsFactors=FALSE)
-  expect_equal(unname(col_concat(close.data)), c("0.12345678a", "0.12345679a"))
+  expect_equal(unname(col_concat(close.data)), c("0.12345678, a", "0.12345679, a"))
   wide.data <- data.frame(n=c(1, 10, 100), g=c("a", "b", "c"), stringsAsFactors=FALSE)
-  expect_equal(unname(col_concat(wide.data)), c("1a", "10b", "100c"))
+  expect_equal(unname(col_concat(wide.data)), c("1, a", "10, b", "100, c"))
   # a row gives the same string whatever other rows come with it
   expect_equal(unname(col_concat(head(iris, n=2)))[2], unname(col_concat(iris[2,])))
   # so rows that differ are not reported as duplicates

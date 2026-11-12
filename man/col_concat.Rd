@@ -4,12 +4,12 @@
 \alias{col_concat}
 \title{Concatenate all columns of each row in data frame into a string}
 \usage{
-col_concat(data, sep = "")
+col_concat(data, sep = ", ")
 }
 \arguments{
 \item{data}{A data frame}
 
-\item{sep}{A string to separate the columns with (default: "")}
+\item{sep}{A string to separate the columns with (default: ", ")}
 }
 \value{
 A vector of rows concatenated into strings
@@ -19,6 +19,13 @@ This function will return a vector, with the same length as the number
 of rows of the provided data frame. Each element of the vector will be
 it's corresponding row with all of its values (one for each column)
 "pasted" together in a string.
+}
+\details{
+Rows that differ can still give the same string if the
+separator also appears inside the values (for example \code{"a, b"}
+and \code{"c"} against \code{"a"} and \code{"b, c"}). To check that
+columns are jointly unique without building strings, use
+\code{verify(is_uniq(col1, col2))}
 }
 \examples{
 

@@ -126,7 +126,12 @@ attr(num_row_NAs, "call") <- "num_row_NAs"
 #' "pasted" together in a string.
 #'
 #' @param data A data frame
-#' @param sep A string to separate the columns with (default: "")
+#' @param sep A string to separate the columns with (default: ", ")
+#' @details Rows that differ can still give the same string if the
+#' separator also appears inside the values (for example \code{"a, b"}
+#' and \code{"c"} against \code{"a"} and \code{"b, c"}). To check that
+#' columns are jointly unique without building strings, use
+#' \code{verify(is_uniq(col1, col2))}
 #' @return A vector of rows concatenated into strings
 #' @seealso \code{\link{paste}}
 #' @examples
@@ -149,7 +154,7 @@ attr(num_row_NAs, "call") <- "num_row_NAs"
 #'   assert_rows(col_concat, is_uniq, mpg, hp, wt) # ok
 #'
 #' @export
-col_concat <- function(data, sep=""){
+col_concat <- function(data, sep=", "){
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
 
