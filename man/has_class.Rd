@@ -7,7 +7,8 @@
 has_class(..., class)
 }
 \arguments{
-\item{...}{An arbitrary amount of quoted column names to check for}
+\item{...}{An arbitrary amount of quoted column names to check for.
+Character vectors of names are accepted too.}
 
 \item{class}{Expected class for chosen columns.}
 }
@@ -22,6 +23,9 @@ piped to `verify`.
 \examples{
 
 verify(mtcars, has_class("mpg", "wt", class = "numeric"))
+
+# the column names can also be given as a character vector
+verify(mtcars, has_class(c("mpg", "wt"), class = "numeric"))
 
 library(magrittr)   # for pipe operator
 

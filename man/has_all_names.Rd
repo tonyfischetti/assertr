@@ -7,7 +7,8 @@
 has_all_names(...)
 }
 \arguments{
-\item{...}{A arbitrary amount of quoted names to check for}
+\item{...}{A arbitrary amount of quoted names to check for.
+Character vectors of names are accepted too.}
 }
 \value{
 TRUE if all names exist, FALSE if not

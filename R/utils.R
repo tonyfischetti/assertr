@@ -60,7 +60,8 @@ apply.predicate.to.vector <- function(a.column, predicate){
 #' for the existence of specific column names in a `data.frame` that is
 #' piped to `verify`. It can also work on a non-`data.frame` list.
 #'
-#' @param ... A arbitrary amount of quoted names to check for
+#' @param ... A arbitrary amount of quoted names to check for.
+#'            Character vectors of names are accepted too.
 #' @return TRUE if all names exist, FALSE if not
 #' @family Name verification
 #' @seealso \code{\link{exists}}
@@ -87,7 +88,7 @@ apply.predicate.to.vector <- function(a.column, predicate){
 #'
 #' @export
 has_all_names <- function(...){
-  check_this <- list(...)
+  check_this <- unlist(list(...))
   parent <- parent.frame()
   given_names <- rlang::env_names(parent$.top_env)
   given_names <- given_names[given_names != ".data"]
@@ -134,7 +135,7 @@ has_all_names <- function(...){
 #' @export
 has_only_names <- function(...) {
   # Collect all arguments
-  check_this <- unlist(list(...))
+  check_this <- unique(unlist(list(...)))
   # Ensure a clear error message if other classes are passed in.
   stopifnot("Arguments to 'has_only_names()' must be character strings."=is.character(check_this))
   parent <- parent.frame()
@@ -158,12 +159,16 @@ has_only_names <- function(...) {
 #' for the existence of a specific column class in a `data.frame` that is
 #' piped to `verify`.
 #'
-#' @param ... An arbitrary amount of quoted column names to check for
+#' @param ... An arbitrary amount of quoted column names to check for.
+#'            Character vectors of names are accepted too.
 #' @param class Expected class for chosen columns.
 #' @return TRUE if all classes are correct, FALSE if not
 #' @examples
 #'
 #' verify(mtcars, has_class("mpg", "wt", class = "numeric"))
+#'
+#' # the column names can also be given as a character vector
+#' verify(mtcars, has_class(c("mpg", "wt"), class = "numeric"))
 #'
 #' library(magrittr)   # for pipe operator
 #'
@@ -174,10 +179,11 @@ has_only_names <- function(...) {
 #'
 #' @export
 has_class <- function(..., class){
-  check_this <- list(...)
+  check_this <- unlist(list(...))
   parent <- parent.frame()
   given_classes <- lapply(check_this, function(name) class(parent$.top_env[[name]]))
-  all(given_classes %in% class)
+  # a column can have more than one class (a date-time, an ordered factor)
+  all(vapply(given_classes, function(col.classes) any(col.classes %in% class), logical(1)))
 }
 
 
