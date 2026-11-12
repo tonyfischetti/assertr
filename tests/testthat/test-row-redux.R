@@ -100,6 +100,35 @@ test_that("num_row_NAs works correctly", {
                c(rep(0, 9), 1, 0, 2, rep(0,3)))
 })
 
+test_that("num_row_NAs works correctly on other kinds of input", {
+  expect_equal(num_row_NAs(matrix(c(1, NaN, NA, 4), nrow=2)), c(1, 0))
+  expect_equal(num_row_NAs(matrix(c(1, NaN, NA, 4), nrow=2), allow.NaN=TRUE), c(1, 1))
+  expect_equal(num_row_NAs(matrix(c("a", NA, "c", "d"), nrow=2)), c(0, 1))
+  expect_equal(num_row_NAs(tibble::tibble(x=c(1, NA), g=c("a", NA))), c(0, 2))
+  # a missing string is counted, the string "NA" is not
+  expect_equal(num_row_NAs(data.frame(g=c("a", NA, "NA"), n=c(1, 2, 3), stringsAsFactors=FALSE)), c(0, 1, 0))
+  # a single row, and no rows
+  expect_equal(unname(num_row_NAs(mnexmpl.data[12,])), 2)
+  expect_equal(num_row_NAs(exmpl.data[0,]), integer(0))
+})
+
+test_that("num_row_NAs tells NaN from NA next to non-numeric columns", {
+  nan.col <- c(1, NaN, NA, 4)
+  # the answer when every column is numeric
+  expect_equal(num_row_NAs(data.frame(x=nan.col, y=c(1, 2, NA, 4))), c(0, 0, 2, 0))
+  # is also the answer next to a character, factor or date column
+  chr.data <- data.frame(x=nan.col, g=c("a", "b", NA, "d"), stringsAsFactors=FALSE)
+  expect_equal(num_row_NAs(chr.data), c(0, 0, 2, 0))
+  expect_equal(num_row_NAs(data.frame(x=nan.col, f=factor(c("a", "b", NA, "d")))), c(0, 0, 2, 0))
+  expect_equal(num_row_NAs(data.frame(x=nan.col, d=as.Date(c("2020-01-01", "2020-01-02", NA, "2020-01-04")))),
+               c(0, 0, 2, 0))
+  # and the NaN is still counted on request
+  expect_equal(num_row_NAs(chr.data, allow.NaN=TRUE), c(0, 1, 2, 0))
+  # so a row with a NaN and no NA passes a "no NAs" rule
+  expect_equal(assert_rows(chr.data[1:2,], num_row_NAs, in_set(0), x, g, error_fun=error_logical),
+               chr.data[1:2,])
+})
+
 test_that("num_row_NAs breaks correctly", {
   expect_error(num_row_NAs(), "argument \"data\" is missing, with no default")
   expect_error(num_row_NAs(exmpl.data[1,1]),

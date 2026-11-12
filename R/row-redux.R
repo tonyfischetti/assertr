@@ -107,11 +107,18 @@ num_row_NAs <- function(data, allow.NaN=FALSE){
   if(!(any(class(data) %in% c("matrix", "data.frame"))))
     stop("\"data\" must be a data.frame (or matrix)", call.=FALSE)
   pred <- if(allow.NaN){
-            function(x){ sum((is.na(x) | is.nan(x))) }
+            function(x){ (is.na(x) | is.nan(x)) }
           } else {
-            function(x){ sum((is.na(x)&(!(is.nan(x))))) }
+            function(x){ (is.na(x)&(!(is.nan(x)))) }
           }
-  ret.vec <- apply(data, 1, pred)
+  # each column is checked as it is: apply() would turn the data into a
+  # matrix first, and a NaN next to a non-numeric column becomes an NA
+  # on the way
+  if(is.data.frame(data))
+    data[] <- lapply(data, pred)
+  else
+    data <- pred(data)
+  ret.vec <- apply(data, 1, sum)
   return(ret.vec)
 }
 attr(num_row_NAs, "call") <- "num_row_NAs"
