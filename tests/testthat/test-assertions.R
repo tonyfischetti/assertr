@@ -379,6 +379,22 @@ test_that("assert applies custom predicates element-wise on a single column", {
   expect_equal(assert(contacts, improper.has.at, email, error_fun = error_logical), FALSE)
 })
 
+test_that("assert and assert_rows stop when a predicate returns a zero-length value", {
+  limits <- list(max_mpg=30)
+
+  # a misspelled list element is NULL, so the comparison has length zero
+  expect_error(assert(mtcars, function(x) x <= limits$max_mgp, mpg),
+               "predicate returned a zero-length value")
+  # grep (unlike grepl) returns integer(0) when there is no match
+  expect_error(assert(iris, function(x) grep("virginica", x), Species),
+               "predicate returned a zero-length value")
+  expect_error(assert_rows(mtcars, rowSums, function(x) x <= limits$max_mgp, vs, am),
+               "predicate returned a zero-length value")
+  # dropping NAs inside the predicate leaves nothing to test for an NA element
+  expect_error(assert(test.df2, function(x) x[!is.na(x)] > -2, z),
+               "predicate returned a zero-length value")
+})
+
 ######################################
 
 
