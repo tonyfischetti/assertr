@@ -5,8 +5,8 @@
   "description": "Provides functionality to assert conditions that have to be met so that errors in data used in analysis pipelines can fail quickly. Similar to 'stopifnot()' but more powerful, friendly, and easier for use in pipelines.",
   "name": "assertr: Assertive Programming for R Analysis Pipelines",
   "relatedLink": ["https://docs.ropensci.org/assertr/", "https://CRAN.R-project.org/package=assertr"],
-  "codeRepository": "https://github.com/ropensci/assertr",
-  "issueTracker": "https://github.com/ropensci/assertr/issues",
+  "codeRepository": "https://github.com/tonyfischetti/assertr",
+  "issueTracker": "https://github.com/tonyfischetti/assertr/issues",
   "license": "https://spdx.org/licenses/MIT",
   "version": "3.1.0",
   "programmingLanguage": {
@@ -174,10 +174,10 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "357.297KB",
-  "releaseNotes": "https://github.com/ropensci/assertr/blob/main/NEWS",
+  "fileSize": "350.851KB",
+  "releaseNotes": "https://github.com/tonyfischetti/assertr/blob/main/NEWS",
   "readme": "https://github.com/tonyfischetti/assertr/blob/master/README.md",
-  "contIntegration": ["https://github.com/ropensci/assertr/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/ropensci/assertr?branch=master"],
+  "contIntegration": ["https://github.com/tonyfischetti/assertr/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/tonyfischetti/assertr?branch=master"],
   "review": {
     "@type": "Review",
     "url": "https://github.com/ropensci/software-review/issues/23",
