@@ -674,6 +674,28 @@ test_that("skip_chain_opts doesn't affect functionality outside chain for insist
                 "Column 'Sepal.Length' violates assertion 'within_n_sds\\(2\\)' 5 times")
 })
 
+test_that("insist works with single row data.frames", {
+  single_row_data <- head(mtcars, 1)
+  # a predicate generator that does not need more than one value to work with
+  within.limits <- function(a.vector) within_bounds(10, 30)
+
+  expect_equal(insist(single_row_data, within.limits, mpg), single_row_data)
+  expect_equal(insist(single_row_data, within.limits, mpg, qsec), single_row_data)
+  expect_equal(insist(single_row_data, within.limits, disp, error_fun = error_logical), FALSE)
+  expect_output(insist(single_row_data, within.limits, disp, error_fun = just.show.error),
+               "Column 'disp' violates assertion 'within.limits' 1 time.*")
+  expect_equal(insist(single_row_data, within.limits, disp, mpg, error_fun = error_logical), FALSE)
+  expect_output(insist(single_row_data, within.limits, disp, mpg, error_fun = just.show.error),
+               "Column 'disp' violates assertion 'within.limits' 1 time.*")
+  # every column that fails is reported
+  expect_output(insist(single_row_data, within.limits, disp, hp, mpg, error_fun = just.show.error),
+               "Column 'hp' violates assertion 'within.limits' 1 time.*")
+  expect_equal(length(attr(insist(single_row_data, within.limits, disp, hp, mpg, error_fun = error_append),
+                           "assertr_errors")), 2)
+  expect_equal(length(attr(single_row_data %>% chain_start %>% insist(within.limits, disp, hp, mpg) %>% chain_end(error_fun = error_append),
+                           "assertr_errors")), 2)
+})
+
 ######################################
 
 
