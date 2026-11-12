@@ -269,6 +269,10 @@ assert_rows <- function(data, row_reduction_fn, predicate, ...,
     return(success_fun(data, "assert_rows", name.of.predicate, colnames(sub.frame), name.of.row.redux.fn, description))
   }
 
+  # a data.frame with no rows has no rows that could violate the predicate
+  if(nrow(sub.frame)==0)
+    return(success_fun(data, "assert_rows", name.of.predicate, colnames(sub.frame), name.of.row.redux.fn, description))
+
   redux <- row_reduction_fn(sub.frame)
 
   log.vec <- apply.predicate.to.vector(redux, predicate)
@@ -407,6 +411,10 @@ insist <- function(data, predicate_generator, ...,
             "' matched no columns, so nothing was checked", call.=FALSE)
     return(success_fun(data, "insist", name.of.predicate.generator, colnames(sub.frame), NA, description))
   }
+
+  # a data.frame with no rows has no elements that could violate the predicate
+  if(nrow(sub.frame)==0)
+    return(success_fun(data, "insist", name.of.predicate.generator, colnames(sub.frame), NA, description))
 
   # get true predicates (not the generator)
   true.predicates <- sapply(names(sub.frame),
@@ -574,6 +582,10 @@ insist_rows <- function(data, row_reduction_fn, predicate_generator, ...,
             "' matched no columns, so nothing was checked", call.=FALSE)
     return(success_fun(data, "insist_rows", name.of.predicate.generator, colnames(sub.frame), name.of.row.redux.fn, description))
   }
+
+  # a data.frame with no rows has no rows that could violate the predicate
+  if(nrow(sub.frame)==0)
+    return(success_fun(data, "insist_rows", name.of.predicate.generator, colnames(sub.frame), name.of.row.redux.fn, description))
 
   redux <- row_reduction_fn(sub.frame)
 

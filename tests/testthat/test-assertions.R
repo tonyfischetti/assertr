@@ -1784,6 +1784,35 @@ test_that("assert passes on zero-row data frames (#95)", {
   expect_equal(assert(a_tibble, within_bounds(0,1), a), a_tibble)
 })
 
+test_that("insist passes on zero-row data frames", {
+  no.rows <- mtcars[0, ]
+  expect_equal(insist(no.rows, within_n_sds(3), mpg, hp), no.rows)
+  expect_equal(insist(no.rows, within_n_mads(3), mpg), no.rows)
+  # also with a predicate generator that is not one of ours
+  expect_equal(insist(no.rows, function(a.vector) within_bounds(10, 30), mpg, hp), no.rows)
+  expect_true(insist(no.rows, within_n_sds(3), mpg, success_fun=success_logical))
+  # and it does not end a chain
+  expect_equal(no.rows %>% chain_start %>% insist(within_n_sds(3), mpg) %>% chain_end, no.rows)
+})
+
+test_that("assert_rows passes on zero-row data frames", {
+  no.rows <- mtcars[0, ]
+  expect_equal(assert_rows(no.rows, num_row_NAs, within_bounds(0,1), mpg, hp), no.rows)
+  expect_equal(assert_rows(no.rows, col_concat, is_uniq, mpg, hp), no.rows)
+  # also with a row reduction function that cannot work without rows
+  expect_equal(assert_rows(no.rows, maha_dist, within_bounds(0,10), mpg, hp), no.rows)
+  expect_true(assert_rows(no.rows, maha_dist, within_bounds(0,10), mpg, hp, success_fun=success_logical))
+})
+
+test_that("insist_rows passes on zero-row data frames", {
+  no.rows <- mtcars[0, ]
+  expect_equal(insist_rows(no.rows, maha_dist, within_n_mads(3), mpg, hp), no.rows)
+  expect_equal(insist_rows(no.rows, num_row_NAs, within_n_sds(3), mpg, hp), no.rows)
+  expect_true(insist_rows(no.rows, maha_dist, within_n_mads(3), mpg, hp, success_fun=success_logical))
+  # and it does not end a chain
+  expect_equal(no.rows %>% chain_start %>% insist_rows(maha_dist, within_n_mads(3), mpg, hp) %>% chain_end, no.rows)
+})
+
 test_that("assertions warn when the column selection matches no columns (#113)", {
   # these used to pass without a word
   expect_warning(assert(mtcars, function(x) FALSE, dplyr::starts_with("zzz")),
