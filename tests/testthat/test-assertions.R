@@ -362,6 +362,23 @@ test_that("assert works with single row data.frames", {
                "Column 'disp' violates assertion 'within_bounds\\(10, 30\\)' 1 time.*")
 })
 
+test_that("assert applies custom predicates element-wise on a single column", {
+  contacts <- data.frame(email=c("a@b.com", "not-an-email", "also bad"),
+                         zip=c("12345", "123", ""),
+                         stringsAsFactors=FALSE)
+  has.at <- function(x) grepl("@", x)
+  long.enough <- function(x) nchar(x) >= 5
+  improper.has.at <- function(x) if(!grepl("@", x)) return(FALSE)
+
+  expect_equal(assert(contacts, has.at, email, error_fun = error_logical), FALSE)
+  expect_output(assert(contacts, has.at, email, error_fun = just.show.error),
+                "Column 'email' violates assertion 'has.at' 2 times")
+  expect_equal(assert(contacts, long.enough, zip, error_fun = error_logical), FALSE)
+  expect_output(assert(contacts, long.enough, zip, error_fun = just.show.error),
+                "Column 'zip' violates assertion 'long.enough' 2 times")
+  expect_equal(assert(contacts, improper.has.at, email, error_fun = error_logical), FALSE)
+})
+
 ######################################
 
 
@@ -1602,7 +1619,7 @@ test_that("description is correctly stored and displayed in results", {
 
 })
 
-test_that("handle predicates applied to the whole data, and not to subframe", {
+test_that("assert passes on zero-row data frames (#95)", {
   a_tibble <- tibble::tibble(
     a = c(0, 0),
     b = c(0,0)
@@ -1612,4 +1629,6 @@ test_that("handle predicates applied to the whole data, and not to subframe", {
   expect_silent({
     assert(data = a_tibble, predicate = function(x) nrow(x) == 0L, dplyr::everything())
   })
+  expect_equal(assert(a_tibble, not_na, a, b), a_tibble)
+  expect_equal(assert(a_tibble, within_bounds(0,1), a), a_tibble)
 })

@@ -101,18 +101,9 @@ assert <- function(data, predicate, ..., success_fun=success_continue,
 
   sub.frame <- dplyr::select(data, !!!(keeper.vars))
 
-  is_successful <- tryCatch(
-    expr = {
-      res <- predicate(sub.frame)
-      length(res) == 1 && isTRUE(res)
-    },
-    error = function(e){FALSE},
-    warning = function(w){FALSE}
-  )
-
-  if(is_successful){
+  # a data.frame with no rows has no elements that could violate the predicate
+  if(nrow(sub.frame)==0)
     return(success_fun(data, "assert", name.of.predicate, colnames(sub.frame), NA, description))
-  }
 
   log.mat <- sapply(colnames(sub.frame),
                     function(column){

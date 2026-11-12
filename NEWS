@@ -1,5 +1,14 @@
 # assertr development version
 
+* `assert()` no longer calls the predicate on the whole data frame
+  before checking each element. A custom predicate on a single column
+  (eg `function(x) grepl("@", x)`) could pass without any element
+  actually being checked. Predicates that expect a whole data frame are not
+  supported in `assert()`
+
+* `assert()` no longer errors on data frames with 0 rows (the
+  underlying cause of #95)
+
 * Assert errors now print the description in the error summary (PR #132)
 
 * Added the ability to check non-numeric classes with `within_bounds()`
