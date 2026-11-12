@@ -1501,6 +1501,28 @@ test_that("error_report counts an assertion on several columns as one verb", {
   expect_output(suppressWarnings(two.bad %>% chain_start %>% assert(within_bounds(0,10), a, b) %>% assert(within_bounds(0,10), a, b) %>% chain_end(error_fun=warn_report)),
                 "There are 4 errors across 2 verbs:", fixed = TRUE)
 })
+
+test_that("warning_append marks every error it attaches as a warning", {
+  two.bad <- data.frame(a=c(1, 20), b=c(1, 30), c=c(1, 2))
+  marked <- function(data) vapply(attr(data, "assertr_errors"), function(x) isTRUE(attr(x, "warning")), logical(1))
+  # one failing column, or a verb that gives a single error
+  expect_equal(marked(assert(two.bad, within_bounds(0,10), a, error_fun=warning_append)), TRUE)
+  expect_equal(marked(verify(two.bad, a < 10, error_fun=warning_append)), TRUE)
+  # an assertion that fails on two columns attaches two errors, both marked
+  expect_equal(marked(assert(two.bad, within_bounds(0,10), a, b, c, error_fun=warning_append)), c(TRUE, TRUE))
+  expect_equal(marked(insist(two.bad, function(a.vector) within_bounds(0,10), a, b, error_fun=warning_append)), c(TRUE, TRUE))
+  # errors that were already on the data are left as they were
+  expect_equal(marked(two.bad %>% assert(within_bounds(0,10), a, error_fun=error_append) %>%
+                        assert(within_bounds(0,10), a, b, error_fun=warning_append)),
+               c(FALSE, TRUE, TRUE))
+  # error_append marks nothing
+  expect_equal(marked(assert(two.bad, within_bounds(0,10), a, b, error_fun=error_append)), c(FALSE, FALSE))
+  # inside a chain
+  expect_equal(marked(two.bad %>% chain_start %>%
+                        assert(within_bounds(0,10), a, b, error_fun=warning_append, skip_chain_opts=TRUE) %>%
+                        chain_end(error_fun=error_append)),
+               c(TRUE, TRUE))
+})
 ###################################
 
 

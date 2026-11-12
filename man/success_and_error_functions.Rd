@@ -106,6 +106,10 @@ provided by this package:
    to allow assertr errors to be accumulated in a pipeline so that
    all assertions can have a chance to be checked and so that all
    the errors can be displayed at the end of the chain.
+  \item \code{warning_append} - Like \code{error_append}, but each
+   error it attaches is marked as a warning (its \code{"warning"}
+   attribute is \code{TRUE}), for code that reads the errors later.
+   assertr itself treats them like any other error.
   \item \code{error_return} - Returns the raw object containing all
     the errors
   \item \code{error_df_return} - Returns a "tidy" \code{data.frame}
