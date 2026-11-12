@@ -1481,6 +1481,26 @@ test_that("chain_end leaves no chain state on the data (#115)", {
   kept <- df %>% chain_start %>% assert(within_bounds(0,5), X2) %>% chain_end(error_fun=error_append)
   expect_equal(length(attr(kept, "assertr_errors")), 1)
 })
+
+test_that("error_report counts an assertion on several columns as one verb", {
+  two.bad <- data.frame(a=c(1, 20), b=c(1, 30), c=c(1, 2))
+  # one failing column: one error, one verb
+  expect_output(suppressWarnings(assert(two.bad, within_bounds(0,10), a, error_fun=warn_report)),
+                "There is 1 error across 1 verb:", fixed = TRUE)
+  # two failing columns in one assertion are still one verb
+  expect_output(suppressWarnings(assert(two.bad, within_bounds(0,10), a, b, c, error_fun=warn_report)),
+                "There are 2 errors across 1 verb:", fixed = TRUE)
+  expect_output(suppressWarnings(insist(two.bad, function(a.vector) within_bounds(0,10), a, b, error_fun=warn_report)),
+                "There are 2 errors across 1 verb:", fixed = TRUE)
+  expect_output(expect_error(assert(two.bad, within_bounds(0,10), a, b, error_fun=error_report), "assertr stopped execution"),
+                "There are 2 errors across 1 verb:", fixed = TRUE)
+  # in a chain, each assertion counts once
+  expect_output(suppressWarnings(two.bad %>% chain_start %>% assert(within_bounds(0,10), a, b) %>% verify(a < 10) %>% chain_end(error_fun=warn_report)),
+                "There are 3 errors across 2 verbs:", fixed = TRUE)
+  # also when the same assertion is written twice
+  expect_output(suppressWarnings(two.bad %>% chain_start %>% assert(within_bounds(0,10), a, b) %>% assert(within_bounds(0,10), a, b) %>% chain_end(error_fun=warn_report)),
+                "There are 4 errors across 2 verbs:", fixed = TRUE)
+})
 ###################################
 
 

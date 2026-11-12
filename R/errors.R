@@ -427,7 +427,9 @@ error_report <- function(errors, data=NULL, warn=FALSE, ...){
 
   total.num.failures <- sum(unlist(lapply(errors, function(x) x$num.violations)))
   big.error.frame <- do.call(rbind, lapply(errors, function(x) x$error_df))
-  num.of.errors <- length(errors)
+  # an assertion on several columns gives one error per column, all of
+  # them with the same assertion.id
+  num.of.errors <- length(unique(unlist(lapply(errors, function(x) x$assertion.id))))
   cat(sprintf("There %s %d error%s across %d verb%s:\n",
               if (total.num.failures==1) "is" else "are",
               total.num.failures,
